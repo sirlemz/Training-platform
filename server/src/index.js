@@ -43,11 +43,15 @@ app.get('/uploads/:filename', (req, res) => {
 // ── Assessment HTML (static) ─────────────────────────────────
 app.use('/assessment', express.static(path.join(__dirname, '../public')));
 
+// ── Slide player (static) ────────────────────────────────────
+app.use('/slideplayer', express.static(path.join(__dirname, '../public/slideplayer')));
+
 // ── API routes ───────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/admin/assessments', require('./routes/assessments'));
 app.use('/api/trainee', require('./routes/trainee'));
+app.use('/api/slide-modules', require('./routes/slideModules'));
 
 // ── Serve built client in production ────────────────────────
 const clientDist = path.join(__dirname, '../../client/dist');

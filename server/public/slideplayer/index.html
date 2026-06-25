@@ -1,0 +1,2967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Module 1 — Communication & Customer Service Excellence</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0D2137;color:#222;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#app{display:flex;flex:1;overflow:hidden}
+/* Sidebar */
+#sidebar{width:230px;min-width:180px;background:#162B3E;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid #1F4E79}
+#sidebar-header{padding:14px 16px;background:#1F4E79;color:#fff;font-size:13px;font-weight:700;letter-spacing:.5px}
+#sidebar-list{flex:1;overflow-y:auto;padding:8px 0}
+.sec-item{padding:10px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .15s}
+.sec-item:hover{background:#1F4E79;border-left-color:#5BC0EB}
+.sec-item.active{background:#2E75B6;border-left-color:#5BC0EB}
+.sec-item.locked{opacity:.4;cursor:not-allowed}
+.sec-label{color:#C8D8E8;font-size:12.5px;font-weight:600}
+.sec-badge{display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px}
+.sec-badge.pass{background:#22863a;color:#fff}
+.sec-badge.todo{background:#b08800;color:#fff}
+/* Main */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{background:#1F4E79;color:#fff;display:flex;align-items:center;padding:8px 16px;gap:12px;min-height:48px}
+#topbar h1{font-size:14px;font-weight:700;flex:1}
+#progress-bar-wrap{background:#0D2137;border-radius:4px;height:6px;width:140px}
+#progress-bar{height:6px;background:#5BC0EB;border-radius:4px;transition:width .3s}
+#progress-pct{color:#5BC0EB;font-size:11px;font-weight:700;min-width:32px}
+#btn-admin{background:rgba(255,255,255,.15);border:none;color:#fff;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:13px}
+#slide-area{flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px}
+#slide-viewer{flex:1;overflow:hidden;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+#audio-bar{background:#162B3E;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:10px;min-height:44px}
+#audio-player{flex:1;height:28px;accent-color:#5BC0EB}
+#vo-panel{background:#162B3E;border-radius:8px;padding:12px 16px;max-height:110px;overflow-y:auto}
+#vo-label{color:#5BC0EB;font-size:11px;font-weight:700;margin-bottom:4px}
+#vo-text{color:#C8D8E8;font-size:12.5px;line-height:1.6}
+#nav-bar{background:#0D2137;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+#slide-counter{color:#C8D8E8;font-size:12px}
+.btn-nav{background:#2E75B6;color:#fff;border:none;padding:8px 22px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:background .15s}
+.btn-nav:hover:not(:disabled){background:#1F4E79}
+.btn-nav:disabled{opacity:.35;cursor:not-allowed}
+/* Slide base */
+.sl{width:100%;height:100%;position:relative;overflow:hidden}
+.sl-navy{background:#1F4E79;color:#fff}
+.sl-white{background:#F9FBFD;color:#1A2B3C}
+.timing-chip{position:absolute;bottom:10px;right:12px;background:rgba(255,255,255,.2);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px}
+.timing-chip-dark{position:absolute;bottom:10px;right:12px;background:#1F4E79;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px}
+.header-bar{background:#1F4E79;padding:2.2% 3%;margin-bottom:2%}
+.header-bar h2{color:#fff;font-size:1.8vw;font-weight:700}
+/* Title slide */
+.title-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80%;padding:4%}
+.module-badge{background:#5BC0EB;color:#1F4E79;font-size:1.1vw;font-weight:700;padding:4px 14px;border-radius:12px;margin-bottom:3%}
+.title-h1{color:#fff;font-size:3.2vw;font-weight:800;text-align:center;line-height:1.15;margin-bottom:2%}
+.title-sub{color:#C8D8E8;font-size:1.3vw;text-align:center;max-width:75%}
+.title-footer{position:absolute;bottom:0;left:0;right:0;height:6px;background:#5BC0EB}
+/* Learn slide */
+.learn-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:2%;padding:2% 3%;height:calc(100% - 60px)}
+.learn-tile{border-radius:8px;padding:5% 4%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.learn-icon{font-size:2.2vw;margin-bottom:6%}
+.learn-label{color:#fff;font-size:1.1vw;font-weight:700;margin-bottom:4%}
+.learn-desc{color:rgba(255,255,255,.8);font-size:.85vw}
+/* Callout */
+.callout-body{padding:3% 5%;display:flex;align-items:center;justify-content:center;height:calc(100% - 60px)}
+.callout-quote-wrap{max-width:80%;text-align:center}
+.callout-q-mark{font-size:5vw;color:#1F4E79;opacity:.3;line-height:1;margin-bottom:-1%}
+.callout-quote{font-size:1.6vw;font-style:italic;color:#1A2B3C;font-weight:600;line-height:1.5;margin-bottom:3%}
+.callout-speaker{font-size:1.1vw;color:#555;font-weight:600}
+/* Section divider */
+.section-body{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80%;padding:6%}
+.section-num{color:#5BC0EB;font-size:1.4vw;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:2%}
+.section-title{color:#fff;font-size:3vw;font-weight:800;text-align:center;line-height:1.2;margin-bottom:2%}
+.section-desc{color:#C8D8E8;font-size:1.2vw;text-align:center;max-width:75%}
+.section-footer{position:absolute;bottom:0;left:0;right:0;height:5px;background:#5BC0EB}
+/* Content */
+.content-body{padding:2% 4%;height:calc(100% - 80px);overflow-y:auto}
+.bullets{list-style:none;padding:0}
+.bullets li{padding:1.5% 0;border-bottom:1px solid #E8EEF4;font-size:1.25vw;color:#1A2B3C;display:flex;align-items:flex-start;gap:10px}
+.bullets li::before{content:"▶";color:#2E75B6;font-size:.8em;margin-top:.2em;flex-shrink:0}
+.amber-note{background:#FFF8E1;border-left:4px solid #FFC107;padding:10px 16px;margin:2% 4%;font-size:1.05vw;color:#555}
+/* Two-column */
+.twocol-body{display:grid;grid-template-columns:1fr 1fr;gap:3%;padding:2% 3%;height:calc(100% - 60px)}
+.col-box{padding:3%;border-radius:6px}
+.col-title{font-size:1.15vw;font-weight:700;color:#1F4E79;margin-bottom:3%;padding-bottom:6px;border-bottom:2px solid rgba(0,0,0,.1)}
+.col-item{padding:2.5% 0;border-bottom:1px solid rgba(0,0,0,.07);font-size:1.1vw}
+/* Framework */
+.framework-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:2%;padding:2% 3%;height:calc(100% - 60px)}
+.fw-col{border-radius:6px;padding:3%;display:flex;flex-direction:column}
+.fw-letter{font-size:3vw;font-weight:900;color:rgba(255,255,255,.3);margin-bottom:2%}
+.fw-title{font-size:1.15vw;font-weight:800;color:#fff;margin-bottom:3%;padding-bottom:6px;border-bottom:2px solid rgba(255,255,255,.3)}
+.fw-point{font-size:.95vw;color:rgba(255,255,255,.9);padding:2% 0;border-bottom:1px solid rgba(255,255,255,.1)}
+/* Call Structure */
+.callstruct-body{display:flex;gap:1.5%;padding:2% 3%;height:calc(100% - 60px);align-items:stretch}
+.cs-stage{display:flex;flex-direction:column;align-items:center;flex:1}
+.cs-num{width:2.6vw;height:2.6vw;border-radius:50%;color:#fff;font-size:1.3vw;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:4%;flex-shrink:0}
+.cs-body{border:2px solid;border-radius:6px;padding:5% 6%;flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%}
+.cs-label{font-size:1.1vw;font-weight:800;margin-bottom:4%}
+.cs-desc{font-size:.85vw;color:#555;line-height:1.4}
+/* Do's and Dont's */
+.dosdont-body{display:grid;grid-template-columns:1fr 1fr;gap:3%;padding:2% 3%;height:calc(100% - 60px)}
+.dos-box{background:#E8F5E9;border-radius:6px;padding:3%;overflow-y:auto}
+.dont-box{background:#FFEBEE;border-radius:6px;padding:3%;overflow-y:auto}
+.dd-title{font-size:1.05vw;font-weight:800;margin-bottom:3%;color:#1A2B3C}
+.dd-item{font-size:1.05vw;padding:2.5% 0;border-bottom:1px solid rgba(0,0,0,.08);color:#1A2B3C}
+/* Table */
+.sl-table{width:100%;border-collapse:collapse;font-size:1vw}
+.sl-table thead{background:#1F4E79;color:#fff}
+.sl-table th{padding:1.5% 2%;text-align:left;font-size:1vw;font-weight:700}
+.sl-table td{padding:1.5% 2%;border-bottom:1px solid #E0E8EF;vertical-align:top}
+.sl-table tr:nth-child(even){background:#F0F6FA}
+/* Pron table */
+.pron-word{font-weight:700;color:#1F4E79}
+.pron-phonetic{color:#028090;font-style:italic}
+.pron-mistake{color:#C62828}
+.pron-th-word{width:18%}.pron-th-phonetic{width:28%}.pron-th-mistake{width:24%}.pron-th-tip{width:30%}
+/* Regions overview */
+.rov-grid{display:grid;grid-template-columns:1fr 1fr;gap:2%;padding:2% 3%;height:calc(100% - 60px)}
+.rov-card{border:2px solid;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.rov-card-head{color:#fff;font-size:1.2vw;font-weight:800;padding:3% 4%;letter-spacing:.5px}
+.rov-card-states{font-size:.9vw;font-weight:700;padding:2% 4%;letter-spacing:.3px}
+.rov-card-trait{font-size:.9vw;color:#444;padding:0 4% 3%}
+/* Region detail */
+.region-header{padding:3% 4%;color:#fff}
+.region-name{font-size:2.2vw;font-weight:800}
+.region-states{font-size:1vw;margin-top:1%;opacity:.9}
+.region-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:2%;padding:2% 3%;flex:1;overflow:hidden}
+.region-col{border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.region-col-header{padding:3% 4%;color:#fff;font-size:1vw;font-weight:700}
+.region-col-body{flex:1;padding:3% 4%;overflow-y:auto}
+.region-col-item{font-size:.95vw;padding:1.5% 0;border-bottom:1px solid rgba(0,0,0,.08)}
+/* Caller types */
+.caller-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:2%;padding:2% 3%;height:calc(100% - 60px)}
+.caller-col{border:2px solid;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.caller-col-head{color:#fff;font-size:1.05vw;font-weight:800;padding:3% 4%}
+.caller-col-body{flex:1;padding:3% 4%;overflow-y:auto}
+.caller-item{font-size:.95vw;padding:1.5% 0;border-bottom:1px solid rgba(0,0,0,.08)}
+/* HOA */
+.hoa-body{flex:1;padding:2% 3%;display:flex;flex-direction:column;gap:2%;overflow-y:auto}
+.hoa-row{display:grid;grid-template-columns:1fr 1fr;gap:2%}
+.hoa-box{border:2px solid;border-radius:6px;overflow:hidden}
+.hoa-box-head{color:#fff;padding:2.5% 3%;font-size:1.05vw;font-weight:700}
+.hoa-box-body{padding:2.5% 3%}
+.hoa-box-item{font-size:.95vw;padding:1% 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.hoa-amber{background:#FFF8E1;border-left:4px solid #FFC107;border-radius:4px;padding:2% 3%}
+.hoa-amber-title{font-size:1.05vw;font-weight:700;color:#1A2B3C;margin-bottom:2%}
+.hoa-amber-item{font-size:.95vw;color:#555;padding:1% 0;border-bottom:1px solid rgba(0,0,0,.07)}
+/* Caller script */
+.cs-ask-bar{background:#1F4E79;color:#fff;padding:2% 3%;font-size:1.1vw;font-weight:700;text-align:center;margin-bottom:2%}
+.cs-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2%;padding:0 3%;flex:1;overflow:hidden}
+.cs-card{border:2px solid;border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
+.cs-card-head{color:#fff;padding:2.5% 3%;font-size:1.05vw;font-weight:700}
+.cs-card-body{flex:1;padding:2.5% 3%;font-size:.95vw;overflow-y:auto;line-height:1.5}
+.cs-rule{background:#FFF8E1;border-left:4px solid #FFC107;padding:1.5% 3%;margin:2% 3%;font-size:.95vw;color:#555}
+/* Recap */
+.recap-body{padding:3% 5%;overflow-y:auto;max-height:78%}
+.recap-item{display:flex;gap:16px;padding:2.5% 0;border-bottom:1px solid rgba(255,255,255,.15)}
+.recap-num{color:#5BC0EB;font-size:1.6vw;font-weight:800;flex-shrink:0;min-width:2vw}
+.recap-text{color:#fff;font-size:1.1vw;line-height:1.5}
+/* Next */
+.next-body{padding:3% 4%;display:flex;flex-direction:column;gap:3%;height:calc(100% - 60px)}
+.next-item{display:flex;gap:16px;align-items:center}
+.next-num{width:3vw;height:3vw;border-radius:50%;color:#fff;font-size:1.4vw;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.next-text{flex:1;padding:2.5% 3%;border-radius:6px;font-size:1.15vw;font-weight:600}
+/* End */
+.end-body{display:flex;flex-direction:column;align-items:center;justify-content:center;height:80%;padding:6%}
+.end-title{color:#fff;font-size:3vw;font-weight:800;text-align:center;margin-bottom:2%}
+.end-sub{color:#C8D8E8;font-size:1.3vw;text-align:center;max-width:70%;margin-bottom:4%}
+.end-next{color:#5BC0EB;font-size:1.2vw;font-weight:600;text-align:center}
+.end-footer{position:absolute;bottom:0;left:0;right:0;height:6px;background:#5BC0EB}
+.end-footer-text{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:.85vw;white-space:nowrap}
+/* Assessment modal */
+#assessment-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.modal-box{background:#fff;border-radius:10px;width:min(700px,90vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.modal-head{background:#1F4E79;color:#fff;padding:16px 20px;font-size:15px;font-weight:700}
+.modal-body{flex:1;overflow-y:auto;padding:16px 20px}
+.q-block{margin-bottom:20px}
+.q-text{font-size:13.5px;font-weight:700;color:#1A2B3C;margin-bottom:8px}
+.q-option{display:block;font-size:13px;padding:6px 0;cursor:pointer;color:#333}
+.q-option input{margin-right:8px}
+.quiz-score{padding:12px 16px;border-radius:6px;font-size:14px;font-weight:700;margin-top:12px}
+.quiz-score.pass{background:#E8F5E9;color:#22863a}
+.quiz-score.fail{background:#FFEBEE;color:#C62828}
+.modal-foot{padding:12px 20px;border-top:1px solid #E0E8EF;display:flex;gap:10px;justify-content:flex-end}
+.btn-modal{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-modal-primary{background:#2E75B6;color:#fff}
+.btn-modal-secondary{background:#E0E8EF;color:#1A2B3C}
+/* Admin panel */
+#admin-panel{display:none;position:fixed;top:48px;right:0;bottom:0;width:340px;background:#162B3E;border-left:1px solid #1F4E79;flex-direction:column;z-index:900;overflow:hidden}
+.admin-head{background:#1F4E79;padding:12px 16px;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.admin-head-btns{display:flex;gap:8px;padding:8px 16px;background:#1A3050;flex-wrap:wrap}
+.admin-head-btns label,.admin-head-btns button{font-size:11px;font-weight:700;padding:5px 10px;border:none;border-radius:4px;cursor:pointer;background:#2E75B6;color:#fff}
+#admin-slide-list{flex:1;overflow-y:auto;padding:4px 0}
+.admin-row{padding:6px 14px;border-bottom:1px solid #1F4E79;display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.admin-row-info{color:#C8D8E8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%}
+.admin-row-num{font-weight:700;color:#5BC0EB}
+.admin-row-sec{color:#aaa}
+.admin-row-actions{display:flex;align-items:center;gap:6px}
+.audio-loaded{color:#22863a;font-size:11px;font-weight:700}
+.btn-rm-audio{background:#C62828;color:#fff;border:none;border-radius:3px;padding:2px 7px;cursor:pointer;font-size:10px}
+.btn-upload-single{background:#028090;color:#fff;border:none;border-radius:3px;padding:3px 8px;cursor:pointer;font-size:10px;font-weight:700}
+.btn-reassign{background:#2E75B6;color:#fff;border:none;border-radius:3px;padding:2px 7px;cursor:pointer;font-size:10px}
+.shared-tag{color:#F0C040;font-size:10px;margin-top:2px;display:block}
+.admin-row-linked{border-left:2px solid #F0C040}
+#audio-continuing{background:#F0C040;color:#1A2B3C;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap}
+/* Assign modal */
+#assign-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1100;align-items:center;justify-content:center}
+.assign-box{background:#162B3E;border-radius:10px;width:min(560px,92vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.assign-head{background:#1F4E79;padding:14px 18px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.assign-head button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px}
+.assign-body{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:12px}
+.assign-file-row{background:#1A3050;border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.assign-file-row label{background:#2E75B6;color:#fff;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+#assign-file-name{color:#C8D8E8;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.assign-helpers{display:flex;gap:8px;align-items:center}
+.assign-helpers button{background:#1F4E79;border:none;color:#C8D8E8;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px}
+.assign-helpers span{color:#aaa;font-size:11px}
+.assign-sec-group{margin-bottom:6px}
+.assign-sec-head{color:#5BC0EB;font-size:11px;font-weight:700;letter-spacing:.5px;padding:4px 0 2px;border-bottom:1px solid #1F4E79;margin-bottom:4px}
+.assign-row{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;color:#C8D8E8;font-size:12px}
+.assign-row input{accent-color:#5BC0EB;cursor:pointer}
+.assign-sid{color:#5BC0EB;font-weight:700;min-width:24px}
+.assign-stitle{color:#C8D8E8}
+.assign-error{color:#FF7070;font-size:12px;min-height:18px}
+.assign-foot{padding:12px 18px;border-top:1px solid #1F4E79;display:flex;gap:10px;justify-content:flex-end}
+.assign-foot button{padding:7px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-assign-confirm{background:#2E75B6;color:#fff}
+.btn-assign-cancel{background:#1F4E79;color:#C8D8E8}
+/* ── Multi-view layout ─────────────────────────────────────── */
+#view-login,#view-admin,#view-trainee,#view-player{display:none;width:100%;height:100vh;flex-direction:column}
+/* ── Login screen ──────────────────────────────────────────── */
+#view-login{align-items:center;justify-content:center;background:linear-gradient(135deg,#0D2137 0%,#1F4E79 100%)}
+.login-card{background:#162B3E;border-radius:12px;padding:40px 44px;width:min(380px,90vw);box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.login-logo{color:#5BC0EB;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.login-title{color:#fff;font-size:22px;font-weight:800;margin-bottom:4px}
+.login-sub{color:#7DA8C8;font-size:13px;margin-bottom:28px}
+.login-label{display:block;color:#C8D8E8;font-size:12px;font-weight:700;margin-bottom:6px}
+.login-input{width:100%;background:#0D2137;border:1px solid #2E75B6;border-radius:6px;color:#fff;font-size:14px;padding:10px 14px;margin-bottom:14px;outline:none}
+.login-input:focus{border-color:#5BC0EB}
+.login-btn{width:100%;background:#2E75B6;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;padding:11px;cursor:pointer;margin-top:6px;transition:background .15s}
+.login-btn:hover{background:#1F4E79}
+.login-error{color:#FF7070;font-size:12px;margin-top:10px;min-height:16px}
+.login-hint{color:#5BC0EB;font-size:11px;margin-top:18px;text-align:center;opacity:.7}
+/* ── Shared dashboard chrome ───────────────────────────────── */
+.dash-header{background:#1F4E79;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dash-logo{color:#5BC0EB;font-size:12px;font-weight:700;letter-spacing:1.5px}
+.dash-header-right{display:flex;align-items:center;gap:14px}
+.dash-user{color:#C8D8E8;font-size:13px}
+.btn-logout{background:rgba(255,255,255,.12);border:none;color:#fff;padding:5px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700}
+.dash-body{flex:1;overflow-y:auto;padding:24px 32px;background:#0D2137}
+/* ── Admin tabs ────────────────────────────────────────────── */
+.dash-tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid #1F4E79}
+.dash-tab{background:none;border:none;color:#7DA8C8;font-size:13px;font-weight:700;padding:10px 20px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab-active{color:#fff;border-bottom-color:#5BC0EB}
+.dash-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dash-section-title{color:#fff;font-size:16px;font-weight:700}
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn-primary{background:#2E75B6;color:#fff;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-primary:hover{background:#1F4E79}
+.btn-danger{background:#C62828;color:#fff;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:700}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:4px;border:none;cursor:pointer;font-weight:700}
+.btn-sm.btn-primary{background:#2E75B6;color:#fff}
+.btn-sm.btn-danger{background:#C62828;color:#fff}
+.empty-state{color:#7DA8C8;font-size:13px;padding:32px;text-align:center;background:#162B3E;border-radius:8px}
+/* ── Class cards ───────────────────────────────────────────── */
+.cls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.cls-card{background:#162B3E;border-radius:10px;overflow:hidden;border:1px solid #1F4E79}
+.cls-card-head{background:#1F4E79;padding:14px 18px}
+.cls-card-name{color:#fff;font-size:15px;font-weight:700}
+.cls-card-meta{color:#C8D8E8;font-size:11px;margin-top:3px}
+.cls-card-body{padding:12px 18px}
+.mod-badge{display:inline-block;background:#2E75B6;color:#fff;font-size:10px;padding:3px 8px;border-radius:10px;margin-right:4px;margin-bottom:4px}
+.cls-trainees{color:#C8D8E8;font-size:11px;margin-top:8px}
+.cls-card-foot{padding:10px 18px;border-top:1px solid #1F4E79;display:flex;gap:8px}
+/* ── Trainee rows (admin view) ─────────────────────────────── */
+.trainee-row{background:#162B3E;border-radius:8px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;border:1px solid #1F4E79}
+.trainee-info{flex:1;margin-right:16px}
+.trainee-name{color:#fff;font-size:14px;font-weight:700}
+.trainee-meta{color:#7DA8C8;font-size:11px;margin-top:2px}
+.tprog-wrap{background:#0D2137;border-radius:4px;height:5px;margin:6px 0;width:100%;max-width:300px}
+.tprog-bar{height:5px;background:#5BC0EB;border-radius:4px;transition:width .3s}
+/* ── Dashboard modals ──────────────────────────────────────── */
+.dash-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;align-items:center;justify-content:center}
+.dash-modal-box{background:#162B3E;border-radius:10px;width:min(520px,92vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.dash-modal-head{background:#1F4E79;padding:14px 20px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.dash-modal-body{flex:1;overflow-y:auto;padding:18px 20px}
+.dash-modal-foot{padding:12px 20px;border-top:1px solid #1F4E79;display:flex;gap:10px;justify-content:flex-end}
+.dash-input{width:100%;background:#0D2137;border:1px solid #2E75B6;border-radius:6px;color:#fff;font-size:13px;padding:9px 12px;margin-top:6px;outline:none}
+.dash-input:focus{border-color:#5BC0EB}
+.dash-label{color:#C8D8E8;font-size:12px;font-weight:700;margin-top:12px;display:block}
+.dash-error{color:#FF7070;font-size:12px;margin-top:8px;min-height:16px}
+.dash-modal-section{margin-bottom:16px}
+.dash-modal-section-title{color:#5BC0EB;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+/* ── Trainee dashboard ─────────────────────────────────────── */
+.trainee-class-card{background:#162B3E;border-radius:10px;margin-bottom:18px;border:1px solid #1F4E79;overflow:hidden}
+.trainee-class-head{background:#1F4E79;padding:14px 20px;color:#fff;font-size:15px;font-weight:700}
+.trainee-class-body{padding:14px 20px}
+.t-mod-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1F4E79}
+.t-mod-row:last-child{border-bottom:none}
+.t-mod-info{flex:1;margin-right:16px}
+.t-mod-title{color:#fff;font-size:14px;font-weight:700;margin-bottom:4px}
+.t-mod-status{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:6px}
+.status-new{background:#1F4E79;color:#C8D8E8}
+.status-progress{background:#b08800;color:#fff}
+.status-done{background:#22863a;color:#fff}
+.t-mod-meta{color:#7DA8C8;font-size:11px;margin-top:4px}
+.btn-launch{background:#2E75B6;color:#fff;border:none;border-radius:6px;padding:10px 20px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap}
+.btn-launch:hover{background:#028090}
+/* ── Module rows (admin) ───────────────────────────────────── */
+.mod-row{background:#162B3E;border-radius:8px;padding:14px 18px;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;border:1px solid #1F4E79}
+.mod-row-left{flex:1}
+.mod-row-title{color:#fff;font-size:14px;font-weight:700;margin-bottom:4px}
+.mod-row-desc{color:#7DA8C8;font-size:12px;margin-bottom:6px}
+.mod-row-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mod-meta-chip{background:#1F4E79;color:#C8D8E8;font-size:10px;padding:2px 8px;border-radius:10px}
+.mod-row-actions{display:flex;gap:8px;flex-shrink:0;align-items:flex-start;padding-top:2px}
+.status-draft{background:#444;color:#C8D8E8}
+/* ── Module textarea ───────────────────────────────────────── */
+textarea.dash-input{font-family:inherit;padding-top:8px}
+/* ── Player back button ────────────────────────────────────── */
+#btn-back-dashboard{background:rgba(255,255,255,.12);border:none;color:#C8D8E8;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+#btn-back-dashboard:hover{background:rgba(255,255,255,.2)}
+/* ── Module Content Editor ─────────────────────────────────── */
+#view-module-editor{display:none;width:100%;height:100vh;flex-direction:column;background:#0D2137}
+.med-header{background:#1F4E79;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.med-header-title{color:#fff;font-size:14px;font-weight:700}
+.med-header-right{display:flex;align-items:center;gap:10px}
+.med-body{flex:1;display:flex;overflow:hidden}
+#ed-sidebar{width:220px;min-width:160px;background:#162B3E;border-right:1px solid #1F4E79;overflow-y:auto;padding:8px 0}
+.ed-sec-item{padding:10px 14px;cursor:pointer;border-left:3px solid transparent}
+.ed-sec-item:hover{background:#1F4E79;border-left-color:#5BC0EB}
+.ed-sec-active{background:#2E75B6!important;border-left-color:#5BC0EB!important}
+.ed-sec-label{color:#C8D8E8;font-size:13px;font-weight:600}
+.ed-sec-meta{color:#7DA8C8;font-size:11px;margin-top:2px}
+.ed-add-sec-btn{width:100%;background:#1F4E79;color:#C8D8E8;border:none;padding:10px 14px;cursor:pointer;font-size:12px;font-weight:700;text-align:left}
+.ed-add-sec-btn:hover{background:#2E75B6}
+#ed-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ed-main-header{background:#162B3E;border-bottom:1px solid #1F4E79;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ed-section-name-input{background:#0D2137;border:1px solid #2E75B6;color:#fff;font-size:14px;font-weight:700;padding:6px 10px;border-radius:5px;flex:1;min-width:160px}
+.ed-toggle{color:#C8D8E8;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;cursor:pointer}
+#ed-slides-list{flex:1;overflow-y:auto;padding:8px 16px}
+.ed-slide-row{background:#162B3E;border:1px solid #1F4E79;border-radius:6px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.ed-slide-info{flex:1;display:flex;align-items:center;gap:10px;overflow:hidden}
+.ed-slide-num{color:#5BC0EB;font-size:11px;font-weight:700;min-width:28px}
+.ed-slide-type{background:#1F4E79;color:#C8D8E8;font-size:10px;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.ed-slide-title{color:#C8D8E8;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ed-slide-btns{display:flex;gap:5px;flex-shrink:0}
+.ed-main-footer{padding:12px 16px;border-top:1px solid #1F4E79;background:#162B3E;display:flex;gap:10px}
+.ed-empty{color:#7DA8C8;font-size:13px;padding:24px;text-align:center}
+/* Editor modals */
+.ed-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3000;align-items:center;justify-content:center}
+.ed-modal-box{background:#162B3E;border-radius:10px;width:min(640px,92vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.ed-modal-head{background:#1F4E79;padding:14px 18px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.ed-modal-body{flex:1;overflow-y:auto;padding:14px 18px}
+.ed-modal-foot{padding:12px 18px;border-top:1px solid #1F4E79;display:flex;gap:10px;justify-content:flex-end}
+.ed-field-label{display:block;color:#7DA8C8;font-size:11px;font-weight:700;letter-spacing:.5px;margin:10px 0 4px;text-transform:uppercase}
+.ed-field-input{width:100%;background:#0D2137;border:1px solid #2E75B6;color:#fff;font-size:13px;padding:8px 10px;border-radius:5px;outline:none;font-family:inherit}
+.ed-field-input:focus{border-color:#5BC0EB}
+.ed-field-group{background:#1A3050;border-radius:6px;padding:12px 14px;margin-bottom:10px}
+.ed-list-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.ed-list-input{flex:1;background:#0D2137;border:1px solid #1F4E79;color:#fff;font-size:12px;padding:5px 8px;border-radius:4px;outline:none}
+.ed-list-rm{background:#C62828;color:#fff;border:none;border-radius:3px;padding:2px 7px;cursor:pointer;font-size:11px}
+.ed-list-add{background:#1F4E79;color:#C8D8E8;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;font-weight:700;margin-top:4px}
+.ed-list-wrap{max-height:160px;overflow-y:auto}
+/* Assessment editor */
+.assed-q{background:#1A3050;border-radius:6px;padding:12px 14px;margin-bottom:12px}
+.assed-q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.assed-q-num{color:#5BC0EB;font-size:12px;font-weight:700}
+.assed-opt{display:flex;align-items:center;gap:6px;margin:5px 0}
+.assed-opt input[type=radio]{accent-color:#5BC0EB;flex-shrink:0}
+/* Slide audio modal */
+.ed-audio-status{padding:10px 12px;border-radius:6px;font-size:12px;font-weight:700;margin-bottom:12px}
+.ed-audio-has{background:#1B3A1B;color:#22863a;border:1px solid #22863a}
+.ed-audio-none{background:#2A2A1A;color:#b08800;border:1px solid #b08800}
+.ed-audio-file-row{background:#1A3050;border-radius:6px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ed-audio-file-row label{background:#2E75B6;color:#fff;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+.ed-audio-cb-list{max-height:200px;overflow-y:auto;border:1px solid #1F4E79;border-radius:6px;padding:8px 10px}
+.ed-audio-cb-list .assign-row{padding:5px 0}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ═══════════════════════════════════════════════════════ -->
+<div id="view-login">
+  <div class="login-card">
+    <div class="login-logo">TGS TRAINING PLATFORM</div>
+    <div class="login-title">Welcome Back</div>
+    <div class="login-sub">Sign in to your account</div>
+    <label class="login-label">Username</label>
+    <input class="login-input" id="login-username" type="text" placeholder="Enter username" autocomplete="username">
+    <label class="login-label">Password</label>
+    <input class="login-input" id="login-password" type="password" placeholder="Enter password" autocomplete="current-password">
+    <button class="login-btn" onclick="handleLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-hint">Default admin: admin / admin123</div>
+    <div style="margin-top:20px;text-align:center;border-top:1px solid rgba(255,255,255,.15);padding-top:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px">Setting up a new PC? Import your config file.</div>
+      <button onclick="importConfig()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;width:100%">&#8594; Import Config from File</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN DASHBOARD ══════════════════════════════════════════════════════ -->
+<div id="view-admin">
+  <div class="dash-header">
+    <div class="dash-logo">TGS TRAINING — ADMIN</div>
+    <div class="dash-header-right">
+      <span class="dash-user" id="admin-user-name"></span>
+      <button onclick="exportConfig()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:5px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;margin-right:6px" title="Download config file to share with other PCs">&#8595; Export Config</button>
+      <button class="btn-logout" onclick="logoutUser()">Sign Out</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-tabs">
+      <button class="dash-tab" id="admin-tab-modules"  onclick="switchAdminTab('modules')">Modules</button>
+      <button class="dash-tab" id="admin-tab-classes"  onclick="switchAdminTab('classes')">Classes</button>
+      <button class="dash-tab" id="admin-tab-trainees" onclick="switchAdminTab('trainees')">Trainees</button>
+    </div>
+    <!-- Modules section -->
+    <div id="admin-section-modules">
+      <div class="dash-section-head">
+        <div class="dash-section-title">Modules</div>
+        <button class="btn-primary" onclick="openNewModuleModal()">+ Add Module</button>
+      </div>
+      <div id="admin-modules-list"></div>
+    </div>
+    <!-- Classes section -->
+    <div id="admin-section-classes" style="display:none">
+      <div class="dash-section-head">
+        <div class="dash-section-title">Classes</div>
+        <button class="btn-primary" onclick="openNewClassModal()">+ New Class</button>
+      </div>
+      <div class="cls-grid" id="admin-classes-list"></div>
+    </div>
+    <!-- Trainees section -->
+    <div id="admin-section-trainees" style="display:none">
+      <div class="dash-section-head">
+        <div class="dash-section-title">Trainees</div>
+        <button class="btn-primary" onclick="openAddTraineeModal()">+ Add Trainee</button>
+      </div>
+      <div id="admin-trainees-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRAINEE DASHBOARD ════════════════════════════════════════════════════ -->
+<div id="view-trainee">
+  <div class="dash-header">
+    <div class="dash-logo">TGS TRAINING</div>
+    <div class="dash-header-right">
+      <span class="dash-user" id="trainee-user-name"></span>
+      <button class="btn-logout" onclick="logoutUser()">Sign Out</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-section-head" style="margin-bottom:20px">
+      <div class="dash-section-title">My Classes</div>
+    </div>
+    <div id="trainee-classes-list"></div>
+  </div>
+</div>
+
+<!-- ═══ MODULE PLAYER ════════════════════════════════════════════════════════ -->
+<div id="view-player">
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">MODULE 1 — SECTIONS</div>
+    <div id="sidebar-list"></div>
+  </div>
+  <div id="main">
+    <div id="topbar">
+      <button id="btn-back-dashboard">← Dashboard</button>
+      <h1 id="player-topbar-title">Module 1: Communication &amp; Customer Service Excellence</h1>
+      <div id="progress-bar-wrap"><div id="progress-bar" style="width:0%"></div></div>
+      <span id="progress-pct">0%</span>
+      <button id="btn-admin">⚙ Admin</button>
+    </div>
+    <div id="slide-area">
+      <div id="slide-viewer"></div>
+      <div id="audio-bar">
+        <audio id="audio-player" controls style="flex:1;height:28px"></audio>
+        <span id="audio-continuing" style="display:none">▶ continuing</span>
+      </div>
+      <div id="vo-panel" style="display:none">
+        <div id="vo-label">VOICEOVER SCRIPT</div>
+        <div id="vo-text"></div>
+      </div>
+    </div>
+    <div id="nav-bar">
+      <button id="btn-prev" class="btn-nav">← Back</button>
+      <span id="slide-counter">Slide 1 / 37</span>
+      <button id="btn-next" class="btn-nav">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assessment Modal -->
+<div id="assessment-modal">
+  <div class="modal-box">
+    <div class="modal-head" id="quiz-title">Section Assessment</div>
+    <div class="modal-body">
+      <div id="quiz-questions"></div>
+      <div id="quiz-result"></div>
+      <input type="hidden" id="quiz-section-id" value="">
+    </div>
+    <div class="modal-foot">
+      <button class="btn-modal btn-modal-secondary" id="btn-retake-quiz" style="display:none" onclick="retakeAssessment()">Retake</button>
+      <button class="btn-modal btn-modal-primary" id="btn-submit-quiz" onclick="submitAssessment()">Submit Answers</button>
+      <button class="btn-modal btn-modal-primary" id="btn-continue-quiz" style="display:none" onclick="closeAssessmentAndContinue()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel">
+  <div class="admin-head">
+    <span>Audio Management</span>
+    <button class="btn-modal btn-modal-secondary" id="btn-close-admin" style="padding:3px 10px;font-size:11px">✕ Close</button>
+  </div>
+  <div class="admin-head-btns">
+    <button id="btn-new-audio">+ New Audio</button>
+    <button id="btn-export-csv">⬇ Export CSV</button>
+  </div>
+  <div id="admin-slide-list"></div>
+</div>
+
+<!-- close view-player -->
+</div>
+
+<!-- ═══ DASHBOARD MODALS (outside view-player so z-index works) ══════════════ -->
+
+<!-- Add / Edit Module -->
+<div class="dash-modal" id="mod-modal">
+  <div class="dash-modal-box">
+    <div class="dash-modal-head">
+      <span id="mod-modal-title">Module</span>
+      <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeModuleModal()">✕</button>
+    </div>
+    <div class="dash-modal-body">
+      <input type="hidden" id="mod-modal-id">
+      <label class="dash-label">Module Title *</label>
+      <input class="dash-input" id="mod-modal-name" type="text" placeholder="e.g. Module 2: Systems & Tools">
+      <label class="dash-label">Description</label>
+      <textarea class="dash-input" id="mod-modal-desc" rows="3" placeholder="Brief description of this module" style="resize:vertical"></textarea>
+      <label class="dash-label">Status</label>
+      <select class="dash-input" id="mod-modal-status">
+        <option value="draft">Draft — hidden from trainees</option>
+        <option value="published">Published — visible to trainees</option>
+      </select>
+      <div class="dash-error" id="mod-modal-error"></div>
+    </div>
+    <div class="dash-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeModuleModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveModuleModal()">Save Module</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Module to Classes -->
+<div class="dash-modal" id="mac-modal">
+  <div class="dash-modal-box" style="max-width:420px">
+    <div class="dash-modal-head">
+      <span id="mac-modal-title">Assign to Classes</span>
+      <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeMacModal()">✕</button>
+    </div>
+    <div class="dash-modal-body">
+      <input type="hidden" id="mac-modal-mid">
+      <div class="dash-modal-section-title" style="color:#5BC0EB;font-size:11px;font-weight:700;letter-spacing:.5px;margin-bottom:10px">SELECT CLASSES</div>
+      <div id="mac-modal-list"></div>
+    </div>
+    <div class="dash-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeMacModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveMacModal()">Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Class -->
+<div class="dash-modal" id="new-class-modal">
+  <div class="dash-modal-box" style="max-width:420px">
+    <div class="dash-modal-head">Create New Class <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeNewClassModal()">✕</button></div>
+    <div class="dash-modal-body">
+      <label class="dash-label">Class Name</label>
+      <input class="dash-input" id="new-class-name" type="text" placeholder="e.g. Batch 2025-A">
+      <div class="dash-error" id="new-class-error"></div>
+    </div>
+    <div class="dash-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#E0E8EF;color:#1A2B3C" onclick="closeNewClassModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveNewClass()">Create Class</button>
+    </div>
+  </div>
+</div>
+
+<!-- Class Detail -->
+<div class="dash-modal" id="class-detail-modal">
+  <div class="dash-modal-box">
+    <div class="dash-modal-head"><span id="class-detail-name"></span> <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeClassDetail()">✕</button></div>
+    <div class="dash-modal-body">
+      <input type="hidden" id="class-detail-id">
+      <div class="dash-modal-section">
+        <div class="dash-modal-section-title">Modules</div>
+        <div id="class-detail-modules"></div>
+      </div>
+      <div class="dash-modal-section">
+        <div class="dash-modal-section-title">Assigned Trainees</div>
+        <div id="class-detail-trainees"></div>
+      </div>
+    </div>
+    <div class="dash-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#E0E8EF;color:#1A2B3C" onclick="closeClassDetail()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveClassDetail()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Trainee -->
+<div class="dash-modal" id="add-trainee-modal">
+  <div class="dash-modal-box" style="max-width:420px">
+    <div class="dash-modal-head">Add Trainee <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeAddTraineeModal()">✕</button></div>
+    <div class="dash-modal-body">
+      <label class="dash-label">Full Name</label>
+      <input class="dash-input" id="new-t-name" type="text" placeholder="e.g. Maria Santos">
+      <label class="dash-label">Username</label>
+      <input class="dash-input" id="new-t-username" type="text" placeholder="e.g. maria.santos">
+      <label class="dash-label">Password</label>
+      <input class="dash-input" id="new-t-password" type="text" placeholder="Temporary password">
+      <div class="dash-error" id="new-t-error"></div>
+    </div>
+    <div class="dash-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#E0E8EF;color:#1A2B3C" onclick="closeAddTraineeModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveNewTrainee()">Add Trainee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODULE CONTENT EDITOR ═════════════════════════════════════════════════ -->
+<div id="view-module-editor">
+  <div class="med-header">
+    <div class="med-header-title" id="med-mod-title">Module Editor</div>
+    <div class="med-header-right">
+      <span id="med-saved-msg" style="display:none;color:#5BC0EB;font-size:12px;font-weight:700">✓ Saved</span>
+      <button class="btn-primary" onclick="saveModuleEditor()">Save</button>
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeModuleEditor()">← Back to Admin</button>
+    </div>
+  </div>
+  <div class="med-body">
+    <div id="ed-sidebar"></div>
+    <div id="ed-main"><div class="ed-empty">Select a section on the left.</div></div>
+  </div>
+</div>
+
+<!-- Add Section Modal -->
+<div class="ed-modal" id="add-sec-modal">
+  <div class="ed-modal-box" style="max-width:400px">
+    <div class="ed-modal-head">Add Section <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeAddSectionModal()">✕</button></div>
+    <div class="ed-modal-body">
+      <label class="ed-field-label">Section Name *</label>
+      <input class="ed-field-input" id="add-sec-name" type="text" placeholder="e.g. Module Intro">
+      <label class="ed-toggle" style="margin-top:12px;display:flex;align-items:center;gap:6px;color:#C8D8E8;font-size:13px">
+        <input type="checkbox" id="add-sec-has-quiz" checked> Include Assessment
+      </label>
+      <div class="dash-error" id="add-sec-error"></div>
+    </div>
+    <div class="ed-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeAddSectionModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveAddSection()">Add Section</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Slide Modal -->
+<div class="ed-modal" id="add-slide-modal">
+  <div class="ed-modal-box">
+    <div class="ed-modal-head">Add Slide <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeAddSlideModal()">✕</button></div>
+    <div class="ed-modal-body">
+      <label class="ed-field-label">Slide Type</label>
+      <select class="ed-field-input" id="add-slide-type" onchange="buildAddSlidePreview()">
+        <option value="content">Content (bullets)</option>
+        <option value="section">Section Divider</option>
+        <option value="title">Title Slide</option>
+        <option value="callout">Callout / Quote</option>
+        <option value="dosdont">Do's and Don'ts</option>
+        <option value="twocol">Two Column</option>
+        <option value="table">Table</option>
+        <option value="recap">Recap</option>
+        <option value="next">Next Steps</option>
+        <option value="end">End Slide</option>
+      </select>
+      <div id="add-slide-fields" style="margin-top:10px"></div>
+      <div class="dash-error" id="add-slide-error"></div>
+    </div>
+    <div class="ed-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeAddSlideModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveAddSlide()">Add Slide</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Slide Modal -->
+<div class="ed-modal" id="slide-ed-modal">
+  <div class="ed-modal-box">
+    <div class="ed-modal-head" id="slide-ed-modal-title">Edit Slide <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeSlideEdModal()">✕</button></div>
+    <div class="ed-modal-body">
+      <div id="slide-ed-fields"></div>
+      <div class="dash-error" id="slide-ed-error"></div>
+    </div>
+    <div class="ed-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeSlideEdModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveSlideEdModal()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assessment Editor Modal -->
+<div class="ed-modal" id="assessment-ed-modal">
+  <div class="ed-modal-box">
+    <div class="ed-modal-head" id="assed-title">Edit Assessment <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeAssessmentEdModal()">✕</button></div>
+    <div class="ed-modal-body">
+      <div id="assed-questions"></div>
+    </div>
+    <div class="ed-modal-foot">
+      <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeAssessmentEdModal()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="saveAssessmentEdModal()">Save Assessment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Slide Audio Modal (Editor) -->
+<div class="ed-modal" id="ed-audio-modal">
+  <div class="ed-modal-box" style="max-width:480px">
+    <div class="ed-modal-head" id="ed-audio-modal-title">Assign Audio
+      <button style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:12px" onclick="closeSlideAudioModal()">✕</button>
+    </div>
+    <div class="ed-modal-body">
+      <div id="ed-audio-status"></div>
+      <div class="ed-audio-file-row">
+        <label>Choose Audio File
+          <input type="file" id="ed-audio-file-input" accept="audio/*" style="display:none"
+            onchange="document.getElementById('ed-audio-file-name').textContent=this.files[0]?this.files[0].name:'No file chosen'">
+        </label>
+        <span id="ed-audio-file-name" style="color:#C8D8E8;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      </div>
+      <label class="ed-field-label" style="margin-bottom:6px">Apply audio to these slides (check for continuous playback):</label>
+      <div id="ed-audio-slide-cbs"></div>
+      <div class="dash-error" id="ed-audio-error" style="margin-top:8px"></div>
+    </div>
+    <div class="ed-modal-foot" style="justify-content:space-between">
+      <button id="ed-audio-rm-btn" class="btn-sm btn-danger" style="display:none" onclick="removeSlideAudio()">Remove Audio</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm btn-primary" style="background:#1F4E79;color:#C8D8E8" onclick="closeSlideAudioModal()">Cancel</button>
+        <button class="btn-sm btn-primary" onclick="saveSlideAudio()">Assign Audio</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Assign Audio Modal -->
+<div id="assign-modal">
+  <div class="assign-box">
+    <div class="assign-head">
+      <span>Assign Audio to Slides</span>
+      <button onclick="closeAssignModal()">✕ Cancel</button>
+    </div>
+    <div class="assign-body">
+      <div class="assign-file-row">
+        <label>Choose File<input type="file" id="assign-file-input" accept="audio/*" style="display:none" onchange="document.getElementById('assign-file-name').textContent=this.files[0]?this.files[0].name:'No file chosen'"></label>
+        <span id="assign-file-name">No file chosen</span>
+      </div>
+      <div class="assign-helpers">
+        <span>Select slides:</span>
+        <button id="assign-select-all">All</button>
+        <button id="assign-select-none">None</button>
+        <button id="assign-select-section">This section</button>
+      </div>
+      <div id="assign-slide-list"></div>
+      <div class="assign-error" id="assign-error"></div>
+    </div>
+    <div class="assign-foot">
+      <button class="btn-assign-cancel" onclick="closeAssignModal()">Cancel</button>
+      <button class="btn-assign-confirm" onclick="confirmAssign()">Assign Audio</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Default data (seeded into localStorage on first run) ──────────────────────
+var SLIDES_DEFAULT=[{"id":1,"section":"intro","type":"title","timing":"~0:30","moduleLabel":"Module 1","title":"Communication & Customer Service Excellence","subtitle":"Serving the American Customer — Language, Culture & Professional Call Handling","voiceover":"Welcome to Module 1. This module is your foundation for every call you'll take. We're going to cover how Americans communicate, what they expect on the phone, and how you represent TGS with professionalism and confidence. Let's get started."},{"id":2,"section":"intro","type":"learn","timing":"~0:50","tiles":[{"icon":"🗣️","label":"Communication Style","desc":"How Americans speak and what they expect"},{"icon":"📞","label":"Phone Etiquette","desc":"Professional call structure and greeting standards"},{"icon":"❤️","label":"Empathy Skills","desc":"Acknowledging customers with genuine care"},{"icon":"🌎","label":"US Geography","desc":"Regions, climate and housing types"},{"icon":"🗺️","label":"Expressions","desc":"Common American phrases and pronunciation"},{"icon":"👤","label":"Caller Types","desc":"Homeowner, Tenant, Property Manager"}],"voiceover":"In this module you will learn six key skills: how Americans communicate and what they expect from customer service, professional phone etiquette and call structure, how to show empathy and handle frustrated callers, common American expressions and pronunciation of trade terms, US geography and housing types that affect service calls, and how to identify the three types of callers."},{"id":3,"section":"intro","type":"callout","timing":"~0:40","bg":"#DEEAF1","title":"Why This Module Matters","quote":"Every call is someone's home. They are trusting us with their most important asset. The way we speak to them — the first ten seconds — sets the tone for their entire experience.","speaker":"TGS Operations Standard","voiceover":"Before we dive in, let's set the right mindset. Every call you take is about someone's home. Whether it is a broken air conditioner in July or a heating system that stopped working in winter — the customer is stressed and they are trusting us. How you speak in the first ten seconds shapes their entire experience. That responsibility starts with you."},{"id":4,"section":"1.1","type":"section","timing":"~0:20","num":"1.1","title":"How Americans Communicate","desc":"Understanding the communication style and expectations of US customers","voiceover":"Section 1.1 — How Americans Communicate. Understanding what your caller expects before they even say hello."},{"id":5,"section":"1.1","type":"content","timing":"~1:00","title":"American Communication Style","bullets":["Direct and to the point — they say what they mean","Small talk matters — a brief friendly opener builds trust","First names are standard — use theirs and introduce yourself","Silence feels uncomfortable — fill pause gaps confidently","They expect to be heard — active listening is critical"],"note":"Avoid over-formal or stiff language. Keep your tone warm, calm and professional — like a trusted expert, not a call centre script.","voiceover":"Americans communicate directly. They say what they mean and they expect the same from you. But directness does not mean cold — a short, warm opener goes a long way. Use their first name. Fill silence with confidence. And most importantly, listen actively. They want to feel heard before they want to feel helped."},{"id":6,"section":"1.1","type":"twocol","timing":"~1:10","title":"What Americans Expect on a Service Call","ltitle":"They WANT","lbg":"#E2EFDA","litems":["Fast answer — pick up by ring 3","A name: 'Hi, this is [Your Name]'","Empathy before solutions","Clear next steps at every stage","A warm, confident tone throughout"],"rtitle":"They DON'T WANT","rbg":"#FFF0F0","ritems":["Long hold music with no update","Robotic or scripted responses","Being transferred without explanation","Vague answers like 'I'll check on that'","Feeling rushed or dismissed"],"voiceover":"Here is a side-by-side of what American callers want versus what immediately frustrates them. They want you to answer fast, give your name, show empathy, and always tell them what happens next. They do not want hold music without updates, robotic scripts, unexplained transfers, or vague answers. Keep this in mind on every single call."},{"id":7,"section":"1.2","type":"section","timing":"~0:20","num":"1.2","title":"Phone Etiquette","desc":"Professional call structure, greeting standards and hold procedures","voiceover":"Section 1.2 — Phone Etiquette. The professional standards for how every call should sound from the moment you answer."},{"id":8,"section":"1.2","type":"callStructure","timing":"~1:20","voiceover":"Every professional call follows six stages. Answer by the third ring. Listen fully without interrupting. Acknowledge with empathy before you solve. Collect information one question at a time. Confirm everything back to the customer. And close warmly with a clear next step. These six stages are the foundation of every great service call."},{"id":9,"section":"1.2","type":"dosdont","timing":"~1:00","title":"Phone Etiquette — Do's and Don'ts","dos":["Answer: 'Thank you for calling TGS, this is [Name], how can I help?'","Say 'May I place you on a brief hold?' and wait for a yes","Return within 2 minutes or give an update","Confirm: 'Just to confirm, I have your address as...'","Close: 'Is there anything else I can help you with today?'"],"donts":["'Hold on' or 'One sec' — always ask first","Eating, chewing or background noise during the call","Using filler words: 'um', 'uh', 'like', 'you know'","Cutting the customer off before they finish speaking","Ending the call without confirming the next step"],"voiceover":"Here are the etiquette rules that separate a professional call from an average one. Always ask before placing someone on hold and return within two minutes. Never use filler words. Never interrupt. Always confirm the details and always close with a clear next step. The don'ts here are the most common mistakes new agents make — knowing them is your first advantage."},{"id":10,"section":"1.3","type":"section","timing":"~0:20","num":"1.3","title":"Showing Empathy","desc":"Acknowledging customer emotions and de-escalating difficult calls","voiceover":"Section 1.3 — Showing Empathy. The skill that turns a frustrated caller into a satisfied customer."},{"id":11,"section":"1.3","type":"framework","timing":"~1:00","title":"The ACTA Empathy Framework","steps":[{"letter":"A","title":"Acknowledge","color":"#2E75B6","points":["Name the feeling","Do not minimise it","Say it back to them"]},{"letter":"C","title":"Care","color":"#028090","points":["Show genuine concern","'I understand how stressful...'","Avoid scripted phrases"]},{"letter":"T","title":"Take Action","color":"#028060","points":["Tell them what you will do","Be specific about the step","Give a timeframe if you can"]},{"letter":"A","title":"Assure","color":"#1F4E79","points":["Confirm they feel heard","'I am going to get this sorted'","End on a positive note"]}],"voiceover":"Use the ACTA framework on every frustrated call. Acknowledge the feeling — name it out loud. Show Care — make it genuine, not scripted. Take Action — tell them exactly what you are doing and when. And Assure them — end the interaction on a positive, confident note. ACTA gives you a structure so you never freeze when someone is upset."},{"id":12,"section":"1.3","type":"empathyTable","timing":"~1:10","voiceover":"Here are five real situations you will face on the job — and the exact phrases to use. Read each one. Notice they all start by acknowledging the customer's experience before moving to a solution. Memorise these phrases. With practice, they will come naturally."},{"id":13,"section":"1.3","type":"dosdont","timing":"~0:50","title":"Empathy Language — What to Say vs. What Not to Say","dos":["'I completely understand how frustrating that must be.'","'I am so sorry that happened — let me fix this right away.'","'I hear you, and I want to make sure we get this right for you.'","'That is not the experience we want you to have.'"],"donts":["'Calm down, sir/ma'am' — never tell a customer to calm down","'There is nothing I can do' — there is always a next step","'That is not my department' — own it and transfer properly","'I understand' with no follow-up action — empathy needs action"],"voiceover":"Here are the specific phrases that work — and the ones that instantly escalate a call. Never tell a customer to calm down. Never say there is nothing you can do. Never say it is not your department without taking ownership of the transfer. Empathy without action is just words — always follow it with what you are going to do."},{"id":14,"section":"1.4","type":"section","timing":"~0:20","num":"1.4","title":"Common American Expressions","desc":"Understanding everyday US phrases used on service calls","voiceover":"Section 1.4 — Common American Expressions. The everyday phrases Americans use that you need to recognise and respond to naturally."},{"id":15,"section":"1.4","type":"table","timing":"~1:10","title":"Common American Phrases — What They Mean","headers":["Expression","What They Mean","Your Response"],"colWidths":["35%","35%","30%"],"rows":[["'I need this ASAP'","Urgent — they want it today or tomorrow","'Absolutely, I am booking this as a priority right now.'"],["'This is ridiculous'","They are frustrated — not always at you","'I completely understand — let me get this sorted immediately.'"],["'Can you guys come out today?'","They want same-day or earliest available","'Let me check our earliest available slot for you right now.'"],["'What is the damage?'","Asking for the price / cost","'Let me get you a quote — the technician will confirm on-site.'"],["'I have been waiting forever'","They feel their wait was too long","'I sincerely apologise for the wait — your time is important.'"],["'Is this going to cost an arm and a leg?'","Worried about high cost","'We are transparent on pricing — I can walk you through the estimate.'"],["'You guys ghosted me'","Technician or team did not follow up","'I am so sorry — that should not have happened. I am escalating this now.'"]],"voiceover":"Let me walk you through seven expressions you will hear on almost every shift. Some sound casual, but they signal something important. 'ASAP' means urgency — do not downplay it. 'What is the damage' means cost — be ready. 'You ghosted me' means a no-show or no follow-up, and that requires an immediate apology and action. Know these phrases cold."},{"id":16,"section":"1.4","type":"content","timing":"~0:50","title":"Filler & Transition Phrases That Sound Natural","bullets":["'Absolutely' — affirm without sounding robotic","'Of course' — warm acknowledgement of a request","'Let me take care of that for you' — ownership phrase","'Give me just a moment' — buying time professionally","'Happy to help with that' — upbeat, service-focused"],"note":"Use these phrases to bridge between questions. They make the call feel smooth and professional — not scripted.","voiceover":"These five bridge phrases are your transition tools. When you need a moment to look something up, when you are confirming details, when a customer makes a request — these phrases keep the call warm and professional. They take seconds to learn and they immediately elevate how you sound on the phone."},{"id":17,"section":"1.5","type":"section","timing":"~0:20","num":"1.5","title":"Pronunciation Guide","desc":"How to say common HVAC and home services trade terms clearly in English","voiceover":"Section 1.5 — Pronunciation Guide. The trade terms customers use every day, and how to say them correctly every time."},{"id":18,"section":"1.5","type":"pronTable","timing":"~1:20","rows":[{"word":"HVAC","phonetic":"H-VAC (say each letter H-V-A-C)","mistake":"'Have-ack'","tip":"Just spell it out: H — V — A — C"},{"word":"Thermostat","phonetic":"THER-mo-stat","mistake":"'Thermo-stat-ic'","tip":"Three syllables: THER · mo · stat"},{"word":"Furnace","phonetic":"FUR-niss","mistake":"'Fur-nace'","tip":"Rhymes with 'promise'"},{"word":"Ductwork","phonetic":"DUCT-work","mistake":"'Duck-work'","tip":"'Duct' as in duct tape"},{"word":"Compressor","phonetic":"com-PRESS-or","mistake":"'Comp-ressor'","tip":"Stress the middle: com-PRESS"},{"word":"Condenser","phonetic":"con-DEN-ser","mistake":"'Con-denser'","tip":"Stress the middle: con-DEN"},{"word":"Heat pump","phonetic":"HEAT pump (two clear words)","mistake":"'Heetpump'","tip":"Pause between the two words"},{"word":"Attic","phonetic":"AT-tic","mistake":"'Ah-tic'","tip":"Short 'a' — rhymes with 'static'"},{"word":"Crawl space","phonetic":"CRAWL space (two clear words)","mistake":"'Crawlspace'","tip":"Pause and say both words clearly"},{"word":"Baseboard","phonetic":"BASE-board","mistake":"'Bass-board'","tip":"BASE as in base of a wall"}],"voiceover":"These are the ten trade terms that come up on nearly every HVAC and home services call. Look at the phonetic column — that is how Americans pronounce these. Look at the common mistake column — those are the versions that can confuse or concern a customer. Practice each one out loud. Pronouncing trade terms correctly signals expertise and builds immediate trust."},{"id":19,"section":"1.5","type":"content","timing":"~0:50","title":"Pronunciation Tips for American English","bullets":["Speak slightly slower than feels comfortable — clarity matters","Stress the right syllable — Americans notice when stress is wrong","Avoid linking words where they separate naturally: 'heat pump' not 'heatpump'","When unsure, spell it out — 'That is H-V-A-C' is always fine","Ask the customer to repeat an address or term — it shows care"],"note":"You do not need a perfect American accent. You need to be clearly understood. Slow down, emphasise the correct syllable, and speak with confidence.","voiceover":"You do not need to sound American — you need to be understood. The single most important thing is to slow down slightly and hit the correct syllable stress. When you are unsure, spell it out — that is always professional. And never hesitate to ask a customer to repeat an address or name — it shows you care about getting it right."},{"id":20,"section":"1.6","type":"section","timing":"~0:20","num":"1.6","title":"When You Don't Understand","desc":"Professional strategies for handling unclear speech, accents and technical terms on calls","voiceover":"Section 1.6 — When You Do Not Understand. How to handle the moments when a customer is unclear, speaks fast, or uses a term you have never heard."},{"id":21,"section":"1.6","type":"content","timing":"~1:10","title":"Strategies for Unclear or Fast Speech","bullets":["Clarify immediately — 'I want to make sure I have that right: could you repeat the address?'","One clarification at a time — do not ask three things at once","Reflect back what you heard — 'Just to confirm, you said the issue is with the outdoor unit?'","Never fake understanding — confirm before you proceed","When you do not know a term, say: 'Could you describe what that looks like or what it does?'","Stay calm — a confident pause beats a rushed wrong answer every time"],"note":"Customers expect you to ask for clarification. It signals attention and professionalism — not a language barrier.","voiceover":"Every agent faces calls where the customer speaks fast, has a strong regional accent, or uses a term you have never heard before. Here is what to do. Ask for one thing at a time. Reflect back what you heard before moving on. Never pretend to understand — one wrong detail can send the wrong technician to the wrong address. And if you do not know a trade term, just ask them to describe it. Customers actually respect that."},{"id":22,"section":"1.7","type":"section","timing":"~0:20","num":"1.7","title":"American Customer Service Culture","desc":"What American customers expect and how to deliver a world-class service experience","voiceover":"Section 1.7 — American Customer Service Culture. What sets a truly great American customer service experience apart."},{"id":23,"section":"1.7","type":"content","timing":"~1:00","title":"The American Customer Service Standard","bullets":["Speed: answer fast, respond fast, follow through fast","Ownership: 'I will take care of this' — not 'someone will'","Positivity: upbeat tone even when delivering bad news","Proactive updates: call before they need to call you","Recovery: a great recovery can turn a bad experience into loyalty"],"note":"American customers have high service expectations — and they will leave a review. Every call is an opportunity to earn a 5-star response.","voiceover":"American customers expect five things above all else: speed, ownership, a positive tone, proactive communication, and great recovery when something goes wrong. Notice that none of these require a perfect outcome. A delayed technician does not have to be a bad experience if you call ahead, explain, and offer a solution. American culture rewards how you handle problems — not just whether problems happen."},{"id":24,"section":"1.8","type":"section","timing":"~0:20","num":"1.8","title":"US Geography, Climate & Housing","desc":"Why where a customer lives affects the service call — regions, weather, and housing types","voiceover":"Section 1.8 — US Geography, Climate and Housing. Understanding where your customer lives helps you serve them better and book the right job."},{"id":25,"section":"1.8","type":"regionsOverview","timing":"~1:00","voiceover":"The United States is divided into four major regions, each with a distinct climate and housing profile. The Northeast has cold winters and older buildings — HVAC systems run hard in winter. The South has hot, humid summers and large suburban homes without basements. The Midwest gets extreme cold and heat with lots of single-family homes and basements. The West ranges from desert to Pacific rain, with newer construction and earthquake-related building standards. Knowing the region helps you ask the right questions."},{"id":26,"section":"1.8","type":"region","timing":"~0:50","name":"The Northeast","states":"New York · New Jersey · Pennsylvania · Massachusetts · Connecticut · Maine","headerColor":"#2E75B6","climate":["Cold winters — heating is critical Oct–Apr","Summers are warm to hot — AC demand is growing","Peak call volume: winter heating season"],"housing":["Older multi-family buildings and row houses","Basements are common — check for basement units","Radiators and boilers common alongside HVAC"],"style":["Direct and no-nonsense — get to the point","Value expertise — they will ask detailed questions","Expect speed — they have busy schedules"],"voiceover":"The Northeast — New York, New Jersey, Pennsylvania, Massachusetts, Connecticut and Maine. Winters here are cold and long, so heating is a top priority from October through April. Customers have older homes with basements, and they may have radiators or boilers alongside or instead of HVAC. On calls, Northeasterners tend to be direct and fast-paced. Give clear answers quickly and demonstrate expertise."},{"id":27,"section":"1.8","type":"region","timing":"~0:50","name":"The South","states":"Texas · Florida · Georgia · North Carolina · Tennessee · Alabama","headerColor":"#C62828","climate":["Hot humid summers — AC runs almost year-round","Mild winters — heating less critical except TX","Peak call volume: summer AC season"],"housing":["Larger single-family suburban homes","Basements rare — slab foundations common","Attic HVAC units are very common in the South"],"style":["Friendly and warm — small talk is welcomed","Patient but expect follow-through","Very loyal to companies that treat them well"],"voiceover":"The South — Texas, Florida, Georgia, North Carolina, Tennessee, and Alabama. Air conditioning is not a luxury here — it is essential. AC runs almost year-round in Florida and along the Gulf Coast. Homes are large suburban single-family houses on slab foundations, and HVAC units are often in the attic. Southern customers appreciate warmth and friendliness on the call, and they are fiercely loyal when you treat them well."},{"id":28,"section":"1.8","type":"region","timing":"~0:50","name":"The Midwest","states":"Illinois · Ohio · Michigan · Minnesota · Wisconsin · Indiana","headerColor":"#028090","climate":["Extreme cold in winter — heating is critical","Hot summers too — AC in demand June–Aug","Wide seasonal swings require robust systems"],"housing":["Single-family homes with basements","Basements often contain the furnace and water heater","Older homes with aging HVAC infrastructure"],"style":["Practical and polite — value honest answers","Not confrontational but expect follow-up","Appreciate being kept informed throughout"],"voiceover":"The Midwest — Illinois, Ohio, Michigan, Minnesota, Wisconsin, and Indiana. Temperatures swing from extreme cold to hot summers, so both heating and cooling are important. Most homes are single-family with basements — and the furnace is usually down there, which affects dispatch. Midwesterners are practical and polite. They want straight answers and they expect you to follow up when you say you will."},{"id":29,"section":"1.8","type":"region","timing":"~0:50","name":"The West","states":"California · Arizona · Nevada · Washington · Oregon · Colorado","headerColor":"#5D4037","climate":["Desert heat in AZ and NV — AC critical all summer","Pacific Coast: mild — less HVAC demand","Mountain states: cold winters, high heating demand"],"housing":["Mix of modern new construction and older stock","No basements in most of CA and AZ","Ductless mini-splits more common than in East"],"style":["Vary by state — CA is casual; AZ is direct","Tech-aware — may have smart thermostats or apps","Eco-conscious — may ask about energy efficiency"],"voiceover":"The West covers the most geographic variety of any region. Arizona and Nevada are desert states with extreme summer heat — AC is critical. California's coast is mild, but inland valleys get hot. Washington and Oregon are cool and rainy. Colorado has cold mountain winters. Housing ranges from modern construction to California bungalows, and ductless mini-splits are more common here. Western customers are often tech-savvy and may mention smart home systems."},{"id":30,"section":"1.8","type":"content","timing":"~1:00","title":"How to Use Geography on a Call","bullets":["Listen for the state or city — it tells you the likely climate","Ask 'Does the unit have a basement or attic installation?' — region shapes the answer","Match your urgency to the season: AC failure in Texas in July is a priority","Expect different housing: apartment in NYC vs. ranch home in Phoenix vs. cabin in Colorado","Tailor your language: 'your furnace' vs. 'your heat pump' vs. 'your radiant system'"],"note":"You will not always know every city — but knowing the four regions gives you the right questions to ask.","voiceover":"Geography is a practical tool on every call. When someone says they are in Phoenix, Arizona in August with no AC — that is an emergency. When someone in Seattle says their heating has been off for a day — that is urgent, not low priority. Use the state and city to calibrate urgency, ask the right questions about the home, and use the right terminology. You do not need to know every US city — you need to know the four regions."},{"id":31,"section":"1.9","type":"section","timing":"~0:20","num":"1.9","title":"Caller Types","desc":"Identifying Homeowners, Tenants, and Property Managers on every call","voiceover":"Section 1.9 — Caller Types. The three types of people who call TGS, and why it matters which one you are speaking with."},{"id":32,"section":"1.9","type":"callerTypes","timing":"~1:10","voiceover":"Every caller is one of three types. The Homeowner owns the property, pays directly, and can approve all work — they are your most common caller. The Tenant rents the property — their landlord may need to approve and pay for the repair. The Property Manager or HOA calls on behalf of multiple properties or tenants — they may book several jobs at once and may want an account relationship. Identifying the caller type changes how you handle the booking."},{"id":33,"section":"1.9","type":"hoa","timing":"~1:00","voiceover":"Two caller types that need special attention: HOAs and Property Managers. An HOA — Homeowners Association — manages shared areas in neighbourhoods and condo developments. One HOA call can result in multiple work orders. A Property Manager manages rental properties for the owner and may book many jobs across many addresses. When you detect either of these, ask your four key questions — you will see them on screen now — before proceeding to the standard booking flow."},{"id":34,"section":"1.9","type":"callerScript","timing":"~1:10","voiceover":"Here is your exact script for identifying the caller type. Start with this question every time: 'Are you the homeowner, or are you calling for a rental or managed property?' Then follow the branch. If homeowner — proceed normally. If tenant — establish who the billing contact is. If property manager or HOA — flag it as a managed account and gather the billing contact. Knowing this before you confirm the booking prevents billing errors and sets expectations correctly."},{"id":35,"section":"outro","type":"recap","timing":"~1:10","takeaways":["Americans are direct and expect speed, empathy, and clear next steps on every call","Follow the 6-stage call structure: Answer, Listen, Acknowledge, Collect, Confirm, Close","Use the ACTA framework for frustrated callers: Acknowledge, Care, Take Action, Assure","Pronounce trade terms correctly — it signals expertise and builds trust immediately","Know the four US regions — geography changes the urgency and the right questions to ask","Always identify the caller type before confirming a booking — it affects billing and approval"],"voiceover":"Let us recap the six most important things from this module. Americans want speed and empathy — give them both on every call. The 6-stage structure keeps every call professional from start to finish. ACTA gives you a framework when callers are frustrated. Correct pronunciation of trade terms builds immediate credibility. Geography tells you the urgency and the right questions. And always identify your caller type before confirming the booking."},{"id":36,"section":"outro","type":"next","timing":"~0:40","actions":["Complete the Section 1.9 Assessment to unlock Module 2","Practice your empathy phrases and call structure with your Team Leader","Review the pronunciation table and say each term aloud at least three times"],"voiceover":"Here is what you do next. Complete the Section 1.9 assessment — you need 80% or higher to move to Module 2. Practice your empathy phrases out loud with your Team Leader before your first live call. And review the pronunciation table — say each trade term three times until they feel natural. You have everything you need. Now go apply it."},{"id":37,"section":"outro","type":"end","timing":"~0:30","title":"Module 1 Complete","subtitle":"Communication & Customer Service Excellence","next":"Module 2 — TGS Systems & Tools","voiceover":"That is the end of Module 1. You now have the communication foundation every great TGS agent needs. Module 2 is next — where we get into the systems and tools you will use every day. Great work. See you there."}];
+var SECTIONS_QUIZ_DEFAULT=[{"section":"1.1","title":"How Americans Communicate","questions":[{"question":"Americans typically prefer communication that is:","options":["Indirect and formal","Direct and to the point","Silent and reserved","Highly emotional"],"answer":1},{"question":"Using a customer's first name on a call is considered:","options":["Too informal and unprofessional","Standard and expected in US culture","Optional — only if they ask you to","Disrespectful unless they are very young"],"answer":1},{"question":"What should you do when there is silence on a call?","options":["Wait for the customer to speak first","Hang up and call back","Fill the gap confidently with a bridge phrase","Ask if they are still there repeatedly"],"answer":2},{"question":"What do American callers want MOST before a solution?","options":["A discount or refund","To feel heard and acknowledged","To be transferred to a supervisor","A detailed technical explanation"],"answer":1},{"question":"Which phrase best meets American communication expectations?","options":["'I will have someone look into that for you.'","'That is not something I can help with.'","'I will take care of that for you right now.'","'Can I put you on hold while I figure this out?'"],"answer":2}]},{"section":"1.2","title":"Phone Etiquette","questions":[{"question":"What is the correct TGS phone greeting?","options":["'TGS, hold please.'","'Thank you for calling TGS, this is [Name], how can I help?'","'Hello, who is calling?'","'TGS Repair, what do you need?'"],"answer":1},{"question":"Before placing a customer on hold, you should:","options":["Just put them on hold immediately","Say you will be right back","Ask permission and wait for a yes","Transfer them instead"],"answer":2},{"question":"How long should a hold last before you give the customer an update?","options":["5 minutes","10 minutes","2 minutes","As long as it takes"],"answer":2},{"question":"Which filler word should you AVOID on calls?","options":["'Absolutely'","'Of course'","'Um'","'Happy to help'"],"answer":2},{"question":"What must you do before ending every call?","options":["Ask for a review","Confirm next steps and ask if there is anything else","Transfer to quality assurance","Log the call and hang up"],"answer":1}]},{"section":"1.3","title":"Showing Empathy","questions":[{"question":"What does the 'A' in the ACTA framework stand for?","options":["Ask and Assist","Acknowledge and Assure","Answer and Action","Alert and Apologise"],"answer":1},{"question":"A customer says their AC has been out for two days in summer. What do you say first?","options":["'Let me check our schedule.'","'I completely understand — that must be really uncomfortable. I am going to get this sorted right away.'","'What is the model number of your unit?'","'Our technicians are very busy right now.'"],"answer":1},{"question":"Which phrase should you NEVER say to a frustrated customer?","options":["'I completely understand.'","'Calm down, sir.'","'I am sorry that happened.'","'I am going to fix this for you.'"],"answer":1},{"question":"Empathy without _______ is just words.","options":["A script","Action","A supervisor","An apology"],"answer":1},{"question":"A customer says 'You guys ghosted me — nobody showed up!' What is the correct first response?","options":["'Can I get your booking number?'","'I am so sorry that happened. That is not the experience we want you to have. Let me fix this immediately.'","'Our technicians are sometimes delayed.'","'Did you confirm the appointment?'"],"answer":1}]},{"section":"1.4","title":"Common American Expressions","questions":[{"question":"A customer says 'I need this ASAP.' What do they mean?","options":["They are just being polite","They want it as soon as possible — today or tomorrow","They are not in a hurry","They want a refund"],"answer":1},{"question":"'What is the damage?' is an American expression meaning:","options":["How bad is the repair?","How much will it cost?","Did something break?","What happened to the house?"],"answer":1},{"question":"A customer says 'You guys ghosted me.' What happened?","options":["Someone was rude to them","No one followed up or the technician did not show","They got a wrong quote","They were put on hold too long"],"answer":1},{"question":"Which phrase sounds most professional as a bridge between questions?","options":["'Um, let me check.'","'I do not know.'","'Give me just a moment.'","'Hold on sec.'"],"answer":2},{"question":"'Is this going to cost an arm and a leg?' means the customer is:","options":["In pain","Worried the cost will be very high","Asking about payment plans","Comparing your prices to competitors"],"answer":1}]},{"section":"1.5","title":"Pronunciation Guide","questions":[{"question":"How do you correctly pronounce 'HVAC'?","options":["'Have-ack'","Say each letter: H — V — A — C","'Hee-vak'","'Huh-vack'"],"answer":1},{"question":"Which syllable is stressed in 'compressor'?","options":["COM-pressor","com-PRESS-or","compress-OR","All syllables equally"],"answer":1},{"question":"'Furnace' rhymes with:","options":["Furnace sounds like 'fur-nace'","Promise","Furnace","Surface"],"answer":1},{"question":"If you are unsure how to say a trade term, the best approach is to:","options":["Guess and move on","Avoid using the term","Spell it out clearly","Ask the customer how to say it"],"answer":2},{"question":"Why does correct pronunciation of trade terms matter on calls?","options":["It is required by law","It signals expertise and builds customer trust","It helps the customer correct you","It has no real impact"],"answer":1}]},{"section":"1.6","title":"When You Don't Understand","questions":[{"question":"A customer speaks very fast and you miss their street address. What do you do?","options":["Guess and move on","Ask for one piece of clarification: 'I want to make sure I have the address right — could you repeat it?'","Put them on hold to look it up","Ask them to speak English more slowly"],"answer":1},{"question":"You hear a trade term you have never heard before. What is the right response?","options":["Pretend you understand","Say 'I have no idea what that is'","Say 'Could you describe what that looks like or what it does?'","Transfer immediately to a technician"],"answer":2},{"question":"Asking for clarification signals:","options":["A language barrier","That you are unprofessional","Attention and professionalism","That you do not know what you are doing"],"answer":2},{"question":"What should you do BEFORE moving on from any important detail?","options":["Log it in the system","Reflect it back to confirm: 'Just to confirm, the issue is with the outdoor unit?'","Guess if you think you are mostly right","Ask the customer to spell everything"],"answer":1},{"question":"How many things should you clarify at one time?","options":["As many as needed","Three at once to save time","One at a time","None — always move forward"],"answer":2}]},{"section":"1.7","title":"American Customer Service Culture","questions":[{"question":"What is the most important thing in American customer service culture?","options":["Low prices","Speed, ownership and positive tone","Offering discounts","Having the most staff"],"answer":1},{"question":"An agent says 'Someone will take care of that for you.' What is wrong with this?","options":["Nothing — it is fine","It lacks ownership — 'I will take care of that' is stronger","It is too slow","It promises too much"],"answer":1},{"question":"A technician is running 30 minutes late. The best action is to:","options":["Wait and see if the customer calls","Send a text after the appointment","Call the customer proactively, explain the delay and offer options","Do nothing — delays are expected"],"answer":2},{"question":"A customer had a bad experience but the agent recovered it professionally. The likely result is:","options":["They will complain anyway","They will probably never call again","A good recovery can turn a bad experience into loyalty","They will ask for a refund"],"answer":2},{"question":"Why do online reviews matter for TGS customer service agents?","options":["Reviews only matter for the management team","Every call is an opportunity to earn a 5-star experience","Reviews are mostly fake","They only affect marketing"],"answer":1}]},{"section":"1.8","title":"US Geography, Climate & Housing","questions":[{"question":"A caller in Phoenix, Arizona says their AC stopped working in July. What is the correct urgency level?","options":["Low — they can open windows","Medium — schedule within a week","High priority — AC failure in desert summer heat is an emergency","No urgency — it is not that hot in Arizona"],"answer":2},{"question":"In which region are basements MOST common?","options":["The South","The West","The Midwest and Northeast","Hawaii"],"answer":2},{"question":"HVAC units in the South are most often installed:","options":["In the basement","In the attic or rooftop","Under the floor","In the garage"],"answer":1},{"question":"A caller mentions a 'ductless mini-split.' In which region is this MOST commonly found?","options":["The Midwest","The South","The Northeast","The West"],"answer":3},{"question":"Why does knowing the customer's region help on a service call?","options":["It helps with small talk only","It allows you to calibrate urgency, ask the right questions, and use correct terminology","It is only useful for routing calls","It is not useful on a call"],"answer":1}]},{"section":"1.9","title":"Caller Types","questions":[{"question":"Which caller type can approve and pay for all work without checking with anyone else?","options":["Tenant","Property Manager","Homeowner","HOA Representative"],"answer":2},{"question":"A tenant calls to book a repair. What is the key question to ask?","options":["'Is your landlord aware of this call?'","'Are you authorised to approve the service call, or should we coordinate with the property owner?'","'Do you own or rent this property?'","'When did you move in?'"],"answer":1},{"question":"What does HOA stand for?","options":["Home Owners Agreement","Homeowners Association","Housing Operations Authority","Home Office Administration"],"answer":1},{"question":"A Property Manager calls and says they need work done at three different addresses. How should you flag this?","options":["Book each address as a separate normal call","Flag it as a managed account in the FSM and gather the billing contact","Ask them to call back three times","Transfer them to a supervisor"],"answer":1},{"question":"What is the FIRST question to ask on every call before confirming a booking?","options":["'What is the property address?'","'Are you the homeowner, or are you calling for a rental or managed property?'","'What is the problem with your system?'","'How did you hear about TGS?'"],"answer":1}]}];
+var SECTION_MAP_DEFAULT={"intro":{"label":"Introduction","slides":[1,2,3],"hasAssessment":false},"1.1":{"label":"How Americans Communicate","slides":[4,5,6],"hasAssessment":true},"1.2":{"label":"Phone Etiquette","slides":[7,8,9],"hasAssessment":true},"1.3":{"label":"Showing Empathy","slides":[10,11,12,13],"hasAssessment":true},"1.4":{"label":"Common American Expressions","slides":[14,15,16],"hasAssessment":true},"1.5":{"label":"Pronunciation Guide","slides":[17,18,19],"hasAssessment":true},"1.6":{"label":"When You Don't Understand","slides":[20,21],"hasAssessment":true},"1.7":{"label":"American Customer Service Culture","slides":[22,23],"hasAssessment":true},"1.8":{"label":"US Geography, Climate & Housing","slides":[24,25,26,27,28,29,30],"hasAssessment":true},"1.9":{"label":"Caller Types","slides":[31,32,33,34],"hasAssessment":true},"outro":{"label":"Wrap-Up","slides":[35,36,37],"hasAssessment":false}};
+var SECTION_ORDER_DEFAULT=["intro","1.1","1.2","1.3","1.4","1.5","1.6","1.7","1.8","1.9","outro"];
+// ── Working globals (loaded per-module via loadModuleGlobals) ─────────────────
+var SLIDES=[], SECTIONS_QUIZ=[], SECTION_MAP={}, SECTION_ORDER=[];
+// ── Slide Renderer Functions (double-quoted strings throughout) ───────────────
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function chip(t){ return t ? "<div class=\"timing-chip\">"+esc(t)+"</div>" : ""; }
+function chipDark(t){ return t ? "<div class=\"timing-chip-dark\">"+esc(t)+"</div>" : ""; }
+function hdr(title){ return "<div class=\"header-bar\"><h2>"+esc(title)+"</h2></div>"; }
+
+function renderSlide(sl){
+  var fn = {
+    title:rTitle, learn:rLearn, callout:rCallout, section:rSection,
+    content:rContent, twocol:rTwoCol, framework:rFramework,
+    callStructure:rCallStructure, dosdont:rDosDont, table:rTable,
+    pronTable:rPronTable, empathyTable:rEmpathyTable,
+    regionsOverview:rRegionsOverview, region:rRegion,
+    callerTypes:rCallerTypes, hoa:rHOA, callerScript:rCallerScript,
+    recap:rRecap, next:rNext, end:rEnd
+  };
+  return (fn[sl.type] || function(s){ return "<div style='padding:20px;color:#fff;background:#1F4E79'>Slide "+s.id+"</div>"; })(sl);
+}
+
+function rTitle(sl){
+  return "<div class=\"sl sl-navy\" style=\"position:relative\">"
+    +"<div class=\"title-content\">"
+    +"<span class=\"module-badge\">"+esc(sl.moduleLabel)+"</span>"
+    +"<div class=\"title-h1\">"+esc(sl.title)+"</div>"
+    +"<div class=\"title-sub\">"+esc(sl.subtitle)+"</div>"
+    +"</div>"
+    +"<div class=\"title-footer\"></div>"
+    +chip(sl.timing)+"</div>";
+}
+
+function rLearn(sl){
+  var COLS=["#2E75B6","#028090","#028060","#1F4E79","#2E4A7A","#1A3050"];
+  var tiles=sl.tiles.map(function(t,i){
+    return "<div class=\"learn-tile\" style=\"background:"+COLS[i%COLS.length]+"\">"
+      +"<div class=\"learn-icon\">"+t.icon+"</div>"
+      +"<div class=\"learn-label\">"+esc(t.label)+"</div>"
+      +"<div class=\"learn-desc\">"+esc(t.desc)+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-navy\">"
+    +hdr("What You'll Learn in This Module")
+    +"<div class=\"learn-tiles\">"+tiles+"</div>"
+    +chip(sl.timing)+"</div>";
+}
+
+function rCallout(sl){
+  return "<div class=\"sl\" style=\"background:"+(sl.bg||"#DEEAF1")+";position:relative\">"
+    +hdr(sl.title)
+    +"<div class=\"callout-body\">"
+    +"<div class=\"callout-quote-wrap\">"
+    +"<div class=\"callout-q-mark\">&ldquo;</div>"
+    +"<div class=\"callout-quote\">"+esc(sl.quote)+"</div>"
+    +(sl.speaker ? "<div class=\"callout-speaker\">&mdash; "+esc(sl.speaker)+"</div>" : "")
+    +"</div></div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rSection(sl){
+  return "<div class=\"sl sl-navy\" style=\"position:relative\">"
+    +"<div class=\"section-body\">"
+    +"<div class=\"section-num\">Section "+esc(sl.num)+"</div>"
+    +"<div class=\"section-title\">"+esc(sl.title)+"</div>"
+    +(sl.desc ? "<div class=\"section-desc\">"+esc(sl.desc)+"</div>" : "")
+    +"</div>"
+    +"<div class=\"section-footer\"></div>"
+    +chip(sl.timing)+"</div>";
+}
+
+function rContent(sl){
+  var items = sl.bullets.map(function(b){ return "<li>"+esc(b)+"</li>"; }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr(sl.title)
+    +"<div class=\"content-body\">"
+    +"<ul class=\"bullets\">"+items+"</ul>"
+    +"</div>"
+    +(sl.note ? "<div class=\"amber-note\">&#128161;&nbsp; "+esc(sl.note)+"</div>" : "")
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rTwoCol(sl){
+  var lItems = sl.litems.map(function(b){ return "<div class=\"col-item\">"+esc(b)+"</div>"; }).join("");
+  var rItems = sl.ritems.map(function(b){ return "<div class=\"col-item\">"+esc(b)+"</div>"; }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr(sl.title)
+    +"<div class=\"twocol-body\">"
+    +"<div class=\"col-box\" style=\"background:"+esc(sl.lbg)+"\">"
+    +"<div class=\"col-title\">"+esc(sl.ltitle)+"</div>"+lItems+"</div>"
+    +"<div class=\"col-box\" style=\"background:"+esc(sl.rbg)+"\">"
+    +"<div class=\"col-title\">"+esc(sl.rtitle)+"</div>"+rItems+"</div>"
+    +"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rFramework(sl){
+  var cols = sl.steps.map(function(st){
+    var pts = st.points.map(function(p){ return "<div class=\"fw-point\">"+esc(p)+"</div>"; }).join("");
+    return "<div class=\"fw-col\" style=\"background:"+esc(st.color)+"\">"
+      +"<div class=\"fw-letter\">"+esc(st.letter)+"</div>"
+      +"<div class=\"fw-title\">"+esc(st.title)+"</div>"
+      +pts+"</div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr(sl.title)
+    +"<div class=\"framework-cols\">"+cols+"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rCallStructure(){
+  var stages = [
+    {num:"1",label:"Answer",desc:"By 3rd ring\nStandard greeting",color:"#2E75B6"},
+    {num:"2",label:"Listen",desc:"Let them finish\nNo interruptions",color:"#028090"},
+    {num:"3",label:"Acknowledge",desc:"Empathy first\nBefore solving",color:"#028060"},
+    {num:"4",label:"Collect",desc:"One question\nat a time",color:"#1F4E79"},
+    {num:"5",label:"Confirm",desc:"Read everything\nback to them",color:"#2E4A7A"},
+    {num:"6",label:"Close",desc:"Warm close\nNext step clear",color:"#1A3050"},
+  ];
+  var cols = stages.map(function(st){
+    return "<div class=\"cs-stage\">"
+      +"<div class=\"cs-num\" style=\"background:"+st.color+"\">"+st.num+"</div>"
+      +"<div class=\"cs-body\" style=\"border-color:"+st.color+"\">"
+      +"<div class=\"cs-label\" style=\"color:"+st.color+"\">"+st.label+"</div>"
+      +"<div class=\"cs-desc\">"+st.desc.replace(/\n/g,"<br>")+"</div>"
+      +"</div></div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("The 6-Stage Professional Call Structure")
+    +"<div class=\"callstruct-body\">"+cols+"</div>"
+    +chipDark((SLIDES[7]||{}).timing)+"</div>";
+}
+
+function rDosDont(sl){
+  var dos   = sl.dos.map(function(d){ return "<div class=\"dd-item\">"+esc(d)+"</div>"; }).join("");
+  var donts = sl.donts.map(function(d){ return "<div class=\"dd-item\">"+esc(d)+"</div>"; }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr(sl.title)
+    +"<div class=\"dosdont-body\">"
+    +"<div class=\"dos-box\"><div class=\"dd-title\">&#10003;&nbsp; SAY THIS</div><div class=\"dd-items\">"+dos+"</div></div>"
+    +"<div class=\"dont-box\"><div class=\"dd-title\">&#10007;&nbsp; NEVER SAY</div><div class=\"dd-items\">"+donts+"</div></div>"
+    +"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rTable(sl){
+  var ths = sl.headers.map(function(h,i){
+    return "<th style=\"width:"+sl.colWidths[i]+"\">"+esc(h)+"</th>";
+  }).join("");
+  var trs = sl.rows.map(function(row){
+    return "<tr>"+row.map(function(cell){ return "<td>"+esc(cell)+"</td>"; }).join("")+"</tr>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr(sl.title)
+    +"<div style=\"padding:2% 0;overflow:auto;max-height:70%\">"
+    +"<table class=\"sl-table\"><thead><tr>"+ths+"</tr></thead><tbody>"+trs+"</tbody></table>"
+    +"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rPronTable(sl){
+  var ths = "<th class=\"pron-th-word\">Word</th><th class=\"pron-th-phonetic\">How to Say It</th>"
+    +"<th class=\"pron-th-mistake\">Common Mistake</th><th class=\"pron-th-tip\">Memory Tip</th>";
+  var trs = sl.rows.map(function(r){
+    return "<tr><td class=\"pron-word\">"+esc(r.word)+"</td>"
+      +"<td class=\"pron-phonetic\">"+esc(r.phonetic)+"</td>"
+      +"<td class=\"pron-mistake\">"+esc(r.mistake)+"</td>"
+      +"<td>"+esc(r.tip)+"</td></tr>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("Trade Term Pronunciation Guide")
+    +"<div style=\"padding:2% 0;overflow:auto;max-height:72%\">"
+    +"<table class=\"sl-table\"><thead><tr>"+ths+"</tr></thead><tbody>"+trs+"</tbody></table>"
+    +"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rEmpathyTable(sl){
+  var rows = [
+    ["Heat / AC out for more than a day","\"I completely understand — that must be really uncomfortable. I'm going to get this sorted right away.\""],
+    ["No-show technician","\"I'm so sorry that happened. That is not the experience we want you to have. Let me fix this immediately.\""],
+    ["Repeat problem / recall","\"I completely understand your frustration — I'm flagging this as a priority recall right now.\""],
+    ["Long wait time","\"I sincerely apologise for the wait. Your time is important and I want to make sure we get this right for you.\""],
+    ["Upset / frustrated caller","\"I hear you — and I understand. Let me focus on getting this resolved for you right now.\""],
+  ];
+  var ths = "<th style=\"width:30%\">Customer Situation</th><th style=\"width:70%\">What to Say</th>";
+  var trs = rows.map(function(r){
+    return "<tr><td>"+esc(r[0])+"</td><td style=\"font-style:italic\">"+esc(r[1])+"</td></tr>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("Empathy Phrases by Situation")
+    +"<div style=\"padding:2% 0;overflow:auto;max-height:72%\">"
+    +"<table class=\"sl-table\"><thead><tr>"+ths+"</tr></thead><tbody>"+trs+"</tbody></table>"
+    +"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rRegionsOverview(sl){
+  var regions = [
+    {name:"NORTHEAST",states:"NY • NJ • PA • MA • CT • ME",trait:"Cold winters / Dense housing / Older buildings",color:"#2E75B6",bg:"#DEEAF1"},
+    {name:"SOUTH",    states:"TX • FL • GA • NC • TN • AL",trait:"Hot humid summers / Large homes / No basement",color:"#C62828",bg:"#FFF0F0"},
+    {name:"MIDWEST",  states:"IL • OH • MI • MN • WI • IN",trait:"Extreme cold & heat / Single-family / Basements",color:"#028090",bg:"#E2EFDA"},
+    {name:"WEST",     states:"CA • AZ • NV • WA • OR • CO",trait:"Desert to rain / New construction / Earthquakes",color:"#5D4037",bg:"#FBE9E7"},
+  ];
+  var cards = regions.map(function(r){
+    return "<div class=\"rov-card\" style=\"border-color:"+r.color+";background:"+r.bg+"\">"
+      +"<div class=\"rov-card-head\" style=\"background:"+r.color+"\">"+r.name+"</div>"
+      +"<div class=\"rov-card-states\" style=\"color:"+r.color+"\">"+r.states+"</div>"
+      +"<div class=\"rov-card-trait\">"+r.trait+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("The Four Major US Regions")
+    +"<div class=\"rov-grid\">"+cards+"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rRegion(sl){
+  var hc = sl.headerColor;
+  var cols = [
+    {label:"&#127777; Climate & Peak Season",color:"#2E75B6",bg:"#DEEAF1",items:sl.climate},
+    {label:"&#127968; Housing Types",         color:"#028090",bg:"#E0F4F7",items:sl.housing},
+    {label:"&#128222; Customer Style on Calls",color:hc,     bg:"#F4F0FB",items:sl.style},
+  ];
+  var colsHtml = cols.map(function(c){
+    var items = c.items.map(function(it){ return "<div class=\"region-col-item\">"+esc(it)+"</div>"; }).join("");
+    return "<div class=\"region-col\">"
+      +"<div class=\"region-col-header\" style=\"background:"+c.color+"\">"+c.label+"</div>"
+      +"<div class=\"region-col-body\" style=\"background:"+c.bg+"\">"+items+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl\" style=\"background:#F4F6F8;position:relative;display:flex;flex-direction:column\">"
+    +"<div class=\"region-header\" style=\"background:"+hc+"\">"
+    +"<div class=\"region-name\">"+esc(sl.name)+"</div>"
+    +"<div class=\"region-states\">"+esc(sl.states)+"</div>"
+    +"</div>"
+    +"<div class=\"region-cols\">"+colsHtml+"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rCallerTypes(sl){
+  var CCOLS = [
+    {title:"&#127969; HOMEOWNER",          color:"#2E75B6",bg:"#DEEAF1",pts:["Owns the property","Pays directly — no approval needed","Highly emotionally invested","Full authority to approve work","Most common caller type"]},
+    {title:"&#128273; TENANT",             color:"#028090",bg:"#E0F4F7",pts:["Rents — does not own","Landlord may need to approve & pay","Limited authority on expensive repairs","May already be frustrated with landlord","Ask: who is the billing contact?"]},
+    {title:"&#127970; PROPERTY MGR / HOA", color:"#4A148C",bg:"#F3E5F5",pts:["Manages multiple units or properties","Calls on behalf of tenants or HOA","May book several jobs at once","Has or wants a vendor/account relationship","Ask: one property or several?"]},
+  ];
+  var cols = CCOLS.map(function(c){
+    var pts = c.pts.map(function(p){ return "<div class=\"caller-item\">"+esc(p)+"</div>"; }).join("");
+    return "<div class=\"caller-col\" style=\"border-color:"+c.color+"\">"
+      +"<div class=\"caller-col-head\" style=\"background:"+c.color+"\">"+c.title+"</div>"
+      +"<div class=\"caller-col-body\" style=\"background:"+c.bg+"\">"+pts+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("Who Is Calling? — 3 Caller Types")
+    +"<div class=\"caller-cols\">"+cols+"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rHOA(sl){
+  return "<div class=\"sl sl-white\" style=\"position:relative;display:flex;flex-direction:column\">"
+    +hdr("HOA &amp; Property Manager — What You Need to Know")
+    +"<div class=\"hoa-body\">"
+    +"<div class=\"hoa-row\">"
+    +"<div class=\"hoa-box\" style=\"border-color:#2E75B6\">"
+    +"<div class=\"hoa-box-head\" style=\"background:#2E75B6\">What is an HOA?</div>"
+    +"<div class=\"hoa-box-body\" style=\"background:#DEEAF1\">"
+    +"<div class=\"hoa-box-item\">HOA = Homeowners Association</div>"
+    +"<div class=\"hoa-box-item\">Manages shared areas in neighborhoods &amp; condos</div>"
+    +"<div class=\"hoa-box-item\">May call for maintenance in common areas</div>"
+    +"<div class=\"hoa-box-item\">One HOA call can mean multiple work orders</div>"
+    +"</div></div>"
+    +"<div class=\"hoa-box\" style=\"border-color:#4A148C\">"
+    +"<div class=\"hoa-box-head\" style=\"background:#4A148C\">What is a Property Manager?</div>"
+    +"<div class=\"hoa-box-body\" style=\"background:#F3E5F5\">"
+    +"<div class=\"hoa-box-item\">Manages rental properties on behalf of owners</div>"
+    +"<div class=\"hoa-box-item\">May book jobs because the tenant cannot</div>"
+    +"<div class=\"hoa-box-item\">Often has an existing vendor account</div>"
+    +"<div class=\"hoa-box-item\">May manage many properties at once</div>"
+    +"</div></div></div>"
+    +"<div class=\"hoa-amber\">"
+    +"<div class=\"hoa-amber-title\">&#128204; Key Questions to Ask Every HOA / Property Manager Call:</div>"
+    +"<div class=\"hoa-amber-item\">\"Are you calling for one property or multiple units?\"</div>"
+    +"<div class=\"hoa-amber-item\">\"Who is the billing contact for this account?\"</div>"
+    +"<div class=\"hoa-amber-item\">\"Will the tenant be home for the visit, or does access need to be arranged?\"</div>"
+    +"<div class=\"hoa-amber-item\">\"Does anyone need to approve the quote before work begins?\"</div>"
+    +"</div></div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rCallerScript(sl){
+  var cards = [
+    {label:"IF HOMEOWNER",          color:"#2E75B6",bg:"#DEEAF1",script:"\"Perfect. Let me get your details.\"\n→ Proceed with standard booking.\n→ They can approve all work."},
+    {label:"IF TENANT",             color:"#028090",bg:"#E0F4F7",script:"\"Are you authorised to approve the service call, or should we coordinate with the property owner?\"\n→ Note landlord as billing contact if needed."},
+    {label:"IF PROPERTY MGR / HOA", color:"#4A148C",bg:"#F3E5F5",script:"\"Let me set this up as a managed property account. How many units, and who is the primary billing contact?\"\n→ Flag as managed account in FSM."},
+  ];
+  var cardsHtml = cards.map(function(c){
+    return "<div class=\"cs-card\" style=\"border-color:"+c.color+"\">"
+      +"<div class=\"cs-card-head\" style=\"background:"+c.color+"\">"+c.label+"</div>"
+      +"<div class=\"cs-card-body\" style=\"background:"+c.bg+"\">"+esc(c.script).replace(/\\n/g,"<br>")+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative;display:flex;flex-direction:column\">"
+    +hdr("Your Script — Identify the Caller Type First")
+    +"<div class=\"cs-ask-bar\">ASK: \"Are you the homeowner, or are you calling for a rental or managed property?\"</div>"
+    +"<div class=\"cs-cards\">"+cardsHtml+"</div>"
+    +"<div class=\"cs-rule\">&#128204;&nbsp; Identify the caller type BEFORE confirming the booking — it changes who pays and who must approve the work.</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rRecap(sl){
+  var items = sl.takeaways.map(function(t,i){
+    return "<div class=\"recap-item\">"
+      +"<span class=\"recap-num\">"+(i+1)+".</span>"
+      +"<span class=\"recap-text\">"+esc(t)+"</span>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-navy\" style=\"position:relative\">"
+    +"<div style=\"padding:3% 4%\"><h2 style=\"color:#fff;font-size:2vw;font-weight:700\">Module 1 — Key Takeaways</h2></div>"
+    +"<div class=\"recap-body\">"+items+"</div>"
+    +chip(sl.timing)+"</div>";
+}
+
+function rNext(sl){
+  var NCOLS = ["#2E75B6","#028090","#1F4E79"];
+  var items = sl.actions.map(function(a,i){
+    return "<div class=\"next-item\">"
+      +"<div class=\"next-num\" style=\"background:"+NCOLS[i]+"\">"+( i+1)+"</div>"
+      +"<div class=\"next-text\" style=\"background:"+NCOLS[i]+"80;color:#1A2B3C\">"+esc(a)+"</div>"
+      +"</div>";
+  }).join("");
+  return "<div class=\"sl sl-white\" style=\"position:relative\">"
+    +hdr("What to Do Next")
+    +"<div class=\"next-body\">"+items+"</div>"
+    +chipDark(sl.timing)+"</div>";
+}
+
+function rEnd(sl){
+  return "<div class=\"sl sl-navy\" style=\"position:relative\">"
+    +"<div class=\"end-body\">"
+    +"<div class=\"end-title\">"+esc(sl.title)+"</div>"
+    +"<div class=\"end-sub\">"+esc(sl.subtitle)+"</div>"
+    +(sl.next ? "<div class=\"end-next\">Next: "+esc(sl.next)+"</div>" : "")
+    +"</div>"
+    +"<div class=\"end-footer\"></div>"
+    +"<div class=\"end-footer-text\">Questions? See your Team Leader.</div>"
+    +chip(sl.timing)+"</div>";
+}
+
+// ── Auth & Data Layer ─────────────────────────────────────────────────────────
+var AUTH_USERS_KEY   = "mod1_users";
+var AUTH_CLASSES_KEY = "mod1_classes";
+var AUTH_MODULES_KEY = "mod1_modules_registry";
+var AUTH_SESSION_KEY = "mod1_session";
+
+function initDefaultData(){
+  if(!localStorage.getItem(AUTH_USERS_KEY)){
+    localStorage.setItem(AUTH_USERS_KEY, JSON.stringify([
+      {id:"usr_admin",name:"Administrator",username:"admin",password:"admin123",role:"admin"}
+    ]));
+  }
+  if(!localStorage.getItem(AUTH_CLASSES_KEY)){
+    localStorage.setItem(AUTH_CLASSES_KEY, JSON.stringify([]));
+  }
+  if(!localStorage.getItem(AUTH_MODULES_KEY)){
+    localStorage.setItem(AUTH_MODULES_KEY, JSON.stringify([
+      {id:"mod1",title:"Module 1: Communication & Customer Service Excellence",
+       description:"Language, culture and professional call handling for US customers",
+       slides:37,status:"published",createdAt:Date.now()}
+    ]));
+  }
+}
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+function getUsers(){   try{return JSON.parse(localStorage.getItem(AUTH_USERS_KEY))||[];}catch(e){return [];} }
+function saveUsers(u){ localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(u)); }
+
+function getClasses(){   try{return JSON.parse(localStorage.getItem(AUTH_CLASSES_KEY))||[];}catch(e){return [];} }
+function saveClasses(c){ localStorage.setItem(AUTH_CLASSES_KEY, JSON.stringify(c)); }
+
+function getModules(){   try{return JSON.parse(localStorage.getItem(AUTH_MODULES_KEY))||[];}catch(e){return [];} }
+function saveModules(m){ localStorage.setItem(AUTH_MODULES_KEY, JSON.stringify(m)); }
+
+function getCurrentUser(){ try{return JSON.parse(sessionStorage.getItem(AUTH_SESSION_KEY))||null;}catch(e){return null;} }
+function setCurrentUser(u){ sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(u)); }
+function clearCurrentUser(){ sessionStorage.removeItem(AUTH_SESSION_KEY); }
+
+function genUid(p){ return (p||"id")+"_"+(Date.now().toString(36)+Math.random().toString(36).slice(2)); }
+
+// ── User CRUD ─────────────────────────────────────────────────────────────────
+function loginUser(username, password){
+  initDefaultData();
+  var u = getUsers().filter(function(u){ return u.username===username && u.password===password; })[0];
+  if(!u) return null;
+  setCurrentUser(u);
+  return u;
+}
+function logoutUser(){ clearCurrentUser(); showView("view-login"); resetLoginForm(); }
+
+function createUser(name, username, password, role){
+  var users = getUsers();
+  if(users.some(function(u){ return u.username===username; })) return {error:"Username already exists."};
+  var u = {id:genUid("usr"),name:name,username:username,password:password,role:role||"trainee"};
+  users.push(u);
+  saveUsers(users);
+  return u;
+}
+function deleteUser(uid){
+  saveUsers(getUsers().filter(function(u){ return u.id!==uid; }));
+  var cls = getClasses();
+  cls.forEach(function(c){ c.traineeIds=(c.traineeIds||[]).filter(function(id){ return id!==uid; }); });
+  saveClasses(cls);
+}
+
+// ── Class CRUD ────────────────────────────────────────────────────────────────
+function createClass(name){
+  var classes = getClasses();
+  var c = {id:genUid("cls"),name:name,modules:[],traineeIds:[],createdAt:Date.now()};
+  classes.push(c);
+  saveClasses(classes);
+  return c;
+}
+function deleteClass(cid){ saveClasses(getClasses().filter(function(c){ return c.id!==cid; })); }
+function updateClass(cid, updates){
+  saveClasses(getClasses().map(function(c){ return c.id===cid?Object.assign({},c,updates):c; }));
+}
+
+// ── Module CRUD ───────────────────────────────────────────────────────────────
+function createModule(title, description, status){
+  var mods = getModules();
+  var m = {id:genUid("mod"),title:title,description:description||"",slides:0,status:status||"draft",createdAt:Date.now()};
+  mods.push(m);
+  saveModules(mods);
+  return m;
+}
+function updateModule(mid, updates){
+  saveModules(getModules().map(function(m){ return m.id===mid?Object.assign({},m,updates):m; }));
+}
+function deleteModule(mid){
+  saveModules(getModules().filter(function(m){ return m.id!==mid; }));
+  var cls = getClasses();
+  cls.forEach(function(c){ c.modules=(c.modules||[]).filter(function(id){ return id!==mid; }); });
+  saveClasses(cls);
+}
+
+// ── Progress helpers ──────────────────────────────────────────────────────────
+function getTraineeProgress(uid){
+  try{return JSON.parse(localStorage.getItem("mod1_progress_v2_"+uid))||{};}catch(e){return {};}
+}
+
+// ── View Router ───────────────────────────────────────────────────────────────
+function showView(id){
+  ["view-login","view-admin","view-trainee","view-player","view-module-editor"].forEach(function(v){
+    var el = document.getElementById(v);
+    if(el) el.style.display = v===id?"flex":"none";
+  });
+}
+function resetLoginForm(){
+  document.getElementById("login-error").textContent="";
+  document.getElementById("login-username").value="";
+  document.getElementById("login-password").value="";
+}
+function handleLogin(){
+  var un  = document.getElementById("login-username").value.trim();
+  var pw  = document.getElementById("login-password").value;
+  var err = document.getElementById("login-error");
+  if(!un||!pw){ err.textContent="Enter username and password."; return; }
+  var u = loginUser(un,pw);
+  if(!u){ err.textContent="Invalid username or password."; return; }
+  if(u.role==="admin") showAdminDashboard();
+  else showTraineeDashboard();
+}
+window.addEventListener("DOMContentLoaded", function(){
+  initDefaultData();
+  ["login-username","login-password"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("keydown", function(e){ if(e.key==="Enter") handleLogin(); });
+  });
+  var u = getCurrentUser();
+  if(u){ if(u.role==="admin") showAdminDashboard(); else showTraineeDashboard(); }
+  else showView("view-login");
+});
+
+// ── Module Content CRUD ───────────────────────────────────────────────────────
+// Full slide+quiz content is stored per-module in localStorage.
+// On first access for mod1, seeds from the hardcoded *_DEFAULT globals.
+function getModuleContent(mid){
+  try{
+    var s = localStorage.getItem("mod_content_"+mid);
+    if(s) return JSON.parse(s);
+  }catch(e){}
+  // Seed built-in module from defaults
+  if(mid==="mod1" && typeof SLIDES_DEFAULT!=="undefined"){
+    var c={slides:JSON.parse(JSON.stringify(SLIDES_DEFAULT)),
+           quiz:JSON.parse(JSON.stringify(SECTIONS_QUIZ_DEFAULT)),
+           sectionMap:JSON.parse(JSON.stringify(SECTION_MAP_DEFAULT)),
+           sectionOrder:JSON.parse(JSON.stringify(SECTION_ORDER_DEFAULT))};
+    saveModuleContent(mid,c);
+    return c;
+  }
+  return {slides:[],quiz:[],sectionMap:{},sectionOrder:[]};
+}
+function saveModuleContent(mid,content){
+  localStorage.setItem("mod_content_"+mid,JSON.stringify(content));
+}
+// Load a module's content into the live globals used by the player
+function loadModuleGlobals(mid){
+  var c = getModuleContent(mid);
+  SLIDES       = c.slides      || [];
+  SECTIONS_QUIZ= c.quiz        || [];
+  SECTION_MAP  = c.sectionMap  || {};
+  SECTION_ORDER= c.sectionOrder|| [];
+}
+
+// ── Export / Import Config ────────────────────────────────────────────────────
+// Exports all users, classes, modules registry and module content to a JSON file.
+// Audio blobs (IndexedDB) and per-trainee progress are NOT exported — those stay local.
+function exportConfig(){
+  var mods = getModules();
+  var config = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    exportedBy: (getCurrentUser()||{}).username||"admin",
+    users:   getUsers(),
+    classes: getClasses(),
+    modules: mods,
+    content: {}
+  };
+  mods.forEach(function(m){
+    try{
+      var raw = localStorage.getItem("mod_content_"+m.id);
+      if(raw) config.content[m.id] = JSON.parse(raw);
+    }catch(e){}
+  });
+  var json = JSON.stringify(config, null, 2);
+  var blob = new Blob([json], {type:"application/json"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "TGS_Training_Config_"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+function importConfig(){
+  var input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json,application/json";
+  input.onchange = function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var cfg = JSON.parse(ev.target.result);
+        if(!cfg.version || !Array.isArray(cfg.users) || !Array.isArray(cfg.modules)){
+          alert("Invalid config file — make sure you selected the right file.");
+          return;
+        }
+        var msg = "Import this config?\n\n"
+          + "  • " + cfg.users.length   + " user(s)\n"
+          + "  • " + cfg.classes.length + " class(es)\n"
+          + "  • " + cfg.modules.length + " module(s)\n\n"
+          + "This will REPLACE all existing users, classes and module setup on this PC.\n"
+          + "Trainee progress saved on this PC is NOT affected.\n\n"
+          + "Continue?";
+        if(!confirm(msg)) return;
+        localStorage.setItem(AUTH_USERS_KEY,   JSON.stringify(cfg.users));
+        localStorage.setItem(AUTH_CLASSES_KEY, JSON.stringify(cfg.classes));
+        localStorage.setItem(AUTH_MODULES_KEY, JSON.stringify(cfg.modules));
+        if(cfg.content && typeof cfg.content==="object"){
+          Object.keys(cfg.content).forEach(function(mid){
+            localStorage.setItem("mod_content_"+mid, JSON.stringify(cfg.content[mid]));
+          });
+        }
+        alert("Config imported successfully! The page will now reload.");
+        location.reload();
+      }catch(err){
+        alert("Could not read config file: "+err.message);
+        console.error("importConfig error:", err);
+      }
+    };
+    reader.readAsText(file);
+  };
+  document.body.appendChild(input);
+  input.click();
+  document.body.removeChild(input);
+}
+
+// ── Admin Dashboard ───────────────────────────────────────────────────────────
+function showAdminDashboard(){
+  showView("view-admin");
+  document.getElementById("admin-user-name").textContent = getCurrentUser().name;
+  switchAdminTab("modules");
+}
+
+function switchAdminTab(tab){
+  ["modules","classes","trainees"].forEach(function(t){
+    document.getElementById("admin-tab-"+t).classList.toggle("tab-active", t===tab);
+    document.getElementById("admin-section-"+t).style.display = t===tab?"block":"none";
+  });
+  if(tab==="modules")  renderAdminModules();
+  if(tab==="classes")  renderAdminClasses();
+  if(tab==="trainees") renderAdminTrainees();
+}
+
+// ══ MODULES ═══════════════════════════════════════════════════════════════════
+function renderAdminModules(){
+  var mods    = getModules();
+  var classes = getClasses();
+  // build usage map: mid → [class names]
+  var usage = {};
+  classes.forEach(function(c){
+    (c.modules||[]).forEach(function(mid){
+      if(!usage[mid]) usage[mid]=[];
+      usage[mid].push(c.name);
+    });
+  });
+  var list = document.getElementById("admin-modules-list");
+  if(!mods.length){
+    list.innerHTML = "<div class=\"empty-state\">No modules yet. Click \"+ Add Module\" to create one.</div>";
+    return;
+  }
+  var html = "";
+  mods.forEach(function(m){
+    var isPub    = m.status==="published";
+    var usedIn   = usage[m.id] ? usage[m.id].map(function(n){ return esc(n); }).join(", ") : "Not assigned";
+    var isBuiltIn = m.id==="mod1";
+    html += "<div class=\"mod-row\">";
+    html += "<div class=\"mod-row-left\">";
+    html += "<div class=\"mod-row-title\">"+esc(m.title)+"</div>";
+    if(m.description) html += "<div class=\"mod-row-desc\">"+esc(m.description)+"</div>";
+    html += "<div class=\"mod-row-meta\">";
+    html += "<span class=\"t-mod-status "+(isPub?"status-done":"status-new")+"\">"+esc(m.status)+"</span> ";
+    if(m.slides) html += "<span class=\"mod-meta-chip\">"+m.slides+" slides</span>";
+    html += "<span class=\"mod-meta-chip\">Classes: "+usedIn+"</span>";
+    html += "</div></div>";
+    html += "<div class=\"mod-row-actions\">";
+    html += "<button class=\"btn-sm btn-primary\" data-mid=\""+m.id+"\" onclick=\"openEditModuleModal(this.dataset.mid)\">Edit</button>";
+    html += " <button class=\"btn-sm btn-primary\" style=\"background:#028090\" data-mid=\""+m.id+"\" onclick=\"openModuleEditor(this.dataset.mid)\">Edit Content</button>";
+    html += " <button class=\"btn-sm btn-primary\" style=\"background:#5D4037\" data-mid=\""+m.id+"\" onclick=\"previewModule(this.dataset.mid)\">&#9654; Preview</button>";
+    if(!isBuiltIn){
+      html += " <button class=\"btn-sm btn-danger\" data-mid=\""+m.id+"\" onclick=\"handleDeleteModule(this.dataset.mid)\">Delete</button>";
+    }
+    html += "</div></div>";
+  });
+  list.innerHTML = html;
+}
+
+// Add module modal
+function openNewModuleModal(){
+  document.getElementById("mod-modal-title").textContent = "Add New Module";
+  document.getElementById("mod-modal-id").value = "";
+  document.getElementById("mod-modal-name").value = "";
+  document.getElementById("mod-modal-desc").value = "";
+  document.getElementById("mod-modal-status").value = "draft";
+  document.getElementById("mod-modal-error").textContent = "";
+  document.getElementById("mod-modal").style.display = "flex";
+}
+
+// Edit module modal
+function openEditModuleModal(mid){
+  var m = getModules().filter(function(m){ return m.id===mid; })[0];
+  if(!m) return;
+  document.getElementById("mod-modal-title").textContent = "Edit Module";
+  document.getElementById("mod-modal-id").value     = mid;
+  document.getElementById("mod-modal-name").value   = m.title;
+  document.getElementById("mod-modal-desc").value   = m.description||"";
+  document.getElementById("mod-modal-status").value = m.status||"draft";
+  document.getElementById("mod-modal-error").textContent = "";
+  // Lock status field for built-in module only if needed (allow edits)
+  document.getElementById("mod-modal").style.display = "flex";
+}
+
+function closeModuleModal(){ document.getElementById("mod-modal").style.display="none"; }
+
+function saveModuleModal(){
+  var mid    = document.getElementById("mod-modal-id").value;
+  var title  = document.getElementById("mod-modal-name").value.trim();
+  var desc   = document.getElementById("mod-modal-desc").value.trim();
+  var status = document.getElementById("mod-modal-status").value;
+  var errEl  = document.getElementById("mod-modal-error");
+  if(!title){ errEl.textContent="Module title is required."; return; }
+  if(mid){
+    updateModule(mid,{title:title,description:desc,status:status});
+  } else {
+    createModule(title, desc, status);
+  }
+  closeModuleModal();
+  renderAdminModules();
+  // Refresh classes tab if open so module names stay in sync
+}
+
+function handleDeleteModule(mid){
+  if(!confirm("Delete this module? It will be removed from all classes. Trainee progress is preserved.")) return;
+  deleteModule(mid);
+  renderAdminModules();
+}
+
+// ── Module Preview ────────────────────────────────────────────────────────────
+function previewModule(mid){
+  _previewMode = true;
+  currentUserProgressKey = "mod_preview_"+mid;   // isolated — never touches trainee progress
+  if(typeof currentBlobId !== "undefined")  currentBlobId = null;
+  if(typeof currentAudioURL !== "undefined" && currentAudioURL){
+    URL.revokeObjectURL(currentAudioURL); currentAudioURL = null;
+  }
+  if(typeof audioEl !== "undefined" && audioEl){ audioEl.pause(); audioEl.src=""; }
+  showView("view-player");
+  // Always show admin panel button in preview
+  var adminBtn   = document.getElementById("btn-admin");
+  var adminPanel = document.getElementById("admin-panel");
+  if(adminBtn)   adminBtn.style.display = "";
+  if(adminPanel){ adminPanel.style.display = "none"; adminOpen = false; }
+  // Show preview banner in topbar
+  var ttlEl = document.getElementById("player-topbar-title");
+  var shdr  = document.getElementById("sidebar-header");
+  var mods  = getModules();
+  var mod   = mods.filter(function(m){ return m.id===mid; })[0];
+  var label = mod ? mod.title : mid;
+  if(ttlEl)  ttlEl.innerHTML = esc(label)+" <span style=\"background:#F0C040;color:#1A2B3C;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;vertical-align:middle\">PREVIEW</span>";
+  if(shdr)   shdr.textContent = label.toUpperCase();
+  // Load module globals (slides, quiz, sections)
+  loadModuleGlobals(mid);
+  // Always start from slide 1 in preview
+  currentSlide = 1;
+  renderCurrentSlide();
+  buildSidebar();
+  updateProgress();
+}
+
+// Assign modules to classes shortcut from modules tab
+function openAssignModuleToClass(mid){
+  // Pre-open class detail... instead just show a quick assign modal
+  openModuleAssignClassModal(mid);
+}
+
+function openModuleAssignClassModal(mid){
+  var m       = getModules().filter(function(m){ return m.id===mid; })[0];
+  var classes = getClasses();
+  if(!m) return;
+  document.getElementById("mac-modal-title").textContent = "Assign \""+m.title+"\" to Classes";
+  document.getElementById("mac-modal-mid").value = mid;
+  var html = "";
+  if(!classes.length) html = "<span style='color:#aaa;font-size:12px'>No classes yet. Create a class first.</span>";
+  classes.forEach(function(c){
+    var checked = (c.modules||[]).includes(mid)?"checked":"";
+    html += "<label class=\"assign-row\"><input type=\"checkbox\" class=\"mac-cls-cb\" value=\""+c.id+"\" "+checked+"> "
+          + "<span class=\"assign-sid\">"+esc(c.name)+"</span></label>";
+  });
+  document.getElementById("mac-modal-list").innerHTML = html;
+  document.getElementById("mac-modal").style.display = "flex";
+}
+function closeMacModal(){ document.getElementById("mac-modal").style.display="none"; }
+function saveMacModal(){
+  var mid = document.getElementById("mac-modal-mid").value;
+  var classes = getClasses();
+  classes.forEach(function(c){
+    var cb = document.querySelector(".mac-cls-cb[value='"+c.id+"']");
+    if(!cb) return;
+    var mods = (c.modules||[]).filter(function(id){ return id!==mid; });
+    if(cb.checked) mods.push(mid);
+    updateClass(c.id,{modules:mods});
+  });
+  closeMacModal();
+  renderAdminModules();
+}
+
+// ══ CLASSES ════════════════════════════════════════════════════════════════════
+function renderAdminClasses(){
+  var classes = getClasses();
+  var users   = getUsers();
+  var mods    = getModules();
+  var uMap={}, mMap={};
+  users.forEach(function(u){ uMap[u.id]=u; });
+  mods.forEach(function(m){ mMap[m.id]=m; });
+  var list = document.getElementById("admin-classes-list");
+  if(!classes.length){
+    list.innerHTML = "<div class=\"empty-state\">No classes yet. Click \"+ New Class\" to get started.</div>";
+    return;
+  }
+  var html = "";
+  classes.forEach(function(cls){
+    var names = (cls.traineeIds||[]).map(function(id){ return uMap[id]?esc(uMap[id].name):"?"; }).join(", ");
+    var modBadges = (cls.modules||[]).map(function(mid){
+      var m = mMap[mid];
+      return m?"<span class=\"mod-badge\">"+esc(m.title)+"</span>":"";
+    }).join("");
+    html += "<div class=\"cls-card\">";
+    html += "<div class=\"cls-card-head\"><div class=\"cls-card-name\">"+esc(cls.name)+"</div>";
+    html += "<div class=\"cls-card-meta\">"+(cls.traineeIds||[]).length+" trainee(s) &bull; "+(cls.modules||[]).length+" module(s)</div></div>";
+    html += "<div class=\"cls-card-body\">"+(modBadges||"<span style='color:#7DA8C8;font-size:11px'>No modules assigned</span>");
+    if(names) html += "<div class=\"cls-trainees\">Trainees: "+names+"</div>";
+    html += "</div><div class=\"cls-card-foot\">";
+    html += "<button class=\"btn-sm btn-primary\" data-cid=\""+cls.id+"\" onclick=\"openClassDetail(this.dataset.cid)\">Manage</button> ";
+    html += "<button class=\"btn-sm btn-danger\"  data-cid=\""+cls.id+"\" onclick=\"handleDeleteClass(this.dataset.cid)\">Delete</button>";
+    html += "</div></div>";
+  });
+  list.innerHTML = html;
+}
+
+function openNewClassModal(){
+  document.getElementById("new-class-name").value="";
+  document.getElementById("new-class-error").textContent="";
+  document.getElementById("new-class-modal").style.display="flex";
+}
+function closeNewClassModal(){ document.getElementById("new-class-modal").style.display="none"; }
+function saveNewClass(){
+  var name = document.getElementById("new-class-name").value.trim();
+  if(!name){ document.getElementById("new-class-error").textContent="Class name is required."; return; }
+  createClass(name);
+  closeNewClassModal();
+  renderAdminClasses();
+}
+function handleDeleteClass(cid){
+  if(!confirm("Delete this class? Trainee progress is preserved.")) return;
+  deleteClass(cid);
+  renderAdminClasses();
+}
+
+// Class Detail modal — assign modules + trainees
+function openClassDetail(cid){
+  var cls      = getClasses().filter(function(c){ return c.id===cid; })[0];
+  var trainees = getUsers().filter(function(u){ return u.role==="trainee"; });
+  var mods     = getModules();
+  if(!cls) return;
+  document.getElementById("class-detail-name").textContent = cls.name;
+  document.getElementById("class-detail-id").value = cid;
+  // Modules checklist (all modules from registry)
+  var mHtml = "";
+  if(!mods.length) mHtml = "<span style='color:#aaa;font-size:12px'>No modules available. Add modules first.</span>";
+  mods.forEach(function(m){
+    var chk = (cls.modules||[]).includes(m.id)?"checked":"";
+    var lbl = m.status==="draft"?" <span style='color:#b08800;font-size:10px'>(draft)</span>":"";
+    mHtml += "<label class=\"assign-row\"><input type=\"checkbox\" class=\"cls-mod-cb\" value=\""+m.id+"\" "+chk+"> "
+           + esc(m.title)+lbl+"</label>";
+  });
+  document.getElementById("class-detail-modules").innerHTML = mHtml;
+  // Trainees checklist
+  var tHtml = "";
+  if(!trainees.length) tHtml = "<span style='color:#aaa;font-size:12px'>No trainees yet. Add trainees in the Trainees tab.</span>";
+  trainees.forEach(function(u){
+    var chk = (cls.traineeIds||[]).includes(u.id)?"checked":"";
+    tHtml += "<label class=\"assign-row\"><input type=\"checkbox\" class=\"cls-trainee-cb\" value=\""+u.id+"\" "+chk+"> "
+           + "<span class=\"assign-sid\">"+esc(u.name)+"</span> <span class=\"assign-stitle\">@"+esc(u.username)+"</span></label>";
+  });
+  document.getElementById("class-detail-trainees").innerHTML = tHtml;
+  document.getElementById("class-detail-modal").style.display="flex";
+}
+function closeClassDetail(){ document.getElementById("class-detail-modal").style.display="none"; }
+function saveClassDetail(){
+  var cid  = document.getElementById("class-detail-id").value;
+  var mods = []; document.querySelectorAll(".cls-mod-cb:checked").forEach(function(cb){ mods.push(cb.value); });
+  var tIds = []; document.querySelectorAll(".cls-trainee-cb:checked").forEach(function(cb){ tIds.push(cb.value); });
+  updateClass(cid,{modules:mods,traineeIds:tIds});
+  closeClassDetail();
+  renderAdminClasses();
+}
+
+// ══ TRAINEES ══════════════════════════════════════════════════════════════════
+function renderAdminTrainees(){
+  var trainees = getUsers().filter(function(u){ return u.role==="trainee"; });
+  var classes  = getClasses();
+  var list = document.getElementById("admin-trainees-list");
+  if(!trainees.length){
+    list.innerHTML = "<div class=\"empty-state\">No trainees yet. Click \"+ Add Trainee\".</div>";
+    return;
+  }
+  var html = "";
+  trainees.forEach(function(u){
+    var myClasses = classes.filter(function(c){ return (c.traineeIds||[]).includes(u.id); });
+    var prog   = getTraineeProgress(u.id);
+    var pct    = Math.round(((prog.currentSlide||1)/37)*100);
+    var passed = Object.keys(prog.passedSections||{}).length;
+    html += "<div class=\"trainee-row\">";
+    html += "<div class=\"trainee-info\">";
+    html += "<div class=\"trainee-name\">"+esc(u.name)+"</div>";
+    html += "<div class=\"trainee-meta\">@"+esc(u.username)+" &bull; Classes: "+(myClasses.map(function(c){return esc(c.name);}).join(", ")||"None")+"</div>";
+    html += "<div class=\"tprog-wrap\"><div class=\"tprog-bar\" style=\"width:"+pct+"%\"></div></div>";
+    html += "<div class=\"trainee-meta\">Module 1 &mdash; "+pct+"% &bull; "+passed+"/9 sections passed</div>";
+    html += "</div>";
+    html += "<button class=\"btn-sm btn-danger\" data-uid=\""+u.id+"\" onclick=\"handleDeleteTrainee(this.dataset.uid)\">Remove</button>";
+    html += "</div>";
+  });
+  list.innerHTML = html;
+}
+
+function openAddTraineeModal(){
+  ["new-t-name","new-t-username","new-t-password"].forEach(function(id){ document.getElementById(id).value=""; });
+  document.getElementById("new-t-error").textContent="";
+  document.getElementById("add-trainee-modal").style.display="flex";
+}
+function closeAddTraineeModal(){ document.getElementById("add-trainee-modal").style.display="none"; }
+function saveNewTrainee(){
+  var name = document.getElementById("new-t-name").value.trim();
+  var un   = document.getElementById("new-t-username").value.trim();
+  var pw   = document.getElementById("new-t-password").value;
+  var err  = document.getElementById("new-t-error");
+  if(!name||!un||!pw){ err.textContent="All fields are required."; return; }
+  var res = createUser(name,un,pw,"trainee");
+  if(res.error){ err.textContent=res.error; return; }
+  closeAddTraineeModal();
+  renderAdminTrainees();
+}
+function handleDeleteTrainee(uid){
+  if(!confirm("Remove this trainee? Their progress data is preserved.")) return;
+  deleteUser(uid);
+  renderAdminTrainees();
+  renderAdminClasses();
+}
+
+// ── Trainee Dashboard ─────────────────────────────────────────────────────────
+var currentUserProgressKey = "mod1_progress_v2";
+
+function showTraineeDashboard(){
+  showView("view-trainee");
+  if(typeof audioEl !== "undefined" && audioEl){ audioEl.pause(); }
+  var u = getCurrentUser();
+  document.getElementById("trainee-user-name").textContent = u.name;
+  renderMyClasses(u);
+}
+
+function renderMyClasses(u){
+  var classes = getClasses().filter(function(c){ return (c.traineeIds||[]).includes(u.id); });
+  var mods    = getModules();
+  var mMap    = {};
+  mods.forEach(function(m){ mMap[m.id]=m; });
+  var list = document.getElementById("trainee-classes-list");
+  if(!classes.length){
+    list.innerHTML = "<div class=\"empty-state\">You have not been assigned to any classes yet.<br>Please contact your administrator.</div>";
+    return;
+  }
+  var html = "";
+  classes.forEach(function(cls){
+    html += "<div class=\"trainee-class-card\">";
+    html += "<div class=\"trainee-class-head\">"+esc(cls.name)+"</div>";
+    html += "<div class=\"trainee-class-body\">";
+    if(!(cls.modules||[]).length){
+      html += "<div style='color:#7DA8C8;font-size:13px;padding:12px 0'>No modules assigned to this class yet.</div>";
+    }
+    (cls.modules||[]).forEach(function(mid){
+      var m = mMap[mid];
+      if(!m) return;
+      var isDraft  = m.status!=="published";
+      // Only mod1 has real slide content; others show coming soon
+      var hasContent = mid==="mod1";
+      var prog   = !isDraft && hasContent ? getTraineeProgress(u.id) : {};
+      var total  = m.slides||37;
+      var slide  = prog.currentSlide||1;
+      var pct    = (!isDraft && hasContent) ? Math.round((slide/total)*100) : 0;
+      var passed = Object.keys(prog.passedSections||{}).length;
+      var totalSecs = 9;
+      var statusLabel = isDraft?"Coming Soon":(pct>=100?"Complete":(pct>0?"In Progress":"Not Started"));
+      var statusCls   = isDraft?"status-draft":(pct>=100?"status-done":(pct>0?"status-progress":"status-new"));
+      html += "<div class=\"t-mod-row\">";
+      html += "<div class=\"t-mod-info\">";
+      html += "<div class=\"t-mod-title\">"+esc(m.title)+"</div>";
+      html += "<div class=\"t-mod-status "+statusCls+"\">"+statusLabel+"</div>";
+      if(!isDraft && hasContent){
+        html += "<div class=\"tprog-wrap\"><div class=\"tprog-bar\" style=\"width:"+pct+"%\"></div></div>";
+        html += "<div class=\"t-mod-meta\">"+pct+"% complete &bull; "+passed+"/"+totalSecs+" sections passed</div>";
+      } else if(isDraft){
+        html += "<div class=\"t-mod-meta\">This module is being prepared. Check back soon.</div>";
+      } else {
+        html += "<div class=\"t-mod-meta\">Content not yet available for this module.</div>";
+      }
+      html += "</div>";
+      if(!isDraft && hasContent){
+        var btnLabel = pct>0?(pct>=100?"Review":"Continue →"):"Start →";
+        html += "<button class=\"btn-launch\" data-cid=\""+cls.id+"\" data-mid=\""+mid+"\" data-uid=\""+u.id+"\" onclick=\"launchModule(this.dataset.cid,this.dataset.mid,this.dataset.uid)\">"+btnLabel+"</button>";
+      } else {
+        html += "<button class=\"btn-launch\" disabled style=\"opacity:.4;cursor:not-allowed\">Coming Soon</button>";
+      }
+      html += "</div>";
+    });
+    html += "</div></div>";
+  });
+  list.innerHTML = html;
+}
+
+function launchModule(classId, moduleId, userId){
+  _previewMode = false;
+  currentUserProgressKey = "mod1_progress_v2_"+userId;
+  if(typeof currentBlobId !== "undefined"){ currentBlobId=null; }
+  if(typeof currentAudioURL !== "undefined" && currentAudioURL){
+    URL.revokeObjectURL(currentAudioURL); currentAudioURL=null;
+  }
+  if(typeof audioEl !== "undefined" && audioEl){ audioEl.pause(); audioEl.src=""; }
+  showView("view-player");
+  // Hide audio admin for trainees
+  var role = getCurrentUser().role;
+  var adminBtn   = document.getElementById("btn-admin");
+  var adminPanel = document.getElementById("admin-panel");
+  if(adminBtn)   adminBtn.style.display   = role==="admin"?"":"none";
+  if(adminPanel && role!=="admin"){ adminPanel.style.display="none"; adminOpen=false; }
+  // Load module globals (slides, quiz, sectionMap, sectionOrder)
+  loadModuleGlobals(moduleId);
+  // Set topbar title and sidebar header dynamically
+  var mods = getModules();
+  var mod  = mods.filter(function(m){ return m.id===moduleId; })[0];
+  var ttl  = document.getElementById("player-topbar-title");
+  var shdr = document.getElementById("sidebar-header");
+  if(ttl)  ttl.textContent  = mod ? mod.title : moduleId;
+  if(shdr) shdr.textContent = mod ? mod.title.toUpperCase() : "SECTIONS";
+  // Init player
+  var p = getProgress();
+  currentSlide = p.currentSlide||1;
+  renderCurrentSlide();
+  buildSidebar();
+  updateProgress();
+}
+
+// ── App Logic ─────────────────────────────────────────────────────────────────
+
+function getProgress(){ try{ return JSON.parse(localStorage.getItem(currentUserProgressKey))||{}; }catch(e){ return {}; } }
+function saveProgress(p){ localStorage.setItem(currentUserProgressKey, JSON.stringify(p)); }
+
+// ── IndexedDB ─────────────────────────────────────────────────────────────────
+// schema v3: store "blobs" (key=blobId, val=Blob), store "mapping" (key="slide_N", val=blobId)
+function openDB(){
+  return new Promise(function(res,rej){
+    var r = indexedDB.open("Mod1AudioDB",3);
+    r.onupgradeneeded = function(){
+      var db = r.result;
+      if(!db.objectStoreNames.contains("blobs"))   db.createObjectStore("blobs");
+      if(!db.objectStoreNames.contains("mapping")) db.createObjectStore("mapping");
+      if(!db.objectStoreNames.contains("audio"))   db.createObjectStore("audio");
+    };
+    r.onsuccess = function(){ res(r.result); };
+    r.onerror   = function(){ rej(r.error); };
+  });
+}
+
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+
+// Save one blob, assign to multiple slideIds
+async function saveAudioForSlides(slideIds, file){
+  var db = await openDB();
+  var blobId = genId();
+  await new Promise(function(res,rej){
+    var tx = db.transaction(["blobs","mapping"],"readwrite");
+    tx.objectStore("blobs").put(file, blobId);
+    slideIds.forEach(function(sid){ tx.objectStore("mapping").put(blobId,"slide_"+sid); });
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+  return blobId;
+}
+
+// Get blob by blobId directly
+async function loadBlobById(blobId){
+  var db = await openDB();
+  return new Promise(function(res,rej){
+    var tx = db.transaction("blobs","readonly");
+    var r  = tx.objectStore("blobs").get(blobId);
+    r.onsuccess = function(){ res(r.result||null); };
+    r.onerror   = rej;
+  });
+}
+
+// Returns blobId for a slideId (checks mapping, then legacy store key)
+async function getBlobIdForSlide(slideId){
+  var db = await openDB();
+  return new Promise(function(res,rej){
+    var tx  = db.transaction(["mapping"],"readonly");
+    var req = tx.objectStore("mapping").get("slide_"+slideId);
+    req.onsuccess = function(){ res(req.result||null); };
+    req.onerror   = rej;
+  });
+}
+
+// For legacy fallback: get blob from old "audio" store
+async function loadLegacyBlob(slideId){
+  var db = await openDB();
+  return new Promise(function(res,rej){
+    var tx  = db.transaction("audio","readonly");
+    var req = tx.objectStore("audio").get("slide_"+slideId);
+    req.onsuccess = function(){ res(req.result||null); };
+    req.onerror   = rej;
+  });
+}
+
+// Remove mapping for one slide; garbage-collect orphaned blob
+async function clearAudioForSlide(slideId){
+  var mappings = await getAllMappings();
+  var blobId   = mappings["slide_"+slideId];
+  var db       = await openDB();
+  await new Promise(function(res,rej){
+    var tx = db.transaction(["blobs","mapping"],"readwrite");
+    tx.objectStore("mapping").delete("slide_"+slideId);
+    if(blobId){
+      var refs = Object.values(mappings).filter(function(v){ return v===blobId; }).length;
+      if(refs<=1) tx.objectStore("blobs").delete(blobId);
+    }
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+
+// { "slide_N": blobId }
+async function getAllMappings(dbArg){
+  var db = dbArg||await openDB();
+  return new Promise(function(res,rej){
+    var tx   = db.transaction("mapping","readonly");
+    var rVal = tx.objectStore("mapping").getAll();
+    var rKey = tx.objectStore("mapping").getAllKeys();
+    var done=0, vals, keys, out={};
+    function finish(){ keys.forEach(function(k,i){ out[k]=vals[i]; }); res(out); }
+    rVal.onsuccess = function(){ vals=rVal.result; if(++done===2) finish(); };
+    rKey.onsuccess = function(){ keys=rKey.result; if(++done===2) finish(); };
+    rVal.onerror = rKey.onerror = rej;
+  });
+}
+
+// { blobId: [slideId, ...] }
+async function getBlobGroups(){
+  var mappings = await getAllMappings();
+  var groups = {};
+  Object.keys(mappings).forEach(function(k){
+    var bid = mappings[k], sid = parseInt(k.replace("slide_",""));
+    if(!groups[bid]) groups[bid]=[];
+    groups[bid].push(sid);
+  });
+  Object.values(groups).forEach(function(a){ a.sort(function(x,y){return x-y;}); });
+  return groups;
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var currentSlide   = 1;
+var audioEl        = null;
+var currentAudioURL  = null;
+var currentBlobId    = null;   // ← tracks which blob is loaded so we can skip reloads
+var _previewMode     = false;  // ← true when admin is previewing; bypasses locks/gates
+
+// ── Init (called by launchModule in trainee.js) ───────────────────────────────
+function initPlayer(){
+  audioEl = document.getElementById("audio-player");
+  attachNavListeners();
+  attachAdminListeners();
+  document.getElementById("btn-back-dashboard").addEventListener("click", function(){
+    if(typeof audioEl !== "undefined" && audioEl){ audioEl.pause(); }
+    var u = getCurrentUser();
+    if(u && u.role==="admin") showAdminDashboard();
+    else showTraineeDashboard();
+  });
+}
+window.addEventListener("DOMContentLoaded", initPlayer);
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function buildSidebar(){
+  var sb     = document.getElementById("sidebar-list");
+  var passed = getProgress().passedSections||{};
+  var html   = "";
+  SECTION_ORDER.forEach(function(secId){
+    var sec    = SECTION_MAP[secId];
+    var locked = isLocked(secId, passed);
+    html += "<div class=\"sec-item"+(locked?" locked":"")+"\" data-sec=\""+secId+"\" onclick=\"handleSecClick(this)\">";
+    html += "<div class=\"sec-label\">"+esc(sec.label)+"</div>";
+    if(sec.hasAssessment){
+      if(passed[secId])       html += "<div class=\"sec-badge pass\">PASSED</div>";
+      else if(_previewMode)   html += "<div class=\"sec-badge\" style=\"background:#5D4037;color:#fff\">PREVIEW</div>";
+      else if(!locked)        html += "<div class=\"sec-badge todo\">ASSESSMENT</div>";
+    }
+    html += "</div>";
+  });
+  sb.innerHTML = html;
+}
+
+function handleSecClick(el){
+  var secId  = el.dataset.sec;
+  if(!_previewMode && isLocked(secId, getProgress().passedSections||{})) return;
+  currentSlide = SECTION_MAP[secId].slides[0];
+  renderCurrentSlide();
+  buildSidebar();
+  updateProgress();
+}
+
+function isLocked(secId, passed){
+  if(_previewMode) return false;
+  var idx = SECTION_ORDER.indexOf(secId);
+  if(idx===0) return false;
+  var prev = SECTION_ORDER[idx-1];
+  return SECTION_MAP[prev].hasAssessment && !passed[prev];
+}
+
+// ── Slide Rendering ───────────────────────────────────────────────────────────
+function renderCurrentSlide(){
+  var sl = SLIDES[currentSlide-1];
+  document.getElementById("slide-viewer").innerHTML = renderSlide(sl);
+  loadSlideAudio(sl.id);
+  updateNavButtons();
+  updateSidebarActive();
+  updateProgress();
+  var p = getProgress();
+  p.currentSlide = currentSlide;
+  saveProgress(p);
+}
+
+function updateSidebarActive(){
+  var sec = SLIDES[currentSlide-1].section;
+  document.querySelectorAll(".sec-item").forEach(function(el){
+    el.classList.toggle("active", el.dataset.sec===sec);
+  });
+}
+
+// ── Audio — continuous playback ───────────────────────────────────────────────
+// If the new slide uses the same blobId that's already loaded,
+// leave the audio element untouched (it keeps playing from where it is).
+// Only swap when the blob actually changes.
+async function loadSlideAudio(slideId){
+  var voPanel = document.getElementById("vo-panel");
+  var contBadge = document.getElementById("audio-continuing");
+
+  try{
+    // 1. Look up blobId for this slide
+    var newBlobId = await getBlobIdForSlide(slideId);
+
+    // 2. Same blob already loaded? Just keep playing.
+    if(newBlobId && newBlobId === currentBlobId && currentAudioURL){
+      voPanel.style.display = "none";
+      if(contBadge) contBadge.style.display = "inline-block";
+      return;
+    }
+
+    // 3. Hide the continuing badge (we're loading new or no audio)
+    if(contBadge) contBadge.style.display = "none";
+
+    // 4. Different blob (or no blob) — tear down existing audio
+    if(currentAudioURL){
+      URL.revokeObjectURL(currentAudioURL);
+      currentAudioURL = null;
+    }
+    currentBlobId = null;
+    audioEl.pause();
+    audioEl.removeAttribute("src");
+    audioEl.load();   // reset element state before async work
+
+    // 5a. New blob assigned?
+    if(newBlobId){
+      var blob = await loadBlobById(newBlobId);
+      if(blob){
+        currentAudioURL = URL.createObjectURL(blob);
+        currentBlobId   = newBlobId;
+        audioEl.src     = currentAudioURL;
+        audioEl.load();   // tell browser to start loading the new source
+        audioEl.play().catch(function(e){ console.warn("Audio autoplay blocked:", e); });
+        voPanel.style.display = "none";
+        return;
+      }
+    }
+
+    // 5b. No mapping — try legacy "audio" store
+    var legBlob = await loadLegacyBlob(slideId);
+    if(legBlob){
+      currentAudioURL = URL.createObjectURL(legBlob);
+      currentBlobId   = "legacy_"+slideId;
+      audioEl.src     = currentAudioURL;
+      audioEl.load();
+      audioEl.play().catch(function(e){ console.warn("Audio autoplay blocked:", e); });
+      voPanel.style.display = "none";
+      return;
+    }
+
+    // 5c. No audio at all — show voiceover text
+    var _voSlide = SLIDES.filter(function(s){ return s.id===slideId; })[0]||{};
+    voPanel.style.display = "block";
+    document.getElementById("vo-text").textContent = _voSlide.voiceover||"";
+
+  } catch(err){
+    console.error("loadSlideAudio error (slideId="+slideId+"):", err);
+    var _voSlide = SLIDES.filter(function(s){ return s.id===slideId; })[0]||{};
+    voPanel.style.display = "block";
+    var _voEl = document.getElementById("vo-text");
+    if(_voEl) _voEl.textContent = _voSlide.voiceover||"";
+  }
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function attachNavListeners(){
+  document.getElementById("btn-prev").addEventListener("click", goPrev);
+  document.getElementById("btn-next").addEventListener("click", goNext);
+}
+function goPrev(){ if(currentSlide>1){ currentSlide--; renderCurrentSlide(); } }
+function goNext(){
+  var sl  = SLIDES[currentSlide-1];
+  var sec = SECTION_MAP[sl.section];
+  var p   = getProgress();
+  // In preview mode: offer assessment optionally, but don't gate navigation
+  if(!_previewMode && sec.slides[sec.slides.length-1]===sl.id && sec.hasAssessment && !(p.passedSections||{})[sl.section]){
+    openAssessment(sl.section); return;
+  }
+  if(currentSlide<SLIDES.length){ currentSlide++; renderCurrentSlide(); }
+}
+function updateNavButtons(){
+  document.getElementById("btn-prev").disabled = currentSlide===1;
+  document.getElementById("btn-next").disabled = currentSlide===SLIDES.length;
+  document.getElementById("slide-counter").textContent = "Slide "+currentSlide+" / "+SLIDES.length;
+}
+function updateProgress(){
+  var pct = Math.round((currentSlide/SLIDES.length)*100);
+  document.getElementById("progress-bar").style.width = pct+"%";
+  document.getElementById("progress-pct").textContent = pct+"%";
+}
+
+// ── Assessment ────────────────────────────────────────────────────────────────
+function openAssessment(secId){
+  var quiz = SECTIONS_QUIZ.filter(function(q){ return q.section===secId; })[0];
+  if(!quiz) return;
+  document.getElementById("quiz-title").textContent = "Section "+secId+" Assessment";
+  var html="";
+  quiz.questions.forEach(function(q,qi){
+    html += "<div class=\"q-block\"><div class=\"q-text\">"+(qi+1)+". "+esc(q.question)+"</div>";
+    q.options.forEach(function(opt,oi){
+      html += "<label class=\"q-option\"><input type=\"radio\" name=\"q"+qi+"\" value=\""+oi+"\"> "+esc(opt)+"</label>";
+    });
+    html += "</div>";
+  });
+  document.getElementById("quiz-questions").innerHTML = html;
+  document.getElementById("quiz-result").innerHTML    = "";
+  document.getElementById("quiz-section-id").value    = secId;
+  document.getElementById("btn-submit-quiz").style.display   = "inline-block";
+  document.getElementById("btn-retake-quiz").style.display   = "none";
+  document.getElementById("btn-continue-quiz").style.display = "none";
+  document.getElementById("assessment-modal").style.display  = "flex";
+}
+function submitAssessment(){
+  var secId = document.getElementById("quiz-section-id").value;
+  var quiz  = SECTIONS_QUIZ.filter(function(q){ return q.section===secId; })[0];
+  var correct=0, total=quiz.questions.length;
+  quiz.questions.forEach(function(q,qi){
+    var sel = document.querySelector("input[name='q"+qi+"']:checked");
+    if(sel && parseInt(sel.value)===q.answer) correct++;
+  });
+  var pct=Math.round((correct/total)*100), passed=pct>=80;
+  document.getElementById("quiz-result").innerHTML =
+    "<div class=\"quiz-score "+(passed?"pass":"fail")+"\">Score: "+pct+"%  ("+correct+"/"+total+") — "+(passed?"PASSED ✓":"FAILED — Need 80% to continue")+"</div>";
+  if(passed){
+    var p=getProgress(); p.passedSections=p.passedSections||{}; p.passedSections[secId]=true;
+    p.sectionScores=p.sectionScores||{}; p.sectionScores[secId]=pct; saveProgress(p); buildSidebar();
+    document.getElementById("btn-continue-quiz").style.display="inline-block";
+  } else {
+    document.getElementById("btn-retake-quiz").style.display="inline-block";
+  }
+  document.getElementById("btn-submit-quiz").style.display="none";
+}
+function retakeAssessment(){ openAssessment(document.getElementById("quiz-section-id").value); }
+function closeAssessmentAndContinue(){
+  document.getElementById("assessment-modal").style.display="none";
+  if(currentSlide<SLIDES.length){ currentSlide++; renderCurrentSlide(); }
+}
+
+// ── Admin Panel ───────────────────────────────────────────────────────────────
+function attachAdminListeners(){
+  document.getElementById("btn-admin").addEventListener("click", toggleAdmin);
+  document.getElementById("btn-close-admin").addEventListener("click", toggleAdmin);
+  document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
+  document.getElementById("btn-new-audio").addEventListener("click", function(){ openAssignModal(null); });
+}
+function toggleAdmin(){
+  var panel = document.getElementById("admin-panel");
+  adminOpen = !adminOpen;
+  panel.style.display = adminOpen?"flex":"none";
+  if(adminOpen) refreshAdminPanel();
+}
+var adminOpen = false;
+
+async function refreshAdminPanel(){
+  var groups   = await getBlobGroups();   // { blobId: [sid,...] }
+  var mappings = await getAllMappings();   // { "slide_N": blobId }
+  var slideMap = {};
+  Object.keys(mappings).forEach(function(k){ slideMap[parseInt(k.replace("slide_",""))]=mappings[k]; });
+
+  var html = "";
+  // Group rows by blobId so linked slides appear together visually
+  var rendered = {};
+  SLIDES.forEach(function(sl){
+    var blobId  = slideMap[sl.id];
+    var shared  = blobId ? (groups[blobId]||[]) : null;
+    var isFirst = shared ? (shared[0]===sl.id) : true;
+    var sharedLabel = "";
+    if(shared && shared.length>1){
+      sharedLabel = "<span class=\"shared-tag\">&#9654; continuous: slides "+shared.join(", ")+"</span>";
+    }
+    html += "<div class=\"admin-row"+(blobId&&shared&&shared.length>1?" admin-row-linked":"")+"\">";
+    html += "<div class=\"admin-row-info\">";
+    html += "<span class=\"admin-row-num\">#"+sl.id+"</span> ";
+    html += "<span class=\"admin-row-sec\">"+esc(sl.section)+"</span> ";
+    html += "<span class=\"admin-row-title\">"+esc(sl.title||sl.type)+"</span>";
+    if(sharedLabel) html += "<br>"+sharedLabel;
+    html += "</div><div class=\"admin-row-actions\">";
+    if(blobId){
+      html += "<span class=\"audio-loaded\">&#10003;</span> ";
+      html += "<button class=\"btn-reassign\" data-sid=\""+sl.id+"\" onclick=\"openAssignModal(parseInt(this.dataset.sid))\">Reassign</button> ";
+      html += "<button class=\"btn-rm-audio\" data-sid=\""+sl.id+"\" onclick=\"handleRemoveAudio(this.dataset.sid)\">Remove</button>";
+    } else {
+      html += "<button class=\"btn-upload-single\" data-sid=\""+sl.id+"\" onclick=\"openAssignModal(parseInt(this.dataset.sid))\">+ Assign</button>";
+    }
+    html += "</div></div>";
+  });
+  document.getElementById("admin-slide-list").innerHTML = html;
+}
+
+// ── Assign Modal ──────────────────────────────────────────────────────────────
+function openAssignModal(preSlide){
+  document.getElementById("assign-file-input").value = "";
+  document.getElementById("assign-file-name").textContent = "No file chosen";
+  document.getElementById("assign-error").textContent = "";
+
+  var html = "";
+  SECTION_ORDER.forEach(function(secId){
+    var sec = SECTION_MAP[secId];
+    html += "<div class=\"assign-sec-group\">";
+    html += "<div class=\"assign-sec-head\">"+esc(sec.label)+"</div>";
+    sec.slides.forEach(function(sid){
+      var sl = SLIDES.filter(function(s){ return s.id===sid; })[0]||{};
+      var checked = (preSlide===sid)?"checked":"";
+      html += "<label class=\"assign-row\">"
+        +"<input type=\"checkbox\" class=\"assign-cb\" value=\""+sid+"\" "+checked+"> "
+        +"<span class=\"assign-sid\">#"+sid+"</span> "
+        +"<span class=\"assign-stitle\">"+esc(sl.title||sl.type||"Slide #"+sid)+"</span></label>";
+    });
+    html += "</div>";
+  });
+  document.getElementById("assign-slide-list").innerHTML = html;
+
+  document.getElementById("assign-select-all").onclick  = function(){ setAllCBs(true); };
+  document.getElementById("assign-select-none").onclick = function(){ setAllCBs(false); };
+  document.getElementById("assign-select-section").onclick = function(){
+    if(!preSlide) return;
+    setAllCBs(false);
+    var _preSl = SLIDES.filter(function(s){ return s.id===preSlide; })[0];
+    if(!_preSl) return;
+    var sec = SECTION_MAP[_preSl.section];
+    if(!sec) return;
+    sec.slides.forEach(function(sid){
+      var cb = document.querySelector(".assign-cb[value='"+sid+"']");
+      if(cb) cb.checked = true;
+    });
+  };
+  document.getElementById("assign-modal").style.display = "flex";
+}
+function setAllCBs(val){ document.querySelectorAll(".assign-cb").forEach(function(cb){ cb.checked=val; }); }
+function closeAssignModal(){ document.getElementById("assign-modal").style.display="none"; }
+
+async function confirmAssign(){
+  var errEl = document.getElementById("assign-error");
+  var file  = document.getElementById("assign-file-input").files[0];
+  if(!file){ errEl.textContent="Please choose an audio file first."; return; }
+  var chosen=[];
+  document.querySelectorAll(".assign-cb:checked").forEach(function(cb){ chosen.push(parseInt(cb.value)); });
+  if(!chosen.length){ errEl.textContent="Select at least one slide."; return; }
+  errEl.textContent = "Saving...";
+  var newBlobId = await saveAudioForSlides(chosen, file);
+  // If current slide is in the new set and its blob just changed, reload audio
+  var curId = SLIDES[currentSlide-1].id;
+  if(chosen.includes(curId) && newBlobId !== currentBlobId){
+    currentBlobId = null; // force reload
+    loadSlideAudio(curId);
+  }
+  closeAssignModal();
+  await refreshAdminPanel();
+}
+
+async function handleRemoveAudio(sid){
+  var id = parseInt(sid);
+  // If removing the audio for the currently active slide, clear audio player
+  if(SLIDES[currentSlide-1].id===id){
+    if(currentAudioURL){ URL.revokeObjectURL(currentAudioURL); currentAudioURL=null; }
+    currentBlobId = null;
+    audioEl.pause(); audioEl.src="";
+    document.getElementById("vo-panel").style.display="block";
+    document.getElementById("vo-text").textContent = SLIDES[currentSlide-1].voiceover||"";
+    var cb = document.getElementById("audio-continuing");
+    if(cb) cb.style.display="none";
+  }
+  await clearAudioForSlide(id);
+  await refreshAdminPanel();
+}
+
+async function exportCSV(){
+  var mappings = await getAllMappings();
+  var groups   = await getBlobGroups();
+  var slideMap = {};
+  Object.keys(mappings).forEach(function(k){ slideMap[parseInt(k.replace("slide_",""))]=mappings[k]; });
+  var rows = [["Slide ID","Section","Title","Audio Loaded","Continuous Track (shared slides)"]];
+  SLIDES.forEach(function(sl){
+    var bid    = slideMap[sl.id];
+    var shared = bid ? (groups[bid]||[]).filter(function(s){ return s!==sl.id; }) : [];
+    rows.push([sl.id, sl.section, sl.title||sl.type, bid?"Yes":"No", shared.join("|")]);
+  });
+  var csv = rows.map(function(r){
+    return r.map(function(c){ return "\""+String(c).replace(/"/g,'""')+"\""; }).join(",");
+  }).join("\n");
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download = "module1_audio_status.csv";
+  a.click();
+}
+
+// ── Module Content Editor ─────────────────────────────────────────────────────
+var edMid     = null;   // module id being edited
+var edState   = null;   // deep-copy of {slides,quiz,sectionMap,sectionOrder}
+var edSecId   = null;   // currently selected section id
+var edSlideId = null;   // slide id open in editor modal
+
+// ── Open / Close ──────────────────────────────────────────────────────────────
+function openModuleEditor(mid){
+  edMid   = mid;
+  edState = JSON.parse(JSON.stringify(getModuleContent(mid)));
+  // Ensure sectionMap slides arrays are populated
+  if(!edState.sectionOrder.length) edState.sectionOrder=[];
+  edSecId = edState.sectionOrder[0]||null;
+  var m = getModules().filter(function(m){return m.id===mid;})[0];
+  document.getElementById("med-mod-title").textContent = m?m.title:"Module Editor";
+  showView("view-module-editor");
+  renderEdSidebar();
+  renderEdMain();
+}
+function closeModuleEditor(){ showAdminDashboard(); }
+function saveModuleEditor(){
+  saveModuleContent(edMid, edState);
+  var savedEl = document.getElementById("med-saved-msg");
+  savedEl.style.display="inline";
+  setTimeout(function(){ savedEl.style.display="none"; },2000);
+}
+
+// ── Sidebar (sections list) ───────────────────────────────────────────────────
+function renderEdSidebar(){
+  var html="";
+  edState.sectionOrder.forEach(function(secId){
+    var sec=edState.sectionMap[secId]||{};
+    var slides=(sec.slides||[]).length;
+    html+="<div class=\"ed-sec-item"+(secId===edSecId?" ed-sec-active":"")+"\" data-sid=\""+secId+"\" onclick=\"selectEdSection(this.dataset.sid)\">"
+      +"<div class=\"ed-sec-label\">"+esc(sec.label||secId)+"</div>"
+      +"<div class=\"ed-sec-meta\">"+slides+" slide(s)"+(sec.hasAssessment?" &bull; quiz":"")+"</div>"
+      +"</div>";
+  });
+  html+="<button class=\"ed-add-sec-btn\" onclick=\"openAddSectionModal()\">+ Add Section</button>";
+  document.getElementById("ed-sidebar").innerHTML=html;
+}
+
+function selectEdSection(secId){
+  edSecId=secId; renderEdSidebar(); renderEdMain();
+}
+
+// ── Main panel (slide list for selected section) ──────────────────────────────
+function renderEdMain(){
+  var mainEl=document.getElementById("ed-main");
+  if(!edSecId){ mainEl.innerHTML="<div class=\"ed-empty\">Select a section on the left.</div>"; return; }
+  var sec=edState.sectionMap[edSecId]||{label:"",slides:[],hasAssessment:false};
+  var slideIds=sec.slides||[];
+  var html="";
+
+  // Section header
+  html+="<div class=\"ed-main-header\">"
+    +"<input class=\"ed-section-name-input\" id=\"ed-sec-name\" value=\""+esc(sec.label)+"\" placeholder=\"Section name\">"
+    +"<label class=\"ed-toggle\"><input type=\"checkbox\" id=\"ed-has-quiz\""+(sec.hasAssessment?" checked":"")
+    +" onchange=\"updateSecAssessment(this.checked)\"> Assessment</label>";
+  if(edSecId!=="intro"&&edSecId!=="outro")
+    html+="<button class=\"btn-sm btn-danger\" onclick=\"handleDeleteSection()\">Delete Section</button>";
+  html+="<button class=\"btn-sm btn-primary\" style=\"margin-left:auto\" onclick=\"applySectionName()\">Rename</button>"
+    +"</div>";
+
+  // Slides
+  html+="<div class=\"ed-slides-list\" id=\"ed-slides-list\">";
+  if(!slideIds.length) html+="<div class=\"ed-empty\" style=\"padding:16px\">No slides. Add one below.</div>";
+  slideIds.forEach(function(sid,idx){
+    var sl=edState.slides.filter(function(s){return s.id===sid;})[0]||{};
+    html+="<div class=\"ed-slide-row\">"
+      +"<div class=\"ed-slide-info\">"
+      +"<span class=\"ed-slide-num\">#"+sid+"</span>"
+      +"<span class=\"ed-slide-type\">"+esc(sl.type||"?")+"</span>"
+      +"<span class=\"ed-slide-title\">"+esc(sl.title||sl.subtitle||sl.type||"")+"</span>"
+      +"</div>"
+      +"<div class=\"ed-slide-btns\">";
+    if(idx>0)            html+="<button class=\"btn-sm btn-primary\" data-sid=\""+sid+"\" onclick=\"moveEdSlide(this.dataset.sid,-1)\">↑</button> ";
+    if(idx<slideIds.length-1) html+="<button class=\"btn-sm btn-primary\" data-sid=\""+sid+"\" onclick=\"moveEdSlide(this.dataset.sid,1)\">↓</button> ";
+    html+="<button class=\"btn-sm\" id=\"ed-audio-btn-"+sid+"\" data-sid=\""+sid+"\" onclick=\"openSlideAudioModal(parseInt(this.dataset.sid))\" style=\"background:#444;color:#fff;border:none\" title=\"Assign audio to this slide\">&#128263;</button> ";
+    html+="<button class=\"btn-sm btn-primary\" data-sid=\""+sid+"\" onclick=\"openSlideEditor(this.dataset.sid)\">Edit</button> ";
+    html+="<button class=\"btn-sm btn-danger\"  data-sid=\""+sid+"\" onclick=\"deleteEdSlide(this.dataset.sid)\">Delete</button>";
+    html+="</div></div>";
+  });
+  html+="</div>";
+
+  // Footer actions
+  html+="<div class=\"ed-main-footer\">"
+    +"<button class=\"btn-primary\" onclick=\"openAddSlideModal()\">+ Add Slide</button>";
+  if(sec.hasAssessment)
+    html+=" <button class=\"btn-primary\" onclick=\"openAssessmentEditor()\">Edit Assessment</button>";
+  html+="</div>";
+  mainEl.innerHTML=html;
+  // Async: update audio indicators after render
+  refreshEdAudioStatus();
+}
+
+// ── Audio status badges (async) ───────────────────────────────────────────────
+async function refreshEdAudioStatus(){
+  if(!edSecId || !edState.sectionMap[edSecId]) return;
+  var mappings = await getAllMappings();  // { "slide_N": blobId }
+  var slideIds = edState.sectionMap[edSecId].slides||[];
+  slideIds.forEach(function(sid){
+    var btn = document.getElementById("ed-audio-btn-"+sid);
+    if(!btn) return;
+    var hasAudio = !!mappings["slide_"+sid];
+    btn.style.background = hasAudio ? "#22863a" : "#444";
+    btn.title = hasAudio ? "Audio assigned — click to change or remove" : "No audio — click to assign";
+    btn.innerHTML = hasAudio ? "&#128266;" : "&#128263;";
+  });
+}
+
+// ── Slide Audio Modal ─────────────────────────────────────────────────────────
+var edAudioSlideId = null;
+
+async function openSlideAudioModal(sid){
+  edAudioSlideId = sid;
+  var mappings = await getAllMappings();
+  var groups   = await getBlobGroups();   // { blobId: [sids] }
+  var blobId   = mappings["slide_"+sid];
+  var sharedSlides = blobId ? (groups[blobId]||[]) : [];
+
+  // Status line
+  var statusHtml = "";
+  if(blobId){
+    if(sharedSlides.length>1)
+      statusHtml = "<div class=\"ed-audio-status ed-audio-has\">&#128266; Audio assigned — continuous with slides: "+sharedSlides.join(", ")+"</div>";
+    else
+      statusHtml = "<div class=\"ed-audio-status ed-audio-has\">&#128266; Audio assigned to this slide</div>";
+  } else {
+    statusHtml = "<div class=\"ed-audio-status ed-audio-none\">&#128263; No audio assigned</div>";
+  }
+
+  // Slide checkboxes — all slides in section so admin can do continuous audio
+  var sec = edState.sectionMap[edSecId]||{};
+  var secSlides = sec.slides||[];
+  var cbHtml = "<div class=\"ed-audio-cb-list\">";
+  secSlides.forEach(function(id){
+    var sl = edState.slides.filter(function(s){return s.id===id;})[0]||{};
+    var isThis   = id===sid;
+    var isLinked = sharedSlides.includes(id);
+    var checked  = isThis||isLinked ? "checked" : "";
+    var label    = esc(sl.title||sl.type||"Slide #"+id);
+    cbHtml += "<label class=\"assign-row\">"
+      +"<input type=\"checkbox\" class=\"ed-audio-cb\" value=\""+id+"\" "+checked+(isThis?" disabled":"")+"> "
+      +"<span class=\"assign-sid\">#"+id+"</span> "
+      +"<span class=\"assign-stitle\">"+label+(isThis?" <em style='color:#5BC0EB'>(this slide)</em>":"")+"</span>"
+      +"</label>";
+  });
+  cbHtml += "</div>";
+
+  document.getElementById("ed-audio-modal-title").textContent = "Audio — Slide #"+sid;
+  document.getElementById("ed-audio-status").innerHTML   = statusHtml;
+  document.getElementById("ed-audio-slide-cbs").innerHTML = cbHtml;
+  document.getElementById("ed-audio-file-name").textContent = "No file chosen";
+  document.getElementById("ed-audio-file-input").value  = "";
+  document.getElementById("ed-audio-error").textContent = "";
+  document.getElementById("ed-audio-rm-btn").style.display = blobId ? "inline-block" : "none";
+  document.getElementById("ed-audio-modal").style.display = "flex";
+}
+function closeSlideAudioModal(){ document.getElementById("ed-audio-modal").style.display="none"; }
+
+async function saveSlideAudio(){
+  var errEl = document.getElementById("ed-audio-error");
+  var file  = document.getElementById("ed-audio-file-input").files[0];
+  if(!file){ errEl.textContent="Please choose an audio file first."; return; }
+  var chosen = [edAudioSlideId];
+  document.querySelectorAll(".ed-audio-cb:checked").forEach(function(cb){
+    var v=parseInt(cb.value); if(!chosen.includes(v)) chosen.push(v);
+  });
+  errEl.textContent = "Saving...";
+  try{
+    await saveAudioForSlides(chosen, file);
+    closeSlideAudioModal();
+    refreshEdAudioStatus();
+  }catch(e){
+    console.error("saveSlideAudio failed:", e);
+    errEl.textContent = "Error saving audio. Please try again. (Check browser console for details.)";
+  }
+}
+
+async function removeSlideAudio(){
+  if(!confirm("Remove audio from this slide?")) return;
+  await clearAudioForSlide(edAudioSlideId);
+  closeSlideAudioModal();
+  refreshEdAudioStatus();
+}
+
+// ── Section actions ───────────────────────────────────────────────────────────
+function applySectionName(){
+  var name=document.getElementById("ed-sec-name").value.trim();
+  if(!name) return;
+  edState.sectionMap[edSecId].label=name;
+  renderEdSidebar();
+}
+function updateSecAssessment(val){
+  edState.sectionMap[edSecId].hasAssessment=val;
+  renderEdMain();
+}
+function handleDeleteSection(){
+  if(!confirm("Delete this section and all its slides?")) return;
+  var sec=edState.sectionMap[edSecId]||{};
+  var sids=sec.slides||[];
+  edState.slides=edState.slides.filter(function(s){return !sids.includes(s.id);});
+  edState.sectionOrder=edState.sectionOrder.filter(function(id){return id!==edSecId;});
+  delete edState.sectionMap[edSecId];
+  edState.quiz=edState.quiz.filter(function(q){return q.section!==edSecId;});
+  edSecId=edState.sectionOrder[0]||null;
+  renderEdSidebar(); renderEdMain();
+}
+
+// ── Add Section modal ─────────────────────────────────────────────────────────
+function openAddSectionModal(){
+  document.getElementById("add-sec-name").value="";
+  document.getElementById("add-sec-has-quiz").checked=true;
+  document.getElementById("add-sec-error").textContent="";
+  document.getElementById("add-sec-modal").style.display="flex";
+}
+function closeAddSectionModal(){ document.getElementById("add-sec-modal").style.display="none"; }
+function saveAddSection(){
+  var name=document.getElementById("add-sec-name").value.trim();
+  if(!name){ document.getElementById("add-sec-error").textContent="Name required."; return; }
+  var hasQ=document.getElementById("add-sec-has-quiz").checked;
+  var secId="sec_"+(Date.now().toString(36));
+  edState.sectionMap[secId]={label:name,slides:[],hasAssessment:hasQ};
+  edState.sectionOrder.push(secId);
+  edSecId=secId;
+  closeAddSectionModal();
+  renderEdSidebar(); renderEdMain();
+}
+
+// ── Slide order ───────────────────────────────────────────────────────────────
+function moveEdSlide(sid,dir){
+  var sec=edState.sectionMap[edSecId];
+  var i=sec.slides.indexOf(parseInt(sid)||sid);
+  if(i<0) return;
+  var j=i+dir;
+  if(j<0||j>=sec.slides.length) return;
+  var tmp=sec.slides[i]; sec.slides[i]=sec.slides[j]; sec.slides[j]=tmp;
+  renderEdMain();
+}
+function deleteEdSlide(sid){
+  if(!confirm("Delete this slide?")) return;
+  var id=parseInt(sid)||sid;
+  var sec=edState.sectionMap[edSecId];
+  sec.slides=sec.slides.filter(function(s){return s!==id;});
+  edState.slides=edState.slides.filter(function(s){return s.id!==id;});
+  renderEdMain();
+}
+
+// ── Add Slide modal ───────────────────────────────────────────────────────────
+var EDITABLE_TYPES=["content","section","title","callout","dosdont","twocol","table","recap","next","end"];
+
+function openAddSlideModal(){
+  document.getElementById("add-slide-type").value="content";
+  document.getElementById("add-slide-error").textContent="";
+  buildAddSlidePreview();
+  document.getElementById("add-slide-modal").style.display="flex";
+}
+function closeAddSlideModal(){ document.getElementById("add-slide-modal").style.display="none"; }
+
+function buildAddSlidePreview(){
+  var t=document.getElementById("add-slide-type").value;
+  document.getElementById("add-slide-fields").innerHTML=buildSlideForm({type:t,id:-1});
+}
+
+function saveAddSlide(){
+  var type=document.getElementById("add-slide-type").value;
+  var maxId=0;
+  edState.slides.forEach(function(s){if(s.id>maxId) maxId=s.id;});
+  var newId=maxId+1;
+  var sl=readSlideForm({type:type,id:newId,section:edSecId});
+  if(!sl){ document.getElementById("add-slide-error").textContent="Check JSON field."; return; }
+  edState.slides.push(sl);
+  edState.sectionMap[edSecId].slides.push(newId);
+  closeAddSlideModal();
+  renderEdMain();
+}
+
+// ── Slide Edit modal ──────────────────────────────────────────────────────────
+function openSlideEditor(sid){
+  var id=parseInt(sid)||sid;
+  var sl=edState.slides.filter(function(s){return s.id===id;})[0];
+  if(!sl) return;
+  edSlideId=id;
+  document.getElementById("slide-ed-modal-title").textContent="Edit Slide #"+id+" — "+sl.type;
+  document.getElementById("slide-ed-fields").innerHTML=buildSlideForm(sl);
+  document.getElementById("slide-ed-error").textContent="";
+  document.getElementById("slide-ed-modal").style.display="flex";
+}
+function closeSlideEdModal(){ document.getElementById("slide-ed-modal").style.display="none"; }
+function saveSlideEdModal(){
+  var sl=edState.slides.filter(function(s){return s.id===edSlideId;})[0];
+  if(!sl) return;
+  var updated=readSlideForm(sl);
+  if(!updated){ document.getElementById("slide-ed-error").textContent="Invalid JSON in custom field."; return; }
+  Object.assign(sl,updated);
+  closeSlideEdModal();
+  renderEdMain();
+}
+
+// ── Slide form builder ────────────────────────────────────────────────────────
+function tf(label,id,val){
+  return "<label class=\"ed-field-label\">"+label+"</label>"
+    +"<input class=\"ed-field-input\" id=\""+id+"\" value=\""+esc(val||"")+"\">";
+}
+function ta(label,id,val,rows){
+  return "<label class=\"ed-field-label\">"+label+"</label>"
+    +"<textarea class=\"ed-field-input\" id=\""+id+"\" rows=\""+(rows||3)+"\">"+esc(val||"")+"</textarea>";
+}
+function listField(label,id,arr){
+  var items=(arr||[]).map(function(v,i){
+    return "<div class=\"ed-list-item\">"
+      +"<input class=\"ed-list-input\" data-lid=\""+id+"\" data-idx=\""+i+"\" value=\""+esc(v)+"\">"
+      +"<button class=\"ed-list-rm\" data-lid=\""+id+"\" data-idx=\""+i+"\" onclick=\"removeListItem(this)\">✕</button>"
+      +"</div>";
+  }).join("");
+  return "<label class=\"ed-field-label\">"+label+"</label>"
+    +"<div class=\"ed-list-wrap\" id=\"wrap_"+id+"\">"+items+"</div>"
+    +"<button class=\"ed-list-add\" onclick=\"addListItem(this,'"+id+"')\">+ Add</button>";
+}
+function addListItem(btn,id){
+  var wrap=document.getElementById("wrap_"+id);
+  var idx=wrap.children.length;
+  var div=document.createElement("div"); div.className="ed-list-item";
+  div.innerHTML="<input class=\"ed-list-input\" data-lid=\""+id+"\" data-idx=\""+idx+"\" value=\"\">"
+    +"<button class=\"ed-list-rm\" data-lid=\""+id+"\" data-idx=\""+idx+"\" onclick=\"removeListItem(this)\">✕</button>";
+  wrap.appendChild(div);
+}
+function removeListItem(btn){ btn.parentElement.remove(); }
+
+function getListValues(id){
+  var inputs=document.querySelectorAll(".ed-list-input[data-lid=\""+id+"\"]");
+  var vals=[];
+  inputs.forEach(function(inp){ if(inp.value.trim()) vals.push(inp.value.trim()); });
+  return vals;
+}
+function gv(id){ var el=document.getElementById(id); return el?el.value:""; }
+
+function buildSlideForm(sl){
+  var t=sl.type;
+  var common="<div class=\"ed-field-group\">"
+    +tf("Timing","sl_timing",sl.timing)
+    +ta("Voiceover Script","sl_voiceover",sl.voiceover,4)
+    +"</div>";
+  var specific="";
+  switch(t){
+    case "title":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Module Label","sl_moduleLabel",sl.moduleLabel)
+        +tf("Title","sl_title",sl.title)
+        +tf("Subtitle","sl_subtitle",sl.subtitle)
+        +"</div>"; break;
+    case "section":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Section Number (e.g. 1.1)","sl_num",sl.num)
+        +tf("Title","sl_title",sl.title)
+        +tf("Description","sl_desc",sl.desc)
+        +"</div>"; break;
+    case "content":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +listField("Bullet Points","sl_bullets",sl.bullets)
+        +tf("Tip Note (optional)","sl_note",sl.note)
+        +"</div>"; break;
+    case "callout":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +ta("Quote Text","sl_quote",sl.quote,3)
+        +tf("Speaker / Attribution","sl_speaker",sl.speaker)
+        +tf("Background Colour (hex)","sl_bg",sl.bg||"#DEEAF1")
+        +"</div>"; break;
+    case "dosdont":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +listField("Do's (SAY THIS)","sl_dos",sl.dos)
+        +listField("Don'ts (NEVER SAY)","sl_donts",sl.donts)
+        +"</div>"; break;
+    case "twocol":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +tf("Left Column Title","sl_ltitle",sl.ltitle)
+        +tf("Left Column Background","sl_lbg",sl.lbg||"#E2EFDA")
+        +listField("Left Items","sl_litems",sl.litems)
+        +tf("Right Column Title","sl_rtitle",sl.rtitle)
+        +tf("Right Column Background","sl_rbg",sl.rbg||"#FFF0F0")
+        +listField("Right Items","sl_ritems",sl.ritems)
+        +"</div>"; break;
+    case "table":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +listField("Column Headers","sl_headers",sl.headers)
+        +ta("Rows (one row per line, cells separated by | )","sl_rows_raw",(sl.rows||[]).map(function(r){return r.join("|");}).join("\n"),6)
+        +"</div>"; break;
+    case "recap":
+      specific="<div class=\"ed-field-group\">"
+        +listField("Key Takeaways","sl_takeaways",sl.takeaways)
+        +"</div>"; break;
+    case "next":
+      specific="<div class=\"ed-field-group\">"
+        +listField("Next Actions","sl_actions",sl.actions)
+        +"</div>"; break;
+    case "end":
+      specific="<div class=\"ed-field-group\">"
+        +tf("Title","sl_title",sl.title)
+        +tf("Subtitle","sl_subtitle",sl.subtitle)
+        +tf("Next Module Label","sl_next",sl.next)
+        +"</div>"; break;
+    default:
+      // JSON fallback for complex types
+      var jsonStr=JSON.stringify(sl,null,2);
+      specific="<div class=\"ed-field-group\">"
+        +"<label class=\"ed-field-label\">Slide Data (JSON — edit carefully)</label>"
+        +"<textarea class=\"ed-field-input\" id=\"sl_json\" rows=\"14\" style=\"font-family:monospace;font-size:11px\">"+esc(jsonStr)+"</textarea>"
+        +"</div>";
+  }
+  return specific+common;
+}
+
+function readSlideForm(originalSl){
+  var t=originalSl.type;
+  var sl=Object.assign({},originalSl);
+  sl.timing    = gv("sl_timing");
+  sl.voiceover = gv("sl_voiceover");
+  switch(t){
+    case "title":
+      sl.moduleLabel=gv("sl_moduleLabel"); sl.title=gv("sl_title"); sl.subtitle=gv("sl_subtitle"); break;
+    case "section":
+      sl.num=gv("sl_num"); sl.title=gv("sl_title"); sl.desc=gv("sl_desc"); break;
+    case "content":
+      sl.title=gv("sl_title"); sl.bullets=getListValues("sl_bullets"); sl.note=gv("sl_note"); break;
+    case "callout":
+      sl.title=gv("sl_title"); sl.quote=gv("sl_quote"); sl.speaker=gv("sl_speaker"); sl.bg=gv("sl_bg"); break;
+    case "dosdont":
+      sl.title=gv("sl_title"); sl.dos=getListValues("sl_dos"); sl.donts=getListValues("sl_donts"); break;
+    case "twocol":
+      sl.title=gv("sl_title");
+      sl.ltitle=gv("sl_ltitle"); sl.lbg=gv("sl_lbg"); sl.litems=getListValues("sl_litems");
+      sl.rtitle=gv("sl_rtitle"); sl.rbg=gv("sl_rbg"); sl.ritems=getListValues("sl_ritems"); break;
+    case "table":
+      sl.title=gv("sl_title"); sl.headers=getListValues("sl_headers");
+      var rawRows=gv("sl_rows_raw");
+      sl.rows=rawRows.trim()?rawRows.split("\n").map(function(r){return r.split("|").map(function(c){return c.trim();});}):[]; break;
+    case "recap":
+      sl.takeaways=getListValues("sl_takeaways"); break;
+    case "next":
+      sl.actions=getListValues("sl_actions"); break;
+    case "end":
+      sl.title=gv("sl_title"); sl.subtitle=gv("sl_subtitle"); sl.next=gv("sl_next"); break;
+    default:
+      try{ sl=JSON.parse(gv("sl_json")); }catch(e){ return null; }
+  }
+  return sl;
+}
+
+// ── Assessment Editor modal ───────────────────────────────────────────────────
+var edQuizData = [];  // working copy of questions for current section
+
+function openAssessmentEditor(){
+  var existing=edState.quiz.filter(function(q){return q.section===edSecId;})[0];
+  edQuizData=existing?JSON.parse(JSON.stringify(existing.questions)):[];
+  renderAssessmentEditor();
+  var sec=edState.sectionMap[edSecId]||{};
+  document.getElementById("assed-title").textContent="Assessment: "+esc(sec.label||edSecId);
+  document.getElementById("assessment-ed-modal").style.display="flex";
+}
+function closeAssessmentEdModal(){ document.getElementById("assessment-ed-modal").style.display="none"; }
+function saveAssessmentEdModal(){
+  var idx=edState.quiz.findIndex(function(q){return q.section===edSecId;});
+  var sec=edState.sectionMap[edSecId]||{};
+  var entry={section:edSecId,title:sec.label||edSecId,questions:edQuizData};
+  if(idx>=0) edState.quiz[idx]=entry;
+  else edState.quiz.push(entry);
+  closeAssessmentEdModal();
+}
+
+function renderAssessmentEditor(){
+  var html="";
+  edQuizData.forEach(function(q,qi){
+    html+="<div class=\"assed-q\">";
+    html+="<div class=\"assed-q-head\">"
+      +"<span class=\"assed-q-num\">Q"+(qi+1)+"</span>"
+      +"<button class=\"btn-sm btn-danger\" data-qi=\""+qi+"\" onclick=\"deleteAssessmentQ(parseInt(this.dataset.qi))\">Delete</button>"
+      +"</div>";
+    html+="<input class=\"ed-field-input\" data-qi=\""+qi+"\" data-field=\"question\" value=\""+esc(q.question)+"\" placeholder=\"Question text\" onchange=\"updateQField(this)\">";
+    q.options.forEach(function(opt,oi){
+      html+="<div class=\"assed-opt\">"
+        +"<input type=\"radio\" name=\"ans_"+qi+"\" value=\""+oi+"\""+(q.answer===oi?" checked":"")+" onchange=\"updateQAnswer("+qi+","+oi+")\">"
+        +"<input class=\"ed-field-input\" data-qi=\""+qi+"\" data-oi=\""+oi+"\" value=\""+esc(opt)+"\" placeholder=\"Option "+(oi+1)+"\" onchange=\"updateQOption(this)\">"
+        +"</div>";
+    });
+    if(q.options.length<6)
+      html+="<button class=\"ed-list-add\" data-qi=\""+qi+"\" onclick=\"addQOption(parseInt(this.dataset.qi))\">+ Option</button>";
+    html+="</div>";
+  });
+  if(!edQuizData.length) html="<div class=\"ed-empty\">No questions yet. Add one below.</div>";
+  html+="<button class=\"btn-primary\" style=\"margin-top:14px\" onclick=\"addAssessmentQ()\">+ Add Question</button>";
+  document.getElementById("assed-questions").innerHTML=html;
+}
+
+function addAssessmentQ(){
+  edQuizData.push({question:"",options:["","","",""],answer:0});
+  renderAssessmentEditor();
+}
+function deleteAssessmentQ(qi){
+  edQuizData.splice(qi,1);
+  renderAssessmentEditor();
+}
+function updateQField(inp){
+  var qi=parseInt(inp.dataset.qi);
+  edQuizData[qi][inp.dataset.field]=inp.value;
+}
+function updateQOption(inp){
+  var qi=parseInt(inp.dataset.qi), oi=parseInt(inp.dataset.oi);
+  edQuizData[qi].options[oi]=inp.value;
+}
+function updateQAnswer(qi,oi){
+  edQuizData[qi].answer=oi;
+}
+function addQOption(qi){
+  edQuizData[qi].options.push("");
+  renderAssessmentEditor();
+}
+
+</script>
+
+<!-- TGS Platform Integration -->
+<script>
+(function(){
+  var params   = new URLSearchParams(location.search);
+  var MODULE_ID = params.get('moduleId');
+  var TOKEN     = params.get('token');
+  var MODE      = params.get('mode');    // 'player' | 'editor'
+  var MOD_TITLE = decodeURIComponent(params.get('title') || 'Training Module');
+
+  if (!MODULE_ID || !TOKEN) return; // standalone / not integrated
+
+  var API_BASE = '/api';
+
+  /* ── 1. Bypass login: inject fake user into sessionStorage ── */
+  var fakeUser = MODE === 'editor'
+    ? { id: 'admin_int', username: 'admin', name: 'Admin', role: 'admin' }
+    : { id: 'tr_' + MODULE_ID, username: 'trainee', name: 'Trainee', role: 'trainee' };
+  sessionStorage.setItem('mod1_session', JSON.stringify(fakeUser));
+
+  /* ── 2. Pre-populate modules registry so editor can find the title ── */
+  (function(){
+    var key = 'mod1_modules_registry';
+    var mods = [];
+    try { mods = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
+    if (!mods.some(function(m){ return m.id === MODULE_ID; })) {
+      mods.push({ id: MODULE_ID, title: MOD_TITLE, status: 'published', slides: 37 });
+      localStorage.setItem(key, JSON.stringify(mods));
+    }
+  })();
+
+  /* ── 3. Intercept localStorage writes to mirror slide content to API ── */
+  var _origSet = localStorage.setItem.bind(localStorage);
+  var CONTENT_KEY = 'mod_content_' + MODULE_ID;
+  localStorage.setItem = function(key, value) {
+    _origSet(key, value);
+    if (key === CONTENT_KEY) {
+      fetch(API_BASE + '/slide-modules/' + MODULE_ID, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+        body: value
+      }).catch(function(e){ console.error('[TGS] Slide save failed:', e); });
+    }
+  };
+
+  /* ── 4. On DOM ready: fetch content then launch ── */
+  window.addEventListener('DOMContentLoaded', function(){
+    // Loading overlay
+    var overlay = document.createElement('div');
+    overlay.id = 'tgs-load-overlay';
+    overlay.style.cssText = [
+      'position:fixed','inset:0','background:#0D2137','z-index:99999',
+      'display:flex','flex-direction:column','align-items:center','justify-content:center',
+      'color:#5BC0EB','font-family:Inter,sans-serif','gap:16px'
+    ].join(';');
+    overlay.innerHTML = '<div style="font-size:22px;font-weight:700;">TGS Training Platform</div>'
+      + '<div style="font-size:14px;opacity:.7;">Loading module…</div>';
+    document.body.appendChild(overlay);
+
+    // Fetch slide content from API
+    fetch(API_BASE + '/slide-modules/' + MODULE_ID, {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.content) {
+        // Inject content into localStorage before Module2 reads it
+        _origSet(CONTENT_KEY, JSON.stringify(data.content));
+      }
+
+      var ol = document.getElementById('tgs-load-overlay');
+      if (ol) ol.remove();
+
+      if (MODE === 'editor') {
+        /* ── Editor mode: open module editor directly ── */
+        showAdminDashboard && showAdminDashboard();
+        setTimeout(function(){ openModuleEditor && openModuleEditor(MODULE_ID); }, 50);
+      } else {
+        /* ── Player mode: patch progress key + override saveProgress ── */
+        var PROG_KEY = 'tgs_prog_' + MODULE_ID;
+        window.currentUserProgressKey = PROG_KEY;
+
+        // Load saved progress from API if available
+        var savedScore = data.progress;
+        if (savedScore && savedScore.score_data) {
+          try {
+            var pd = JSON.parse(savedScore.score_data);
+            if (pd) _origSet(PROG_KEY, JSON.stringify(pd));
+          } catch(e){}
+        }
+
+        // Override saveProgress to detect completion + notify parent
+        var _origSaveProg = window.saveProgress;
+        window.saveProgress = function(p) {
+          // Fix the progress key Module2 may have changed
+          window.currentUserProgressKey = PROG_KEY;
+          _origSaveProg(p);
+
+          // Mirror to API
+          fetch(API_BASE + '/trainee/progress/' + MODULE_ID, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+            body: JSON.stringify({
+              status: 'in_progress',
+              score_data: p
+            })
+          }).catch(function(){});
+
+          // Check completion: all slides seen + all assessed sections passed
+          var secPassed = Object.keys(p.passedSections || {}).length;
+          var secsWithQuiz = (window.SECTION_ORDER || []).filter(function(s){
+            return window.SECTION_MAP && window.SECTION_MAP[s] && window.SECTION_MAP[s].hasAssessment;
+          }).length;
+          var slidesDone = p.currentSlide && window.SLIDES && p.currentSlide >= window.SLIDES.length;
+
+          if (slidesDone && secPassed >= secsWithQuiz && secsWithQuiz > 0) {
+            fetch(API_BASE + '/trainee/progress/' + MODULE_ID, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+              body: JSON.stringify({ status: 'completed', score: Math.round((secPassed / secsWithQuiz) * 100), score_data: p })
+            }).catch(function(){});
+
+            window.parent.postMessage({
+              type: 'tgs-slidedeck-complete',
+              moduleId: MODULE_ID,
+              passedSections: secPassed,
+              totalSlides: window.SLIDES ? window.SLIDES.length : 0
+            }, '*');
+          }
+        };
+
+        // Override launchModule to use our progress key
+        var _origLaunch = window.launchModule;
+        window.launchModule = function(cid, mid, uid) {
+          _origLaunch(cid, mid, uid);
+          window.currentUserProgressKey = PROG_KEY;
+          // Re-render with correct progress
+          var p = window.getProgress ? window.getProgress() : {};
+          window.currentSlide = p.currentSlide || 1;
+          window.renderCurrentSlide && window.renderCurrentSlide();
+          window.buildSidebar && window.buildSidebar();
+          window.updateProgress && window.updateProgress();
+        };
+
+        launchModule && launchModule('cls_int', MODULE_ID, fakeUser.id);
+      }
+    })
+    .catch(function(e){
+      console.error('[TGS] Failed to load module:', e);
+      var ol = document.getElementById('tgs-load-overlay');
+      if (ol) ol.innerHTML = '<div style="color:#ff6b6b;font-size:16px;">Failed to load module. Please refresh.</div>';
+    });
+  }, false);
+})();
+</script>
+</body>
+</html>

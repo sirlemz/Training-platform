@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api';
 
-const TYPE_ICONS = { video: '🎬', assessment: '📋', text: '📄' };
-const TYPE_LABELS = { video: 'Video', assessment: 'Assessment', text: 'Reading' };
+const TYPE_ICONS = { video: '🎬', assessment: '📋', text: '📄', slide_deck: '🖼️' };
+const TYPE_LABELS = { video: 'Video', assessment: 'Assessment', text: 'Reading', slide_deck: 'Slide Deck' };
 
 function VideoPlayer({ module: mod, onComplete }) {
   const [watched, setWatched] = useState(mod.progress?.status === 'completed');
@@ -151,6 +151,50 @@ function AssessmentPlayer({ module: mod, user, onComplete }) {
   );
 }
 
+function SlideDeckPlayer({ module: mod, user, onComplete }) {
+  const [done, setDone] = useState(mod.progress?.status === 'completed');
+  const token = localStorage.getItem('tgs_token') || '';
+
+  useEffect(() => {
+    if (done) return;
+    const handler = async (e) => {
+      if (e.data?.type !== 'tgs-slidedeck-complete') return;
+      if (String(e.data.moduleId) !== String(mod.id)) return;
+      try {
+        await api.saveProgress(mod.id, { status: 'completed', score: e.data.passedSections != null ? Math.round((e.data.passedSections / Math.max(e.data.totalSlides > 0 ? 1 : 1, 1)) * 100) : 100 });
+        setDone(true);
+        onComplete();
+      } catch (err) {
+        console.error('Failed to save slide deck progress', err);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [mod.id, done, onComplete]);
+
+  if (done) {
+    return (
+      <div className="card" style={{ textAlign: 'center', padding: 40 }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--pri)', marginBottom: 8 }}>Slide Deck Complete</div>
+        <div style={{ fontSize: 13, color: 'var(--muted)' }}>You have completed all sections and passed all quizzes for this module.</div>
+      </div>
+    );
+  }
+
+  const src = `/slideplayer/?mode=player&moduleId=${mod.id}&token=${encodeURIComponent(token)}&title=${encodeURIComponent(mod.title)}`;
+  return (
+    <div style={{ width: '100%', height: 'calc(100vh - 120px)', minHeight: 600, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--bdr)' }}>
+      <iframe
+        src={src}
+        style={{ width: '100%', height: '100%', border: 'none' }}
+        title={mod.title}
+        allow="fullscreen"
+      />
+    </div>
+  );
+}
+
 export default function TraineeClass() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -190,7 +234,7 @@ export default function TraineeClass() {
 
       <div style={{ display: 'flex', gap: 0, flex: 1, minHeight: 'calc(100vh - 61px)' }}>
         {/* Module sidebar */}
-        <div style={{ width: 280, flexShrink: 0, borderRight: '1px solid var(--bdr)', background: '#fff', padding: 16, overflowY: 'auto' }}>
+        <div style={{ width: 280, flexShrink: 0, borderRight: '1px solid rgba(91,192,235,.15)', background: 'var(--card)', padding: 16, overflowY: 'auto' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 12 }}>
             Modules — {cls.modules.filter(m => m.progress?.status === 'completed').length}/{cls.modules.length} done
           </div>
@@ -208,12 +252,12 @@ export default function TraineeClass() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8,
                   marginBottom: 4, cursor: isLocked ? 'not-allowed' : 'pointer',
-                  background: isActive ? '#eff6ff' : 'transparent',
+                  background: isActive ? 'rgba(91,192,235,.12)' : 'transparent',
                   border: `1.5px solid ${isActive ? 'var(--blue)' : 'transparent'}`,
                   opacity: isLocked ? .5 : 1,
                 }}
               >
-                <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, background: isDone ? '#dcfce7' : isActive ? '#dbeafe' : '#f1f5f9', flexShrink: 0 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, background: isDone ? 'rgba(40,167,69,.2)' : isActive ? 'rgba(91,192,235,.15)' : 'rgba(13,33,55,.5)', flexShrink: 0 }}>
                   {isLocked ? '🔒' : isDone ? '✅' : TYPE_ICONS[mod.type]}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -247,6 +291,8 @@ export default function TraineeClass() {
                 <TextReader key={activeMod.id} module={activeMod} onComplete={load} />
               ) : activeMod.type === 'assessment' ? (
                 <AssessmentPlayer key={activeMod.id} module={activeMod} user={user} onComplete={load} />
+              ) : activeMod.type === 'slide_deck' ? (
+                <SlideDeckPlayer key={activeMod.id} module={activeMod} user={user} onComplete={load} />
               ) : null}
             </>
           ) : (

@@ -4,9 +4,10 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { api } from '../../api';
+import { useAuth } from '../../contexts/AuthContext';
 
-const TYPE_ICONS = { video: '🎬', assessment: '📋', text: '📄' };
-const TYPE_LABELS = { video: 'Video', assessment: 'Assessment', text: 'Text / Reading' };
+const TYPE_ICONS = { video: '🎬', assessment: '📋', text: '📄', slide_deck: '🖼️' };
+const TYPE_LABELS = { video: 'Video', assessment: 'Assessment', text: 'Text / Reading', slide_deck: 'Slide Deck' };
 
 function ModuleFormModal({ classId, mod, onSave, onClose }) {
   const [title, setTitle] = useState(mod?.title || '');
@@ -43,6 +44,7 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
       } else if (type === 'assessment') {
         fd.append('content', selectedAssessment);
       }
+      // slide_deck: content starts empty; editor fills it via the slide editor
 
       if (mod) {
         await api.updateModule(mod.id, fd);
@@ -70,6 +72,7 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
             <label className="lbl">Module Type *</label>
             <select className="inp" value={type} onChange={e => setType(e.target.value)}>
               <option value="video">🎬 Video Training</option>
+              <option value="slide_deck">🖼️ Slide Deck (Interactive)</option>
               <option value="assessment">📋 Assessment (TGS Pre-Hire)</option>
               <option value="text">📄 Text / Reading Material</option>
             </select>
@@ -110,6 +113,12 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
           <div className="fg">
             <label className="lbl">Content (HTML supported)</label>
             <textarea className="inp" style={{ minHeight: 120 }} value={textContent} onChange={e => setTextContent(e.target.value)} placeholder="Reading material content…" />
+          </div>
+        )}
+
+        {type === 'slide_deck' && (
+          <div className="info-box">
+            A blank slide deck will be created. After saving, click <strong>Edit Slides</strong> on the module card to open the slide editor and build your content.
           </div>
         )}
 
@@ -164,7 +173,7 @@ function AssignTraineeModal({ classId, assignedIds, onSave, onClose }) {
             {trainees.map(t => {
               const assigned = assignedSet.has(t.id);
               return (
-                <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: assigned ? '#f0fdf4' : '#f8fafc', borderRadius: 8, border: `1.5px solid ${assigned ? 'var(--ok)' : 'var(--bdr)'}` }}>
+                <div key={t.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: assigned ? 'rgba(40,167,69,.12)' : 'rgba(13,33,55,.4)', borderRadius: 8, border: `1.5px solid ${assigned ? 'var(--ok)' : 'var(--bdr)'}` }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>{t.name}</div>
                     <div style={{ fontSize: 11, color: 'var(--muted)' }}>{t.email}</div>
@@ -253,19 +262,27 @@ function ProgressModal({ classId, onClose }) {
   );
 }
 
-function SortableModule({ mod, onEdit, onDelete }) {
+function SortableModule({ mod, onEdit, onDelete, token }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: mod.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? .5 : 1 };
+
+  const openSlideEditor = () => {
+    const url = `/slideplayer/?mode=editor&moduleId=${mod.id}&token=${encodeURIComponent(token)}&title=${encodeURIComponent(mod.title)}`;
+    window.open(url, `slide-editor-${mod.id}`, 'width=1280,height=800,menubar=no,toolbar=no');
+  };
 
   return (
     <div ref={setNodeRef} style={style} className="module-item">
       <div className="drag-handle" {...attributes} {...listeners} title="Drag to reorder">⠿</div>
-      <div className={`module-icon ${mod.type}`}>{TYPE_ICONS[mod.type]}</div>
+      <div className={`module-icon ${mod.type}`}>{TYPE_ICONS[mod.type] || '📦'}</div>
       <div className="module-info">
         <div className="module-title">{mod.title}</div>
-        <div className="module-sub">{TYPE_LABELS[mod.type]}{mod.description ? ` · ${mod.description}` : ''}</div>
+        <div className="module-sub">{TYPE_LABELS[mod.type] || mod.type}{mod.description ? ` · ${mod.description}` : ''}</div>
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
+        {mod.type === 'slide_deck' && (
+          <button className="btn btn-ghost btn-sm" onClick={openSlideEditor} title="Open slide editor">🖼️ Edit Slides</button>
+        )}
         <button className="btn btn-ghost btn-sm btn-icon" onClick={() => onEdit(mod)}>✏️</button>
         <button className="btn btn-ghost btn-sm btn-icon" onClick={() => onDelete(mod)}>🗑️</button>
       </div>
@@ -276,6 +293,7 @@ function SortableModule({ mod, onEdit, onDelete }) {
 export default function AdminClassDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const token = localStorage.getItem('tgs_token') || '';
   const [cls, setCls] = useState(null);
   const [modules, setModules] = useState([]);
   const [showModuleModal, setShowModuleModal] = useState(false);
@@ -333,7 +351,7 @@ export default function AdminClassDetail() {
 
         <div style={{ display: 'flex', gap: 0, marginBottom: 20, borderBottom: '2px solid var(--bdr)' }}>
           {[['modules', `📦 Modules (${modules.length})`], ['trainees', `👥 Trainees (${cls.trainees.length})`]].map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key)} style={{ padding: '8px 20px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: tab === key ? 'var(--blue)' : 'var(--muted)', borderBottom: `2px solid ${tab === key ? 'var(--blue)' : 'transparent'}`, marginBottom: -2 }}>
+            <button key={key} onClick={() => setTab(key)} style={{ padding: '8px 20px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, color: tab === key ? 'var(--blue)' : 'var(--muted)', borderBottom: `2px solid ${tab === key ? 'var(--blue)' : 'transparent'}`, marginBottom: -2, fontFamily: 'inherit' }}>
               {label}
             </button>
           ))}
@@ -358,7 +376,7 @@ export default function AdminClassDetail() {
                         <div key={mod.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ width: 24, textAlign: 'center', fontSize: 12, color: 'var(--muted)', fontWeight: 700 }}>{idx + 1}</div>
                           <div style={{ flex: 1 }}>
-                            <SortableModule mod={mod} onEdit={m => { setEditMod(m); setShowModuleModal(true); }} onDelete={handleDeleteModule} />
+                            <SortableModule mod={mod} onEdit={m => { setEditMod(m); setShowModuleModal(true); }} onDelete={handleDeleteModule} token={token} />
                           </div>
                         </div>
                       ))}
