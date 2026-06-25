@@ -12,7 +12,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 // ── Video streaming with range support ───────────────────────
-const UPLOADS_DIR = path.join(__dirname, '../../uploads');
+const UPLOADS_DIR = process.env.UPLOADS_PATH || path.join(__dirname, '../../uploads');
 app.get('/uploads/:filename', (req, res) => {
   const filePath = path.join(UPLOADS_DIR, req.params.filename);
   if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
