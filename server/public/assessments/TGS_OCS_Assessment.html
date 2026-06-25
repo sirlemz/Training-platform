@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGS BPO | Outbound Chat Specialist Assessment</title>
+<style>
+  :root {
+    --navy: #1B3262;
+    --navy-dark: #122244;
+    --blue: #2E5BA8;
+    --blue-light: #4A9ED6;
+    --green: #27AE60;
+    --red: #E74C3C;
+    --orange: #F39C12;
+    --white: #FFFFFF;
+    --gray-light: #F4F6FA;
+    --gray-mid: #DDE3EE;
+    --gray-text: #555E70;
+    --text: #1A2035;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--gray-light);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── COVER ── */
+  #cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 60%, var(--blue) 100%);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .cover-badge {
+    background: rgba(255,255,255,0.12);
+    color: #A8C4F0;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .cover-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 10px;
+    max-width: 600px;
+  }
+  .cover-subtitle {
+    font-size: 17px;
+    color: #A8C4F0;
+    margin-bottom: 36px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cover-meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px 24px;
+    min-width: 120px;
+  }
+  .cover-meta-item .num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .cover-meta-item .label {
+    font-size: 12px;
+    color: #A8C4F0;
+    margin-top: 2px;
+  }
+  .cover-instructions {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 20px 28px;
+    max-width: 520px;
+    text-align: left;
+    margin-bottom: 36px;
+    color: #CBD8EE;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .cover-instructions ul { padding-left: 18px; }
+  .cover-instructions li { margin-bottom: 6px; }
+  .start-btn {
+    background: var(--white);
+    color: var(--navy);
+    border: none;
+    padding: 16px 48px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }
+  .confidential {
+    margin-top: 28px;
+    font-size: 11px;
+    color: rgba(168,196,240,0.6);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ── QUIZ ── */
+  #quiz { display: none; min-height: 100vh; flex-direction: column; }
+
+  .quiz-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .quiz-logo { font-weight: 700; font-size: 14px; color: #A8C4F0; letter-spacing: 0.5px; }
+  .quiz-logo span { color: var(--white); }
+  #timer {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    font-variant-numeric: tabular-nums;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 16px;
+    border-radius: 8px;
+    transition: background 0.3s, color 0.3s;
+  }
+  #timer.warning { background: rgba(243,156,18,0.3); color: #FFD166; }
+  #timer.danger { background: rgba(231,76,60,0.3); color: #FF7B72; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  .progress-bar-wrap { padding: 0 28px 0; background: var(--navy-dark); }
+  .progress-bar-track {
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--blue-light);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .progress-label {
+    color: #A8C4F0;
+    font-size: 12px;
+    padding: 6px 0 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .quiz-body {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 36px 20px 80px;
+  }
+
+  .question-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(27,50,98,0.08);
+    max-width: 740px;
+    width: 100%;
+    padding: 36px 40px;
+  }
+  .section-tag {
+    display: inline-block;
+    background: var(--gray-light);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    border: 1px solid var(--gray-mid);
+  }
+  .q-number {
+    font-size: 12px;
+    color: var(--gray-text);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+  .scenario-box {
+    background: #F0F4FF;
+    border-left: 4px solid var(--blue);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #2D3A55;
+  }
+  .scenario-box strong { color: var(--navy); }
+
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 2px solid var(--gray-mid);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--text);
+    user-select: none;
+  }
+  .option:hover { border-color: var(--blue-light); background: #F0F6FF; }
+  .option input[type="radio"] { display: none; }
+  .option-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-mid);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .option-dot::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--white);
+    display: none;
+  }
+  .option.selected { border-color: var(--blue); background: #EEF3FF; }
+  .option.selected .option-dot {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .option.selected .option-dot::after { display: block; }
+
+  /* Feedback states */
+  .option.correct { border-color: var(--green); background: #EAFAF1; }
+  .option.correct .option-dot { background: var(--green); border-color: var(--green); }
+  .option.correct .option-dot::after { display: block; }
+  .option.incorrect { border-color: var(--red); background: #FDEDEC; }
+  .option.incorrect .option-dot { background: var(--red); border-color: var(--red); }
+
+  .feedback-msg {
+    margin-top: 18px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.55;
+    display: none;
+  }
+  .feedback-msg.correct { background: #D5F5E3; color: #1A7A44; border: 1px solid #A9DFBF; }
+  .feedback-msg.incorrect { background: #FADBD8; color: #922B21; border: 1px solid #F1948A; }
+
+  .quiz-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--gray-mid);
+    padding: 16px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    box-shadow: 0 -2px 12px rgba(27,50,98,0.07);
+  }
+  .nav-btn {
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-prev { background: var(--gray-light); color: var(--gray-text); border: 1px solid var(--gray-mid); }
+  .btn-prev:hover { background: var(--gray-mid); }
+  .btn-next { background: var(--blue); color: var(--white); }
+  .btn-next:hover { background: var(--navy); }
+  .btn-submit { background: var(--green); color: var(--white); }
+  .btn-submit:hover { background: #219150; }
+  .btn-next:disabled, .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+  .nav-counter { font-size: 13px; color: var(--gray-text); font-weight: 500; }
+
+  /* ── RESULTS ── */
+  #results {
+    display: none;
+    min-height: 100vh;
+    background: var(--gray-light);
+    padding: 0 0 60px;
+  }
+  .results-header {
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    color: var(--white);
+    padding: 40px 28px 60px;
+    text-align: center;
+  }
+  .results-header h2 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #A8C4F0; margin-bottom: 16px; }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid rgba(255,255,255,0.25);
+    position: relative;
+  }
+  .score-circle.pass { border-color: var(--green); background: rgba(39,174,96,0.15); }
+  .score-circle.fail { border-color: var(--red); background: rgba(231,76,60,0.15); }
+  .score-pct { font-size: 42px; font-weight: 800; color: var(--white); line-height: 1; }
+  .score-label { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .pass-badge {
+    display: inline-block;
+    padding: 6px 22px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .pass-badge.pass { background: var(--green); color: var(--white); }
+  .pass-badge.fail { background: var(--red); color: var(--white); }
+  .results-note { font-size: 14px; color: #A8C4F0; margin-top: 8px; }
+
+  .results-body {
+    max-width: 760px;
+    margin: -30px auto 0;
+    padding: 0 20px;
+  }
+  .results-card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(27,50,98,0.08);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .results-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-mid);
+  }
+  .section-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-light);
+    gap: 12px;
+  }
+  .section-row:last-child { border-bottom: none; }
+  .section-name { font-size: 14px; color: var(--text); flex: 1; }
+  .section-score-bar { flex: 2; height: 8px; background: var(--gray-mid); border-radius: 4px; overflow: hidden; }
+  .section-score-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .section-score-fill.high { background: var(--green); }
+  .section-score-fill.mid { background: var(--orange); }
+  .section-score-fill.low { background: var(--red); }
+  .section-fraction { font-size: 13px; font-weight: 700; width: 44px; text-align: right; }
+  .section-fraction.high { color: var(--green); }
+  .section-fraction.mid { color: var(--orange); }
+  .section-fraction.low { color: var(--red); }
+
+  .review-item {
+    margin-bottom: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+  .review-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .review-q { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.45; }
+  .review-your { font-size: 13px; color: var(--red); margin-bottom: 4px; }
+  .review-your::before { content: '✗ Your answer: '; font-weight: 600; }
+  .review-correct { font-size: 13px; color: var(--green); }
+  .review-correct::before { content: '✓ Correct answer: '; font-weight: 600; }
+  .review-explain {
+    font-size: 13px;
+    color: var(--gray-text);
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--gray-light);
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+  .no-errors { text-align: center; padding: 20px; color: var(--green); font-weight: 600; font-size: 15px; }
+
+  .results-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .btn-retake {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    padding: 13px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-print {
+    background: var(--white);
+    color: var(--navy);
+    border: 2px solid var(--navy);
+    padding: 13px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .time-taken { font-size: 13px; color: var(--gray-text); text-align: center; margin-top: 12px; }
+
+  @media print {
+    .quiz-nav, .results-actions, #cover, #quiz { display: none !important; }
+    #results { display: block !important; }
+    .results-header { background: var(--navy) !important; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ COVER ══════════════════ -->
+<div id="cover">
+  <div class="cover-badge">Internal Training Assessment</div>
+  <div class="cover-title">Outbound Chat Specialist<br>Knowledge Assessment</div>
+  <div class="cover-subtitle">TGS BPO Incorporated — Operations Department</div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span class="num">40</span><span class="label">Questions</span></div>
+    <div class="cover-meta-item"><span class="num">30</span><span class="label">Minutes</span></div>
+    <div class="cover-meta-item"><span class="num">70%</span><span class="label">Passing Score</span></div>
+    <div class="cover-meta-item"><span class="num">11</span><span class="label">Topic Areas</span></div>
+  </div>
+  <div class="cover-instructions">
+    <ul>
+      <li>This assessment covers the full Outbound Chat Specialist SOP, Version 1.0.</li>
+      <li>You have <strong>30 minutes</strong> to complete all 40 questions.</li>
+      <li>The passing score is <strong>70% (28 out of 40 correct)</strong>.</li>
+      <li>Select one answer per question. You can navigate back to change answers.</li>
+      <li>Your results will show a section-by-section breakdown and a review of any incorrect answers.</li>
+      <li>Scores below 70% trigger a mandatory coaching session within 48 hours.</li>
+    </ul>
+  </div>
+  <button class="start-btn" onclick="startQuiz()">Begin Assessment →</button>
+  <div class="confidential">Confidential — Internal Use Only — Version 1.0 — June 2026</div>
+</div>
+
+<!-- ══════════════════ QUIZ ══════════════════ -->
+<div id="quiz">
+  <div class="quiz-header">
+    <div class="quiz-logo">TGS BPO <span>| OCS Assessment</span></div>
+    <div id="timer">30:00</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label">
+      <span id="progressText">Question 1 of 40</span>
+      <span id="answeredCount">0 answered</span>
+    </div>
+  </div>
+  <div class="quiz-body">
+    <div class="question-card" id="questionCard"></div>
+  </div>
+  <div class="quiz-nav">
+    <button class="nav-btn btn-prev" id="btnPrev" onclick="navigate(-1)">← Previous</button>
+    <span class="nav-counter" id="navCounter">1 / 40</span>
+    <button class="nav-btn btn-next" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ══════════════════ RESULTS ══════════════════ -->
+<div id="results">
+  <div class="results-header">
+    <h2>Assessment Complete — TGS BPO Incorporated</h2>
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-pct" id="scorePct">--</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="pass-badge" id="passBadge">--</div>
+    <div class="results-note" id="resultsNote"></div>
+  </div>
+  <div class="results-body">
+    <div class="results-card">
+      <h3>Score by Section</h3>
+      <div id="sectionBreakdown"></div>
+    </div>
+    <div class="results-card">
+      <h3>Questions to Review</h3>
+      <div id="reviewSection"></div>
+    </div>
+    <div class="time-taken" id="timeTaken"></div>
+    <div class="results-actions">
+      <button class="btn-retake" onclick="retake()">Retake Assessment</button>
+      <button class="btn-print" onclick="window.print()">Print Results</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOTAL_TIME = 30 * 60;
+let timeLeft = TOTAL_TIME;
+let timerInterval = null;
+let startTime = null;
+let current = 0;
+let userAnswers = new Array(40).fill(null);
+
+const questions = [
+  // ── SECTION 1: Tools & Systems ──────────────────────────────────────
+  {
+    section: "Tools & Systems",
+    text: "Which platform serves as the primary hub for task tracking, outreach activity logging, and lead status updates?",
+    options: ["Slack", "Asana", "LinkedIn", "Google Calendar"],
+    correct: 1,
+    explain: "Asana is your hub every shift — all outreach is logged there, lead statuses are managed there, and your task board starts every shift there."
+  },
+  {
+    section: "Tools & Systems",
+    text: "By which day should an Outbound Chat Specialist be fully independent across all assigned platforms?",
+    options: ["Day 7", "Day 15", "Day 30", "Day 60"],
+    correct: 2,
+    explain: "Agents are expected to be proficient by Day 15 and fully independent — requiring no guidance — by Day 30."
+  },
+  {
+    section: "Tools & Systems",
+    scenario: "A colleague says their LinkedIn account keeps logging them out and asks if they can use your credentials temporarily to keep the campaign running.",
+    text: "What should you do?",
+    options: [
+      "Share your credentials — keeping the campaign running is the priority",
+      "Decline and advise them to report the issue to their Team Leader on Slack immediately",
+      "Let them use your personal LinkedIn account instead",
+      "Ignore the request and continue your own outreach"
+    ],
+    correct: 1,
+    explain: "Credentials must never be shared between agents. The colleague should report the login issue to their Team Leader on Slack immediately — not work around it."
+  },
+
+  // ── SECTION 2: Daily Shift Structure ────────────────────────────────
+  {
+    section: "Daily Shift Structure",
+    text: "Skipping or reordering phases in the daily shift structure is classified as what?",
+    options: ["A minor process deviation", "A coaching opportunity", "A QA compliance violation", "An escalation trigger"],
+    correct: 2,
+    explain: "The SOP is explicit: agents must complete each phase in order. Skipping or reordering phases is a QA compliance violation."
+  },
+  {
+    section: "Daily Shift Structure",
+    text: "What is the correct sequence for the shift start phase?",
+    options: [
+      "Set targets → Check Slack → Open platforms → Review pipeline",
+      "Open platforms → Review Asana → Check Slack → Review pipeline → Set targets",
+      "Review pipeline → Open platforms → Set targets → Check Slack",
+      "Check Slack → Set targets → Open platforms → Review Asana"
+    ],
+    correct: 1,
+    explain: "The correct order is: log in to all platforms first, then check Asana, then Slack, then review your pipeline from the previous shift, then set your outreach targets."
+  },
+  {
+    section: "Daily Shift Structure",
+    text: "What is the minimum daily outreach target across all channels per shift?",
+    options: ["30 messages", "40 messages", "50 messages", "80 messages"],
+    correct: 2,
+    explain: "The minimum is 50 messages per shift across all active channels. The stretch target is 80–100."
+  },
+  {
+    section: "Daily Shift Structure",
+    text: "When should you stop sending new outreach messages at the end of your shift?",
+    options: [
+      "At the exact moment your shift ends",
+      "15 minutes before shift end",
+      "30 minutes before shift end",
+      "60 minutes before shift end"
+    ],
+    correct: 2,
+    explain: "You must stop sending new outreach messages 30 minutes before shift end to allow time for wrap-up tasks, Asana logging, pipeline review, and posting your end-of-shift report."
+  },
+  {
+    section: "Daily Shift Structure",
+    text: "Which of the following items is required in every end-of-shift Slack report?",
+    options: [
+      "Messages sent by channel, replies received, calls booked, hot prospects, and blockers",
+      "Total messages sent and discovery calls booked only",
+      "Reply rate and Asana logging count",
+      "Campaign performance vs. last week and issue escalations"
+    ],
+    correct: 0,
+    explain: "The end-of-shift report must follow the exact template in Section 3.4: messages sent broken down by channel, replies by type, calls booked, hot prospects, and any issues or blockers."
+  },
+  {
+    section: "Daily Shift Structure",
+    scenario: "You're at your mid-shift check-in and have only sent 18 messages. Your minimum target is 50.",
+    text: "What is the correct action?",
+    options: [
+      "Continue at your current pace — you have plenty of shift left",
+      "Immediately post a blocker in Slack and wait for TL instructions",
+      "Identify the gap and adjust your send rate for the remaining shift hours",
+      "Skip Asana logging for the rest of the shift to free up time for outreach"
+    ],
+    correct: 2,
+    explain: "The SOP instructs agents to identify the gap at mid-shift and adjust pace for the remaining hours. Skipping logging is never acceptable regardless of time pressure."
+  },
+
+  // ── SECTION 3: LinkedIn ─────────────────────────────────────────────
+  {
+    section: "LinkedIn Outreach",
+    text: "What is the maximum number of LinkedIn DMs or connection requests you should send in a single hour?",
+    options: ["10–15", "20–25", "30–35", "50"],
+    correct: 1,
+    explain: "LinkedIn has platform limits. The SOP caps LinkedIn outreach at 20–25 messages or connection requests per hour to avoid triggering restrictions."
+  },
+  {
+    section: "LinkedIn Outreach",
+    text: "Which of the following is the LinkedIn personalization minimum standard according to the SOP?",
+    options: [
+      "Addressing the prospect by their first name only",
+      "Mentioning TGS BPO's services in the first sentence",
+      "At least one element: name/title, company reference, recent post, or industry observation",
+      "Including the prospect's company name anywhere in the message"
+    ],
+    correct: 2,
+    explain: "Every LinkedIn message must include at least one personalized element — name and specific job title, company name and what they do, a recent post or achievement, or a specific industry observation. Generic messages fail QA."
+  },
+  {
+    section: "LinkedIn Outreach",
+    text: "Which of the following LinkedIn messages is QA-compliant?",
+    options: [
+      "\"Hi, I wanted to reach out about our outsourcing services. Would you be interested in a call?\"",
+      "\"Hello, we help businesses like yours scale efficiently. Let me know if you want to learn more.\"",
+      "\"Hi David, I noticed TechScale just expanded to three new markets — I work with ops teams going through exactly this growth stage. Would it make sense to connect?\"",
+      "\"Hi there! We have great BPO services and can help your company. Free 30-min call?\""
+    ],
+    correct: 2,
+    explain: "Option C is the only message with a personalized element (name + specific company news), a relevant bridge, and a low-friction CTA. The others are generic copy-paste messages with no personalization."
+  },
+  {
+    section: "LinkedIn Outreach",
+    text: "According to the follow-up sequence for LinkedIn, when should the second follow-up message be sent after no reply?",
+    options: ["Day 3", "Day 5", "Day 7", "Day 10"],
+    correct: 2,
+    explain: "The LinkedIn follow-up sequence is: Day 0 (initial) → Day 3 (first follow-up) → Day 7 (second follow-up, gentle check-in) → Day 14 (final attempt). Day 7 is the second follow-up."
+  },
+
+  // ── SECTION 4: Email ────────────────────────────────────────────────
+  {
+    section: "Email Outreach",
+    text: "What is the daily email target per shift for Outbound Chat Specialists?",
+    options: ["10–15 emails", "15–20 emails", "20–35 emails", "40–50 emails"],
+    correct: 2,
+    explain: "The SOP specifies 20–35 emails per shift across active email campaigns. Email is the highest-volume channel."
+  },
+  {
+    section: "Email Outreach",
+    text: "Which email subject line is compliant with SOP standards?",
+    options: [
+      "\"FREE OUTSOURCING SERVICES — GUARANTEED RESULTS — ACT NOW!!!\"",
+      "\"Just following up on my previous email from last week\"",
+      "\"GrowthCo + back-office support — worth 15 min?\"",
+      "\"Our Award-Winning BPO Services Can Help Your Company Succeed Today\""
+    ],
+    correct: 2,
+    explain: "Option C is personalized, curiosity-driven, under 10 words, and contains no spam trigger words. The others violate subject line standards: spam words, too generic, or too long."
+  },
+  {
+    section: "Email Outreach",
+    text: "True or False: It is acceptable to include a company brochure attachment in a cold outreach email to provide the prospect more information.",
+    options: ["True", "False"],
+    correct: 1,
+    explain: "The SOP explicitly prohibits attachments in cold outreach emails. They trigger spam filters and reduce deliverability. All information should be contained within the email body."
+  },
+
+  // ── SECTION 5: Facebook & Instagram ────────────────────────────────
+  {
+    section: "Facebook & Instagram",
+    text: "What is the appropriate word count range for a Facebook DM sent to a prospect?",
+    options: ["20–50 words", "50–150 words", "150–300 words", "300–500 words"],
+    correct: 1,
+    explain: "Facebook DMs should be 50–150 words — casual, conversational, and benefit-focused. Facebook is less formal than LinkedIn or email but still professional."
+  },
+  {
+    section: "Facebook & Instagram",
+    text: "Which Instagram DM opening line is compliant with SOP standards?",
+    options: [
+      "\"Hi, I saw your profile and think we could work together.\"",
+      "\"Hello! We offer great outsourcing solutions. Click this link to learn more: [URL]\"",
+      "\"Hey [Name]! Your recent post about [specific topic] really stood out — love what you're building with [Brand Name].\"",
+      "\"Hi there! Do you need outsourcing services for your business?\""
+    ],
+    correct: 2,
+    explain: "Option C references something specific to the prospect's brand and recent activity. The SOP requires referencing their brand, a recent post, or something specific to their business — not generic openers or link drops."
+  },
+  {
+    section: "Facebook & Instagram",
+    text: "After sending a Facebook DM and one follow-up with no reply received, what is the correct next step?",
+    options: [
+      "Send a third message with a completely different angle",
+      "Mark the prospect as 'No Response' in Asana and do not re-contact",
+      "Switch to LinkedIn and send a message there without Team Leader approval",
+      "Escalate to your Team Leader to take over the conversation"
+    ],
+    correct: 1,
+    explain: "For Facebook and Instagram, the maximum is one follow-up after the initial message. After two attempts with no reply, mark as 'No Response' in Asana and do not re-contact."
+  },
+
+  // ── SECTION 6: Lead Qualification ──────────────────────────────────
+  {
+    section: "Lead Qualification",
+    text: "How many BANT-Lite criteria must a prospect meet to be considered Qualified for a discovery call?",
+    options: ["All 4 criteria", "At least 3 out of 4", "At least 2 out of 4", "At least 1 out of 4"],
+    correct: 1,
+    explain: "A prospect must meet at least 3 of the 4 BANT-Lite criteria (Business Fit, Authority, Need, Timing) before being marked Qualified and progressed toward a discovery call."
+  },
+  {
+    section: "Lead Qualification",
+    scenario: "A prospect replies: \"I'm the office manager here. I'd need to check with my director before committing to anything — maybe we could look at this next year.\"",
+    text: "Which BANT-Lite criteria are weak or missing?",
+    options: [
+      "Business Fit and Need",
+      "Authority and Timing",
+      "Need and Business Fit",
+      "Timing only"
+    ],
+    correct: 1,
+    explain: "Authority is weak — the office manager has no purchasing influence and can't get a decision-maker involved. Timing is also weak — 'maybe next year' with no engagement falls outside the 3-month window. This prospect needs more information before qualifying."
+  },
+  {
+    section: "Lead Qualification",
+    text: "Which of the following prospects is DISQUALIFIED under BANT-Lite standards?",
+    options: [
+      "A founder of a 15-person SaaS company: 'We're drowning in admin and I'm ready to act now'",
+      "A VP of Operations at a logistics company exploring outsourcing options for Q3",
+      "A solo freelance graphic designer with no team, no budget, and no immediate business need",
+      "A CEO who says 'We're scaling fast and need support staff within 60 days'"
+    ],
+    correct: 2,
+    explain: "A solo freelancer with no team, no budget, and no business need fails Business Fit, Authority, and Need — three of the four criteria. This prospect is disqualified."
+  },
+  {
+    section: "Lead Qualification",
+    text: "Before reaching out to any prospect, what should you do to support effective personalization?",
+    options: [
+      "Check their contact details in the campaign list only",
+      "Send a generic opening message first and personalize in the follow-up",
+      "Research their LinkedIn profile, company page, or recent posts for relevant context",
+      "Ask your Team Leader to provide personalized notes for each prospect"
+    ],
+    correct: 2,
+    explain: "The SOP requires research before outreach. Checking their LinkedIn, company page, or recent posts gives you the context needed to write a personalized, relevant message. You cannot personalize without researching first."
+  },
+  {
+    section: "Lead Qualification",
+    text: "Moving an unqualified prospect directly to the 'Call Booked' stage is classified as:",
+    options: [
+      "An acceptable shortcut if the prospect seems genuinely engaged",
+      "A coaching opportunity that will be noted during the next 1:1",
+      "A QA compliance failure",
+      "An escalation trigger requiring Team Leader approval"
+    ],
+    correct: 2,
+    explain: "Booking an unqualified prospect wastes the Sales/BD team's time and is explicitly listed as a QA compliance failure in Section 5 of the SOP."
+  },
+
+  // ── SECTION 7: Asana Logging ────────────────────────────────────────
+  {
+    section: "Asana Logging",
+    text: "Within how many minutes of sending an outreach message must you log it in Asana?",
+    options: ["5 minutes", "15 minutes", "30 minutes", "60 minutes"],
+    correct: 1,
+    explain: "Every outreach activity must be logged in Asana within 15 minutes of sending. This applies to messages sent, replies received, and status changes."
+  },
+  {
+    section: "Asana Logging",
+    text: "Which of the following Asana log entries meets the minimum QA standard?",
+    options: [
+      "\"sent linkedin msg\"",
+      "\"replied – interested\"",
+      "\"22 Jun | LinkedIn DM sent (Initial) | No reply yet | FU1 due 25 Jun\"",
+      "\"contacted – no response yet\""
+    ],
+    correct: 2,
+    explain: "A compliant log note must include the date, channel, message type, current status, and next action. Only Option C includes all required elements. The others lack date, context, or next steps."
+  },
+  {
+    section: "Asana Logging",
+    text: "True or False: Batch-logging all outreach activity at the end of your shift is acceptable if you fell behind on messages during the shift.",
+    options: ["True", "False"],
+    correct: 1,
+    explain: "Batch-logging is never acceptable regardless of how busy the shift was. Real-time logging is required — every activity must be logged within 15 minutes of it happening."
+  },
+  {
+    section: "Asana Logging",
+    text: "What is the minimum Asana logging accuracy standard for Outbound Chat Specialists?",
+    options: ["80%", "85%", "90%", "95%"],
+    correct: 3,
+    explain: "The SOP mandates a minimum 95% accuracy rate for Asana logging at all times. This is a core job function, not an optional best practice."
+  },
+  {
+    section: "Asana Logging",
+    scenario: "A prospect tells you via LinkedIn DM that they're not interested and they've already signed with another provider.",
+    text: "What is the correct Asana status to assign and what must you log?",
+    options: [
+      "'No Response' — log that the outreach sequence is complete",
+      "'Disqualified' — log that they don't meet BANT-Lite criteria",
+      "'Not Interested / Rejected' — log their reason and do not re-contact unless instructed by TL",
+      "'Follow-Up Sent' — log the interaction and schedule a re-engagement in 30 days"
+    ],
+    correct: 2,
+    explain: "An explicit rejection means the status should be 'Not Interested / Rejected.' You must log the reason given (already signed with another provider) and not re-contact for 30 days unless your Team Leader instructs you otherwise."
+  },
+
+  // ── SECTION 8: Discovery Call Booking ──────────────────────────────
+  {
+    section: "Discovery Call Booking",
+    text: "What is the correct Google Calendar event title format for a booked discovery call?",
+    options: [
+      "\"Discovery Call – [Date]\"",
+      "\"TGS BPO Call with [Prospect Name]\"",
+      "\"TGS BPO Discovery Call – [Prospect Name], [Company Name]\"",
+      "\"[Prospect Name] – Intro Call – [Agent Name]\""
+    ],
+    correct: 2,
+    explain: "The SOP specifies an exact title format: 'TGS BPO Discovery Call – [Prospect Name], [Company Name].' Deviating from this format fails the Booking & Handoff QA category."
+  },
+  {
+    section: "Discovery Call Booking",
+    text: "Within how many minutes of sending the Google Calendar invite must you post the Slack handoff notification to the Sales/BD channel?",
+    options: ["5 minutes", "15 minutes", "30 minutes", "60 minutes"],
+    correct: 1,
+    explain: "The Slack handoff notification must be posted within 15 minutes of sending the Google Calendar invite. Posting it late is flagged in QA reviews."
+  },
+  {
+    section: "Discovery Call Booking",
+    scenario: "An agent booked a discovery call, created the Google Calendar event with the correct title and duration, but forgot to add the assigned Sales/BD contact as a guest.",
+    text: "What is the most significant consequence of this specific error?",
+    options: [
+      "The prospect will not receive their calendar invitation",
+      "The QA score for Booking & Handoff will automatically drop to zero",
+      "The Sales/BD team will have no calendar visibility for the call and may be unprepared",
+      "The Asana status cannot be updated to 'Call Booked' without both guests added"
+    ],
+    correct: 2,
+    explain: "Not adding the Sales/BD contact means they have no automatic visibility into the call. Even if they see the Slack notification, they won't have the calendar event to prepare from or reschedule if needed."
+  },
+  {
+    section: "Discovery Call Booking",
+    text: "After a discovery call is booked and the Google Calendar invite is sent, what must an agent do on the same channel where the conversation happened?",
+    options: [
+      "Send the prospect a link to the TGS BPO website for more information",
+      "Request the prospect's LinkedIn profile for the Sales team's reference",
+      "Send a confirmation message to the prospect acknowledging the booked call",
+      "Nothing — the calendar invite serves as the confirmation"
+    ],
+    correct: 2,
+    explain: "After sending the Calendar invite, you must send a confirmation message to the prospect on the channel where you originally connected. This closes the loop, reduces no-shows, and sets a professional tone. The calendar invite alone is not sufficient."
+  },
+
+  // ── SECTION 9: QA Scoring ───────────────────────────────────────────
+  {
+    section: "QA Scoring",
+    text: "Which QA category carries the highest weight in the overall score?",
+    options: [
+      "Asana Logging Accuracy (20%)",
+      "Outreach Volume & Activity (20%)",
+      "Message Quality & Personalization (25%)",
+      "Lead Qualification (15%)"
+    ],
+    correct: 2,
+    explain: "Message Quality & Personalization is weighted at 25% — the highest single category in the QA rubric. This reflects how central personalized outreach is to the role."
+  },
+  {
+    section: "QA Scoring",
+    text: "What is the minimum passing QA score, and what happens if an agent scores below it?",
+    options: [
+      "60% — the agent receives a written warning",
+      "70% — the agent receives a mandatory coaching session within 48 hours",
+      "75% — the agent's campaign assignment is temporarily suspended",
+      "80% — the agent is placed on a formal performance improvement plan"
+    ],
+    correct: 1,
+    explain: "The minimum passing score is 70/100. Scores below 70 trigger a mandatory coaching session within 48 hours. Two consecutive scores below 70 trigger the formal performance management process."
+  },
+  {
+    section: "QA Scoring",
+    text: "Which of the following is listed as a common QA failure in the SOP?",
+    options: [
+      "Sending messages to the wrong prospect",
+      "Responding to a prospect reply after 45 minutes",
+      "Batch-logging Asana entries at the end of the shift",
+      "Using a follow-up tone that's too formal for Instagram"
+    ],
+    correct: 2,
+    explain: "Batch-logging is one of the most commonly flagged QA failures. The SOP is clear: all activity must be logged in real time, within 15 minutes — not saved for end of shift."
+  },
+
+  // ── SECTION 10: Escalation ──────────────────────────────────────────
+  {
+    section: "Escalation & Issue Handling",
+    scenario: "A prospect on LinkedIn sends an aggressive reply with threatening language and mentions they are going to report your outreach as spam.",
+    text: "What is the correct response?",
+    options: [
+      "De-escalate the situation by apologizing and trying to continue the conversation",
+      "Block the prospect and remove them from the campaign list",
+      "Screenshot the message, stop responding, and escalate to your Team Leader on Slack immediately",
+      "Log it in Asana and include it in your end-of-shift report"
+    ],
+    correct: 2,
+    explain: "Aggressive or legally threatening behaviour must be escalated immediately. Screenshot the conversation, stop responding, and DM your Team Leader on Slack. Do not attempt to de-escalate on your own."
+  },
+  {
+    section: "Escalation & Issue Handling",
+    scenario: "A qualified prospect says they'd like to see a pricing breakdown and a formal proposal before agreeing to get on a discovery call.",
+    text: "What should you do?",
+    options: [
+      "Send them TGS BPO's standard rate card via email",
+      "Estimate pricing based on what you know and send it to keep the conversation moving",
+      "Explain that you'll connect them with the Sales team, then tag Sales and notify your Team Leader",
+      "Tell them pricing will be covered on the discovery call and push for a booking"
+    ],
+    correct: 2,
+    explain: "Agents must never make pricing commitments or send proposals. When a prospect requests pricing or a proposal, tag the Sales/BD team and notify your Team Leader. This is an explicit escalation trigger."
+  },
+  {
+    section: "Escalation & Issue Handling",
+    text: "Your Team Leader does not respond to an urgent escalation message on Slack within 30 minutes. What is the correct next step?",
+    options: [
+      "Wait another 30 minutes before following up",
+      "Use your best judgment and handle the situation yourself",
+      "Post the issue in the general team Slack channel for visibility",
+      "Escalate to the Operations Supervisor"
+    ],
+    correct: 3,
+    explain: "If a Team Leader doesn't respond to an urgent issue within 30 minutes, the SOP requires escalating to the Operations Supervisor. You should never handle sensitive situations independently or let them go unaddressed."
+  },
+
+  // ── SECTION 11: Performance Milestones ──────────────────────────────
+  {
+    section: "Performance Milestones",
+    text: "By Day 60, how many days per week should an Outbound Chat Specialist be hitting 50 or more messages per shift?",
+    options: ["2 out of 5 days", "3 out of 5 days", "4 out of 5 days", "All 5 days"],
+    correct: 2,
+    explain: "By Day 60, agents should be hitting their 50-message minimum target at least 4 out of 5 working days. Full consistency across all 5 days is the Day 90 and post-90 expectation."
+  },
+  {
+    section: "Performance Milestones",
+    text: "What is the ongoing discovery call show rate target for Outbound Chat Specialists after Day 90?",
+    options: ["60% or higher", "70% or higher", "75% or higher", "80% or higher"],
+    correct: 2,
+    explain: "The ongoing show rate target is 75% or higher on all booked meetings. This becomes the standard post-Day 90 and is tracked as part of regular QA and performance reviews."
+  }
+];
+
+// ── Timer ────────────────────────────────────
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const s = (timeLeft % 60).toString().padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  el.className = timeLeft <= 60 ? 'danger' : timeLeft <= 300 ? 'warning' : '';
+}
+
+// ── Quiz start ───────────────────────────────
+function startQuiz() {
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('quiz').style.display = 'flex';
+  renderQuestion(0);
+  startTimer();
+}
+
+// ── Render question ──────────────────────────
+function renderQuestion(idx) {
+  current = idx;
+  const q = questions[idx];
+  const answered = userAnswers.filter(a => a !== null).length;
+
+  // Progress
+  const pct = ((idx + 1) / questions.length * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Question ${idx + 1} of ${questions.length}`;
+  document.getElementById('answeredCount').textContent = `${answered} answered`;
+  document.getElementById('navCounter').textContent = `${idx + 1} / ${questions.length}`;
+
+  // Nav
+  document.getElementById('btnPrev').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  const isLast = idx === questions.length - 1;
+  document.getElementById('btnNext').style.display = isLast ? 'none' : 'inline-block';
+
+  let submitBtn = document.getElementById('btnSubmit');
+  if (isLast) {
+    if (!submitBtn) {
+      submitBtn = document.createElement('button');
+      submitBtn.id = 'btnSubmit';
+      submitBtn.className = 'nav-btn btn-submit';
+      submitBtn.textContent = 'Submit Assessment';
+      submitBtn.onclick = submitQuiz;
+      document.querySelector('.quiz-nav').appendChild(submitBtn);
+    }
+    submitBtn.style.display = 'inline-block';
+  } else if (submitBtn) {
+    submitBtn.style.display = 'none';
+  }
+
+  // Build card
+  let html = `<div class="section-tag">${q.section}</div>
+  <div class="q-number">Question ${idx + 1} of ${questions.length}</div>`;
+
+  if (q.scenario) {
+    html += `<div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>`;
+  }
+
+  html += `<div class="q-text">${q.text}</div><div class="options">`;
+
+  q.options.forEach((opt, i) => {
+    const sel = userAnswers[idx] === i ? 'selected' : '';
+    html += `<label class="option ${sel}" id="opt-${i}" onclick="selectAnswer(${i})">
+      <input type="radio" name="q" value="${i}" ${userAnswers[idx] === i ? 'checked' : ''}>
+      <div class="option-dot"></div>
+      <span>${opt}</span>
+    </label>`;
+  });
+
+  html += `</div><div class="feedback-msg" id="feedbackMsg"></div>`;
+  document.getElementById('questionCard').innerHTML = html;
+}
+
+function selectAnswer(idx) {
+  userAnswers[current] = idx;
+  // Refresh to show selection
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+    const dot = el.querySelector('.option-dot');
+    if (i === idx) {
+      dot.style.background = 'var(--blue)';
+      dot.style.borderColor = 'var(--blue)';
+    } else {
+      dot.style.background = '';
+      dot.style.borderColor = '';
+    }
+  });
+  const answered = userAnswers.filter(a => a !== null).length;
+  document.getElementById('answeredCount').textContent = `${answered} answered`;
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next >= 0 && next < questions.length) renderQuestion(next);
+}
+
+// ── Submit ───────────────────────────────────
+function submitQuiz() {
+  clearInterval(timerInterval);
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const em = Math.floor(elapsed / 60);
+  const es = elapsed % 60;
+
+  // Score
+  let total = 0;
+  const sectionData = {};
+
+  questions.forEach((q, i) => {
+    if (!sectionData[q.section]) sectionData[q.section] = { correct: 0, total: 0 };
+    sectionData[q.section].total++;
+    if (userAnswers[i] === q.correct) {
+      total++;
+      sectionData[q.section].correct++;
+    }
+  });
+
+  const pct = Math.round((total / questions.length) * 100);
+  const pass = pct >= 70;
+
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  document.getElementById('scorePct').textContent = `${pct}%`;
+  document.getElementById('scoreCircle').className = `score-circle ${pass ? 'pass' : 'fail'}`;
+  const badge = document.getElementById('passBadge');
+  badge.textContent = pass ? '✓ PASSED' : '✗ NOT PASSED';
+  badge.className = `pass-badge ${pass ? 'pass' : 'fail'}`;
+  document.getElementById('resultsNote').textContent = pass
+    ? `${total} out of ${questions.length} correct — great work!`
+    : `${total} out of ${questions.length} correct — a coaching session will be scheduled within 48 hours.`;
+  document.getElementById('timeTaken').textContent = `Time taken: ${em}m ${es}s`;
+
+  // Section breakdown
+  let sbHtml = '';
+  Object.entries(sectionData).forEach(([name, data]) => {
+    const p = Math.round((data.correct / data.total) * 100);
+    const cls = p >= 80 ? 'high' : p >= 60 ? 'mid' : 'low';
+    sbHtml += `<div class="section-row">
+      <div class="section-name">${name}</div>
+      <div class="section-score-bar"><div class="section-score-fill ${cls}" style="width:${p}%"></div></div>
+      <div class="section-fraction ${cls}">${data.correct}/${data.total}</div>
+    </div>`;
+  });
+  document.getElementById('sectionBreakdown').innerHTML = sbHtml;
+
+  // Review incorrect
+  const incorrect = questions.map((q, i) => ({ q, i, ua: userAnswers[i] })).filter(x => x.ua !== x.q.correct);
+  if (incorrect.length === 0) {
+    document.getElementById('reviewSection').innerHTML = '<div class="no-errors">🎉 Perfect score — no questions to review!</div>';
+  } else {
+    let rHtml = '';
+    incorrect.forEach(({ q, i, ua }) => {
+      const yourAns = ua !== null ? q.options[ua] : 'Not answered';
+      rHtml += `<div class="review-item">
+        <div class="review-q">Q${i + 1}. ${q.scenario ? '<em>[Scenario]</em> ' : ''}${q.text}</div>
+        <div class="review-your">${yourAns}</div>
+        <div class="review-correct">${q.options[q.correct]}</div>
+        <div class="review-explain">${q.explain}</div>
+      </div>`;
+    });
+    document.getElementById('reviewSection').innerHTML = rHtml;
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function retake() {
+  timeLeft = TOTAL_TIME;
+  userAnswers = new Array(40).fill(null);
+  current = 0;
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'flex';
+  const submitBtn = document.getElementById('btnSubmit');
+  if (submitBtn) submitBtn.style.display = 'none';
+  document.getElementById('btnNext').style.display = 'inline-block';
+  renderQuestion(0);
+  startTimer();
+}
+</script>
+</body>
+</html>

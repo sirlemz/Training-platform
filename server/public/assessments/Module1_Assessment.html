@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1 Assessment — American Culture &amp; Communication</title>
+<style>
+  :root{
+    --navy:#0f2742; --blue:#1d6fb8; --blue2:#2a87d8; --teal:#0e9d8f;
+    --ink:#1d2733; --muted:#5b6b7b; --line:#e2e8f0; --bg:#f4f7fb;
+    --good:#1f9d57; --good-bg:#e8f7ee; --bad:#d4493a; --bad-bg:#fdecea;
+    --warn:#c9881f; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.55}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 18px 80px}
+  header.hero{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:16px;
+       padding:30px 30px;box-shadow:0 10px 30px rgba(15,39,66,.18)}
+  .hero .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{margin:8px 0 6px;font-size:27px;line-height:1.2}
+  .hero p{margin:0;opacity:.9;font-size:15px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:600}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 22px;margin-top:18px;
+        box-shadow:0 3px 12px rgba(15,39,66,.05)}
+  .q-head{display:flex;gap:12px;align-items:flex-start}
+  .q-num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;
+         display:grid;place-items:center;font-weight:700;font-size:14px}
+  .q-sec{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+  .q-text{font-size:17px;font-weight:600;margin:2px 0 0}
+  .q-type{display:inline-block;font-size:11px;font-weight:700;color:var(--teal);background:#e6f6f4;
+          border-radius:6px;padding:2px 8px;margin-left:8px;vertical-align:middle;text-transform:uppercase;letter-spacing:.05em}
+  .opts{margin:16px 0 0;display:grid;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;
+       padding:12px 14px;cursor:pointer;transition:.12s;background:#fff}
+  .opt:hover{border-color:var(--blue2);background:#f7fbff}
+  .opt input{margin-top:3px;accent-color:var(--blue);transform:scale(1.15)}
+  .opt.sel{border-color:var(--blue);background:#eef6ff}
+  .opt .ot{font-size:15px}
+  .opt.correct{border-color:var(--good);background:var(--good-bg)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+  .opt.lock{cursor:default}
+  .match-row{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px;flex-wrap:wrap}
+  .match-row .ml{flex:1 1 230px;font-weight:600;font-size:15px}
+  .match-row select{flex:1 1 230px;font-size:14.5px;padding:9px 10px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+  .match-row.correct{background:var(--good-bg);border-color:var(--good)}
+  .match-row.wrong{background:var(--bad-bg);border-color:var(--bad)}
+
+  .fb{margin-top:14px;border-radius:10px;padding:12px 14px;font-size:14.5px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:var(--good-bg);border:1px solid #bfe6cd}
+  .fb.no{background:var(--bad-bg);border:1px solid #f3c5bf}
+  .fb b{display:block;margin-bottom:3px}
+
+  .btn{appearance:none;border:0;cursor:pointer;font-weight:700;font-size:16px;border-radius:11px;padding:15px 26px;transition:.15s}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 6px 16px rgba(29,111,184,.3)}
+  .btn-primary:hover{background:#185d9c}
+  .btn-ghost{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+  .btn-ghost:hover{background:#f0f7ff}
+  .actions{margin-top:26px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .note{font-size:13px;color:var(--muted)}
+
+  /* progress */
+  .progress{position:sticky;top:0;z-index:20;background:var(--bg);padding:12px 0 8px;margin-top:6px}
+  .bar{height:8px;background:#dce6f1;border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .3s}
+  .ptext{font-size:12.5px;color:var(--muted);margin-top:5px;font-weight:600}
+
+  /* results */
+  #results{display:none}
+  .score-card{text-align:center;padding:34px 22px}
+  .ring{width:150px;height:150px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;
+        background:conic-gradient(var(--c,#1d6fb8) calc(var(--p,0)*1%),#e6edf4 0)}
+  .ring > div{width:120px;height:120px;border-radius:50%;background:#fff;display:grid;place-items:center;flex-direction:column}
+  .ring .pct{font-size:34px;font-weight:800;line-height:1}
+  .ring .sub{font-size:12px;color:var(--muted)}
+  .verdict{font-size:22px;font-weight:800;margin:10px 0 4px}
+  .verdict.pass{color:var(--good)} .verdict.fail{color:var(--bad)}
+  .vmsg{color:var(--muted);font-size:15px;max-width:480px;margin:0 auto}
+  @media print{ .no-print{display:none!important} body{background:#fff} .card{box-shadow:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">BPO Foundation Training · Module 1 · Day 1</div>
+    <h1>American Culture &amp; Communication</h1>
+    <p>Knowledge Assessment — check your understanding before Session 1A.</p>
+    <div class="meta">
+      <span class="chip">15 Questions</span>
+      <span class="chip">Pass mark: 80%</span>
+      <span class="chip">Mixed formats</span>
+      <span class="chip">~10 minutes</span>
+    </div>
+  </header>
+
+  <div class="progress no-print" id="progress" style="display:none">
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="ptext" id="barText">0 of 15 answered</div>
+  </div>
+
+  <!-- START -->
+  <div class="card" id="startCard">
+    <p style="margin:0 0 6px;font-size:15.5px">This short assessment covers all nine sections of Module 1: communication style, phone etiquette, empathy &amp; LARA, American expressions, pronunciation, handling misunderstandings, customer-service culture, US geography, and caller types.</p>
+    <p class="note" style="margin:0 0 4px">Answer every question, then submit to see your score and an explanation for each answer. You can retake it as many times as you like — nothing is recorded.</p>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="start()">Start Assessment</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <form id="quiz" style="display:none"></form>
+
+  <div class="actions no-print" id="submitRow" style="display:none">
+    <button class="btn btn-primary" type="button" onclick="grade()">Submit &amp; See Results</button>
+    <span class="note" id="warnText"></span>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="card score-card">
+      <div class="ring" id="ring"><div><span class="pct" id="pct">0%</span><span class="sub" id="frac">0 / 15</span></div></div>
+      <div class="verdict" id="verdict"></div>
+      <p class="vmsg" id="vmsg"></p>
+      <div class="actions no-print" style="justify-content:center">
+        <button class="btn btn-ghost" onclick="review()">Review Answers</button>
+        <button class="btn btn-ghost" onclick="window.print()">Print / Save PDF</button>
+        <button class="btn btn-primary" onclick="retake()">Retake</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- Question bank ---------- */
+const QUESTIONS = [
+  { sec:"1.1 · Communication Style", type:"Multiple choice",
+    q:"What is the 3-word standard expected on every American call, every time?",
+    opts:["Polite, Formal, Slow","Warm, Clear, Fast","Friendly, Detailed, Scripted","Calm, Quiet, Patient"],
+    answer:1,
+    why:"The module's core standard is WARM (sound like you care), CLEAR (simple words, one idea at a time) and FAST (resolve on this call). “On time” — answer by the 3rd ring — supports it." },
+
+  { sec:"1.1 · Communication Style", type:"True / False",
+    q:"Being direct with an American customer is the same as being rude.",
+    opts:["True","False"], answer:1,
+    why:"False. Americans value directness — getting to the point respectfully. Being direct ≠ being rude; friendliness and efficiency coexist." },
+
+  { sec:"1.1 · Communication Style", type:"Scenario",
+    q:"You pause for several seconds to read the account. The American caller is most likely to think:",
+    opts:["“This agent is being thorough.”","“Did the call drop?”","“I should wait quietly.”","“They are giving me time to think.”"],
+    answer:1,
+    why:"Silence on the line reads as “Did the call drop?” Fill dead air — e.g. “I’m just pulling that up for you now.”" },
+
+  { sec:"1.2 · Phone Etiquette", type:"Multiple choice",
+    q:"In the 6-stage call structure, which stage comes BEFORE you start solving the problem?",
+    opts:["Collect the details","Confirm everything back","Acknowledge with empathy","Close the call"],
+    answer:2,
+    why:"Order is Answer → Listen → Acknowledge → Collect → Confirm → Close. Acknowledge (empathy first) comes before collecting details or solving." },
+
+  { sec:"1.2 · Phone Etiquette", type:"Scenario",
+    q:"You need to check something and must place the caller on hold. What do you say?",
+    opts:["“Hold on.”","“Wait a sec.”","“May I place you on a brief hold while I check that for you?”","(Click hold without asking)"],
+    answer:2,
+    why:"Always ASK before holding: “May I place you on a brief hold while I check that for you?” Never “Hold on / Wait a sec” and never click hold without asking." },
+
+  { sec:"1.2 · Phone Etiquette", type:"True / False",
+    q:"It is acceptable to keep a caller on hold longer than 3 minutes without checking back in.",
+    opts:["True","False"], answer:1,
+    why:"False. Never hold longer than 3 minutes without a check-in, and thank them for their patience when you return." },
+
+  { sec:"1.3 · Empathy & LARA", type:"Multiple choice",
+    q:"What is the most important principle in this module?",
+    opts:["The customer is always right.","A customer cannot hear your solution until they feel heard.","Speed beats everything else.","Never apologize — it admits fault."],
+    answer:1,
+    why:"“A customer cannot hear your solution until they feel heard.” Acknowledge the emotion first, then solve." },
+
+  { sec:"1.3 · Empathy & LARA", type:"Matching",
+    q:"Match each letter of the LARA framework to its meaning.",
+    match:[
+      {l:"L", correct:"Listen — let them finish completely"},
+      {l:"A (1st)", correct:"Acknowledge — name the feeling first"},
+      {l:"R", correct:"Resolve — state specifically what you’ll do"},
+      {l:"A (2nd)", correct:"Assure — give a specific next step"}
+    ],
+    choices:["Listen — let them finish completely","Acknowledge — name the feeling first","Resolve — state specifically what you’ll do","Assure — give a specific next step"],
+    why:"LARA = Listen, Acknowledge, Resolve, Assure — your framework for every difficult call." },
+
+  { sec:"1.6 · When You Don’t Understand", type:"Scenario",
+    q:"You didn’t catch the caller’s street address. What is the right way to ask?",
+    opts:["“What?”","“I couldn’t understand you.”","“Can you speak more slowly?”","“I want to make sure I have that exactly right — could you repeat the address for me?”"],
+    answer:3,
+    why:"Explain WHY you’re asking (it shows accuracy matters). Avoid “What?”, blaming the customer, or the condescending “speak more slowly.”" },
+
+  { sec:"1.5 · Pronunciation", type:"Multiple choice",
+    q:"A customer doesn’t understand a word you used. What should you do?",
+    opts:["Repeat the same word, louder","Rephrase using simpler words","Spell the word out letter by letter","Ask them to look it up"],
+    answer:1,
+    why:"Rephrase, don’t repeat louder. Use simpler words — e.g. “heating & cooling system” instead of HVAC. Your accent isn’t the problem; clarity is the skill." },
+
+  { sec:"1.8 · US Geography", type:"Scenario",
+    q:"A Midwest caller mentions their furnace is off but says “it’s fine, no big deal.” Best response?",
+    opts:["Take them at their word and book a routine visit","Recognize ‘Midwestern modest’ — ask “How long has it been off?”","Tell them to call back if it gets worse","Assume it’s an emergency and dispatch immediately without asking"],
+    answer:1,
+    why:"Midwestern callers downplay severity (“it’s fine” when it’s not). Don’t take it at face value — always ask how long it’s been off to gauge true urgency." },
+
+  { sec:"1.8 · US Geography", type:"Matching",
+    q:"Match each US region to a key characteristic agents should remember.",
+    match:[
+      {l:"Northeast", correct:"Older buildings, basements common, direct fast-paced callers"},
+      {l:"South", correct:"Hot/humid, usually NO basement, warm chatty callers"},
+      {l:"Midwest", correct:"Extreme cold, furnace failures high priority, modest callers"},
+      {l:"West", correct:"Desert heat & earthquakes, callers may have tried a DIY fix"}
+    ],
+    choices:["Older buildings, basements common, direct fast-paced callers","Hot/humid, usually NO basement, warm chatty callers","Extreme cold, furnace failures high priority, modest callers","Desert heat & earthquakes, callers may have tried a DIY fix"],
+    why:"Northeast = old buildings/basements/direct; South = humid/no basement/hospitable; Midwest = extreme cold/modest; West = desert heat & quakes/DIY-first." },
+
+  { sec:"1.9 · Who Is Calling", type:"Scenario",
+    q:"The caller says they rent the property (a tenant). What should you ask?",
+    opts:["Nothing — book it exactly like a homeowner","“Are you authorised to approve the service call, or should we coordinate with the property owner?”","“Why doesn’t your landlord call instead?”","Refuse the booking until the owner calls"],
+    answer:1,
+    why:"Tenants have limited authority on expensive repairs. Confirm whether they can approve, and note the landlord as billing contact if needed." },
+
+  { sec:"1.9 · Who Is Calling", type:"Multiple choice",
+    q:"Which caller type owns the property, pays directly, and has full authority to approve work?",
+    opts:["Tenant","Homeowner","Property Manager","HOA Board member"],
+    answer:1,
+    why:"The Homeowner owns the property, pays directly (no approval needed), and is the most common caller type with full authority." },
+
+  { sec:"1.7 · Customer-Service Culture", type:"True / False",
+    q:"In American customer-service culture, getting to the point quickly is seen as a sign of respect for the customer’s time.",
+    opts:["True","False"], answer:0,
+    why:"True. “Efficiency is respect” — resolving fast shows you value their time. It’s one of the 6 principles behind every script in this module." }
+];
+
+const PASS = 80;
+let order = [];
+
+/* ---------- Render ---------- */
+function start(){
+  document.getElementById('startCard').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  document.getElementById('submitRow').style.display='flex';
+  document.getElementById('progress').style.display='block';
+  buildQuiz();
+  updateProgress();
+}
+
+function buildQuiz(){
+  const form = document.getElementById('quiz');
+  form.innerHTML='';
+  QUESTIONS.forEach((Q,i)=>{
+    const card=document.createElement('div');
+    card.className='card'; card.id='card-'+i;
+    let html = `<div class="q-head">
+        <div class="q-num">${i+1}</div>
+        <div>
+          <div class="q-sec">${Q.sec}</div>
+          <div class="q-text">${Q.q}<span class="q-type">${Q.type}</span></div>
+        </div>
+      </div>`;
+
+    if(Q.match){
+      html += `<div class="match" data-q="${i}">`;
+      // build shuffled choice list (stable per render)
+      const choiceOpts = Q.choices.map(c=>`<option value="${esc(c)}"></option>`); // placeholder
+      Q.match.forEach((m,mi)=>{
+        let optsHtml = `<option value="">— choose —</option>` +
+          Q.choices.map(c=>`<option value="${esc(c)}">${c}</option>`).join('');
+        html += `<div class="match-row" id="m-${i}-${mi}">
+            <div class="ml">${m.l}</div>
+            <select onchange="updateProgress()" data-q="${i}" data-row="${mi}">${optsHtml}</select>
+          </div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div class="opts">`;
+      Q.opts.forEach((o,oi)=>{
+        html += `<label class="opt" id="o-${i}-${oi}">
+            <input type="radio" name="q${i}" value="${oi}" onchange="selOpt(${i},${oi})">
+            <span class="ot">${o}</span>
+          </label>`;
+      });
+      html += `</div>`;
+    }
+    html += `<div class="fb" id="fb-${i}"></div>`;
+    card.innerHTML=html;
+    form.appendChild(card);
+  });
+}
+function esc(s){return s.replace(/"/g,'&quot;');}
+
+function selOpt(i,oi){
+  document.querySelectorAll('#card-'+i+' .opt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('o-'+i+'-'+oi).classList.add('sel');
+  updateProgress();
+}
+
+function isAnswered(i){
+  const Q=QUESTIONS[i];
+  if(Q.match){
+    const sels=document.querySelectorAll('#card-'+i+' select');
+    return [...sels].every(s=>s.value!=='');
+  }
+  return !!document.querySelector('input[name="q'+i+'"]:checked');
+}
+
+function updateProgress(){
+  let n=0; QUESTIONS.forEach((_,i)=>{ if(isAnswered(i)) n++; });
+  const p = Math.round(n/QUESTIONS.length*100);
+  document.getElementById('barFill').style.width=p+'%';
+  document.getElementById('barText').textContent = `${n} of ${QUESTIONS.length} answered`;
+  document.getElementById('warnText').textContent = n<QUESTIONS.length ? `${QUESTIONS.length-n} question(s) still unanswered.` : 'All questions answered — ready to submit.';
+}
+
+/* ---------- Grade ---------- */
+function grade(){
+  let unanswered=[];
+  QUESTIONS.forEach((_,i)=>{ if(!isAnswered(i)) unanswered.push(i+1); });
+  if(unanswered.length){
+    if(!confirm(`You have ${unanswered.length} unanswered question(s): #${unanswered.join(', #')}.\n\nSubmit anyway? They will be marked incorrect.`)) return;
+  }
+
+  let correct=0;
+  QUESTIONS.forEach((Q,i)=>{
+    const fb=document.getElementById('fb-'+i);
+    let ok=false;
+    if(Q.match){
+      ok=true;
+      const sels=document.querySelectorAll('#card-'+i+' select');
+      sels.forEach((s,mi)=>{
+        const row=document.getElementById('m-'+i+'-'+mi);
+        const good = s.value===Q.match[mi].correct;
+        if(!good) ok=false;
+        row.classList.add(good?'correct':'wrong');
+        s.disabled=true;
+      });
+    } else {
+      const chosen=document.querySelector('input[name="q'+i+'"]:checked');
+      const ci = chosen? parseInt(chosen.value):-1;
+      ok = ci===Q.answer;
+      document.querySelectorAll('#card-'+i+' .opt').forEach((el,oi)=>{
+        el.classList.add('lock');
+        const inp=el.querySelector('input'); inp.disabled=true;
+        if(oi===Q.answer) el.classList.add('correct');
+        else if(oi===ci) el.classList.add('wrong');
+      });
+    }
+    if(ok) correct++;
+    fb.className='fb show '+(ok?'ok':'no');
+    fb.innerHTML = `<b>${ok?'✔ Correct':'✗ Incorrect'}</b>${Q.why}`;
+  });
+
+  const pct=Math.round(correct/QUESTIONS.length*100);
+  showResults(correct,pct);
+}
+
+function showResults(correct,pct){
+  document.getElementById('submitRow').style.display='none';
+  document.getElementById('progress').style.display='none';
+  const res=document.getElementById('results'); res.style.display='block';
+  const pass = pct>=PASS;
+  const ring=document.getElementById('ring');
+  ring.style.setProperty('--p',pct);
+  ring.style.setProperty('--c',pass?'#1f9d57':'#d4493a');
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('frac').textContent=correct+' / '+QUESTIONS.length;
+  const v=document.getElementById('verdict');
+  v.textContent= pass?'PASSED':'NOT YET — REVIEW & RETAKE';
+  v.className='verdict '+(pass?'pass':'fail');
+  document.getElementById('vmsg').textContent = pass
+    ? 'Great work. You’ve met the 80% standard for Module 1. Bring this score to Session 1A with your trainer for pronunciation drills and LARA roleplay.'
+    : 'You scored below the 80% pass mark. Scroll down to review the explanation under each question, rewatch the relevant sections, then retake the assessment.';
+  res.scrollIntoView({behavior:'smooth'});
+}
+
+function review(){ document.getElementById('quiz').scrollIntoView({behavior:'smooth'}); }
+function retake(){ location.reload(); }
+</script>
+</body>
+</html>

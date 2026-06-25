@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2 Assessment — The Repair &amp; Maintenance Industry</title>
+<style>
+  :root{
+    --navy:#1F4E79; --navy-dark:#163a5c; --teal:#1f8a8a; --purple:#6b3fa0;
+    --green:#1e8e4e; --green-bg:#e7f6ed; --red:#c0392b; --red-bg:#fdecea;
+    --ink:#1d2733; --muted:#5b6675; --line:#dde3ea; --bg:#eef2f6; --card:#ffffff;
+    --amber-bg:#fff6e5; --amber:#9a6b00;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.55;}
+  .wrap{max-width:860px;margin:0 auto;padding:24px 18px 80px;}
+  header.hero{background:linear-gradient(135deg,var(--navy),var(--navy-dark));
+    color:#fff;border-radius:14px;padding:28px 30px;box-shadow:0 6px 22px rgba(22,58,92,.18);}
+  header.hero .kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+    opacity:.85;font-weight:600;}
+  header.hero h1{margin:6px 0 4px;font-size:27px;line-height:1.2;}
+  header.hero p{margin:8px 0 0;opacity:.9;font-size:15px;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+    padding:5px 12px;border-radius:999px;font-size:13px;font-weight:600;}
+  .instructions{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 20px;margin:18px 0;font-size:14.5px;color:var(--muted);}
+  .instructions b{color:var(--ink);}
+
+  /* sticky score bar */
+  #scorebar{position:sticky;top:0;z-index:20;display:none;margin:0 0 18px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 20px;box-shadow:0 4px 16px rgba(0,0,0,.07);}
+  #scorebar .row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  #scorebar h2{margin:0;font-size:19px;}
+  #scorebar .verdict{font-weight:700;padding:5px 14px;border-radius:999px;font-size:14px;}
+  .pass{background:var(--green-bg);color:var(--green);}
+  .fail{background:var(--red-bg);color:var(--red);}
+  .bar{height:10px;border-radius:6px;background:#e6ebf1;overflow:hidden;margin-top:12px;}
+  .bar > i{display:block;height:100%;width:0;border-radius:6px;background:var(--green);
+    transition:width .6s ease;}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px 20px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .q .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;padding:3px 9px;border-radius:6px;color:#fff;margin-bottom:10px;}
+  .t-mc{background:var(--navy);} .t-tf{background:var(--teal);} .t-sc{background:var(--purple);}
+  .q .num{color:var(--muted);font-weight:700;}
+  .q .stem{font-size:16px;font-weight:600;margin:2px 0 14px;}
+  .opt{display:flex;align-items:flex-start;gap:11px;border:1.5px solid var(--line);
+    border-radius:9px;padding:11px 14px;margin:8px 0;cursor:pointer;transition:.15s;
+    font-size:15px;}
+  .opt:hover{border-color:#b9c6d6;background:#f7fafc;}
+  .opt input{margin-top:3px;accent-color:var(--navy);width:16px;height:16px;flex:0 0 auto;}
+  .opt .lab{flex:1;}
+  .opt.correct{border-color:var(--green);background:var(--green-bg);}
+  .opt.wrong{border-color:var(--red);background:var(--red-bg);}
+  .opt .mark{font-weight:800;margin-left:6px;}
+  .opt.correct .mark{color:var(--green);} .opt.wrong .mark{color:var(--red);}
+  .explain{display:none;margin-top:12px;padding:12px 14px;border-radius:9px;
+    background:var(--amber-bg);border:1px solid #f0dcae;font-size:14px;color:#4a3a12;}
+  .explain b{color:var(--amber);}
+  .locked .opt{cursor:default;}
+  .locked .opt:hover{border-color:var(--line);background:#fff;}
+  .locked .opt.correct:hover{background:var(--green-bg);border-color:var(--green);}
+  .locked .opt.wrong:hover{background:var(--red-bg);border-color:var(--red);}
+
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;}
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 26px;
+    cursor:pointer;font-size:15.5px;}
+  #submit{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(31,78,121,.3);}
+  #submit:hover{background:var(--navy-dark);}
+  #retry{background:#fff;color:var(--navy);border:1.5px solid var(--navy);display:none;}
+  #retry:hover{background:#f0f5fa;}
+  .warn{color:var(--red);font-weight:600;font-size:14px;margin-top:12px;display:none;}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:30px;}
+  .secref{color:var(--muted);font-size:12.5px;margin-top:8px;font-style:italic;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Module 2 &nbsp;|&nbsp; BPO Foundation Training</div>
+    <h1>Assessment: The Repair &amp; Maintenance Industry</h1>
+    <p>Check your understanding of the home systems, the service model, urgency classification, and the pain points you'll handle on every call.</p>
+    <div class="meta">
+      <span class="pill">20 questions</span>
+      <span class="pill">Pass mark: 80%</span>
+      <span class="pill">~15 minutes</span>
+    </div>
+  </header>
+
+  <div class="instructions">
+    Answer every question, then press <b>Submit</b>. You'll get an instant score, and each
+    question will show the correct answer with a short explanation. You need
+    <b>16 out of 20 (80%)</b> to pass. You can retake it as many times as you like.
+  </div>
+
+  <div id="scorebar">
+    <div class="row">
+      <h2 id="scoreText">Score</h2>
+      <span id="verdict" class="verdict"></span>
+    </div>
+    <div class="bar"><i id="barFill"></i></div>
+  </div>
+
+  <form id="quiz"></form>
+
+  <div class="warn" id="warn">Please answer all questions before submitting.</div>
+  <div class="actions">
+    <button type="button" id="submit">Submit answers</button>
+    <button type="button" id="retry">Retake assessment</button>
+  </div>
+
+  <footer>BPO Foundation Training &nbsp;|&nbsp; Module 2 Assessment &nbsp;|&nbsp; Confidential — Trainer Use</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  { type:"mc", ref:"Section 2.1 — The American Home",
+    stem:"Which four home systems / trades do BPO agents support on their calls?",
+    options:[
+      "HVAC, Plumbing, Electrical, and Appliances",
+      "Heating, Roofing, Landscaping, and Security",
+      "Plumbing, Painting, Flooring, and Appliances",
+      "HVAC, Pest Control, Electrical, and Pools"],
+    answer:0,
+    why:"The four systems are HVAC (heating &amp; cooling), Plumbing (water), Electrical (power &amp; safety), and Appliances." },
+
+  { type:"mc", ref:"Section 2.1 — Trades",
+    stem:"A customer reports a water heater failure and blocked drains. Which trade is this?",
+    options:["HVAC","Plumbing","Electrical","Appliances"],
+    answer:1,
+    why:"Water heaters, blocked drains, leaking pipes, low pressure, and sewer backups all fall under Plumbing." },
+
+  { type:"tf", ref:"Section 2.1 — Trades",
+    stem:"True or False: A smoke alarm failure is classified as an Electrical issue.",
+    options:["True","False"],
+    answer:0,
+    why:"Correct — smoke alarm failure sits under Electrical (power &amp; safety), alongside tripped breakers, dead outlets, flickering lights, and panel issues." },
+
+  { type:"mc", ref:"Section 2.2 — The 8-Stage Service Model",
+    stem:"In the 8-stage service model, which stages are BPO agents MOST active in?",
+    options:[
+      "Stages 5–8 (In Progress to Follow-Up)",
+      "Stages 1–4 (Intake Call to Dispatched)",
+      "Only Stage 1 (Intake Call)",
+      "Stages 3–6 (Scheduled to Completed)"],
+    answer:1,
+    why:"Agents are most active in stages 1–4: Intake Call, Job Created, Scheduled, and Dispatched. Stage 5 onward is mainly the field technician and back office." },
+
+  { type:"mc", ref:"Section 2.2 — The 8-Stage Service Model",
+    stem:"Which stage comes immediately AFTER 'Dispatched'?",
+    options:["Scheduled","Invoice","In Progress","Completed"],
+    answer:2,
+    why:"The order is Intake → Job Created → Scheduled → Dispatched → In Progress → Completed → Invoice → Follow-Up." },
+
+  { type:"sc", ref:"Section 2.2 — Agent's Role at Each Stage",
+    stem:"On an intake call, which mistake should the agent avoid most?",
+    options:[
+      "Spending too long confirming the address",
+      "Rushing past empathy just to get to the form",
+      "Asking the customer to repeat the problem",
+      "Offering the customer two appointment times"],
+    answer:1,
+    why:"The common error at intake is rushing past empathy to get to the form. The caller is stressed — acknowledge that first, then collect the details." },
+
+  { type:"mc", ref:"Section 2.2 — Scheduling",
+    stem:"What is the correct practice when scheduling a job?",
+    options:[
+      "Offer one time and tell the customer to call back if it doesn't work",
+      "Offer two time options, confirm the preference, and confirm a contact number for the technician",
+      "Book the earliest slot automatically without asking",
+      "Let the dispatcher pick the time later"],
+    answer:1,
+    why:"Offer two time options, confirm the customer's preference, and confirm a callback number for the technician. A single option, or a missing callback number, is the error to avoid." },
+
+  { type:"mc", ref:"Section 2.3 — Urgency Classification",
+    stem:"An EMERGENCY job must be dispatched within what timeframe?",
+    options:["Within the standard scheduling window","Within 24 hours","The same hour","Within 3 business days"],
+    answer:2,
+    why:"Emergency = immediate safety risk or severe property damage → dispatch the same hour." },
+
+  { type:"mc", ref:"Section 2.3 — Urgency Classification",
+    stem:"An URGENT job should have a technician within what timeframe?",
+    options:["The same hour","Within 24 hours","Within one week","Whenever convenient"],
+    answer:1,
+    why:"Urgent = significant impact on daily life → technician needed within 24 hours. Routine is scheduled in the standard window." },
+
+  { type:"tf", ref:"Section 2.3 — Borderline Cases",
+    stem:"True or False: When you're not certain of the urgency level, you should choose the LOWER level.",
+    options:["True","False"],
+    answer:1,
+    why:"False. When in doubt, escalate — always choose the HIGHER urgency level if you are not certain. Urgency is a safety decision." },
+
+  { type:"sc", ref:"Section 2.3 — Examples",
+    stem:"A caller reports a gas leak. How should you classify it?",
+    options:["Routine","Urgent","Emergency","Wait for the dispatcher to decide"],
+    answer:2,
+    why:"A gas leak is an immediate safety risk — it's an EMERGENCY and goes directly to the dispatcher, not the standard queue." },
+
+  { type:"sc", ref:"Section 2.3 — Borderline Cases",
+    stem:"No hot water; two adults, no children, moderate weather. The correct classification is:",
+    options:["Routine — it's only an inconvenience","Urgent — hot water is not a luxury","Emergency — dispatch same hour","Quote request for future work"],
+    answer:1,
+    why:"This is URGENT. Hot water is not a luxury — loss of it is a significant daily-life impact, even for two adults in mild weather." },
+
+  { type:"sc", ref:"Section 2.3 — Borderline Cases",
+    stem:"A fridge isn't cooling. When you ask, the customer says they store infant formula in it. You should classify this as:",
+    options:["Routine","Urgent","Emergency","No need to classify — just book it"],
+    answer:2,
+    why:"If refrigeration is needed for medication or infant formula, this becomes an EMERGENCY. Asking that one question is what surfaces the real urgency." },
+
+  { type:"sc", ref:"Section 2.3 — Borderline Cases",
+    stem:"An outlet isn't working in one room. Which follow-up question changes the classification the most?",
+    options:[
+      "Is it a rented or owned home?",
+      "Is that the room with the smoke alarm?",
+      "How old is the building?",
+      "Have you tried resetting the breaker?"],
+    answer:1,
+    why:"Ask whether it's the room with the smoke alarm. If yes, it's an EMERGENCY (safety). If other outlets work and no alarm is affected, it's Routine." },
+
+  { type:"sc", ref:"Section 2.4 — Customer Pain Point #1 (No-Shows)",
+    stem:"A technician never showed up and no one called. What should the agent do FIRST?",
+    options:[
+      "Explain why the technician didn't make it",
+      "Acknowledge the failure before asking any questions",
+      "Ask the customer to rebook online",
+      "Transfer the call to a supervisor"],
+    answer:1,
+    why:"Acknowledge the failure first — before any questions. Don't make excuses. Then escalate for a same-day rescue and give a specific callback commitment." },
+
+  { type:"sc", ref:"Section 2.4 — Customer Pain Point #2 (Surprise Pricing)",
+    stem:"A customer asks directly, 'How much will this cost?' The best response is to:",
+    options:[
+      "Give them a rough estimate to be helpful",
+      "Say it's impossible to know and move on",
+      "Explain the technician provides a written quote before work begins, using the approved pricing script",
+      "Quote the standard diagnostic fee as the total price"],
+    answer:2,
+    why:"Never quote a specific price. Set expectations early: the technician diagnoses and provides a written quote on-site before any work begins. Use the approved pricing script." },
+
+  { type:"sc", ref:"Section 2.4 — Customer Pain Point #3 (Recalls)",
+    stem:"The same system that was repaired two weeks ago has broken again. What must the agent do?",
+    options:[
+      "Create a brand-new job and classify it as Routine",
+      "Search for the original work order, flag the job as a RECALL, and classify it as Urgent",
+      "Tell the customer they'll likely be charged again",
+      "Wait for the customer to find their old invoice"],
+    answer:1,
+    why:"Search for the original work order BEFORE creating a new job, flag it as a RECALL (this changes billing and priority), and classify recalls as Urgent. Don't guess about billing." },
+
+  { type:"sc", ref:"Section 2.4 — Customer Pain Point #5 (Transferred &amp; Not Helped)",
+    stem:"A frustrated customer has been transferred twice already. What's the right approach?",
+    options:[
+      "Transfer them again to the correct department quickly",
+      "Own the call; if a transfer is truly needed, do a warm transfer with full context",
+      "Put them on hold until someone is free",
+      "Ask them to call back later when it's less busy"],
+    answer:1,
+    why:"Own the call and avoid transferring unless absolutely necessary. If you must, explain where they're going and do a warm transfer with a verbal handoff — never a cold transfer." },
+
+  { type:"tf", ref:"Section 2.5 — Company Pain Point #2 (Missed Urgency Flags)",
+    stem:"True or False: Emergency jobs can safely wait in the standard dispatch queue.",
+    options:["True","False"],
+    answer:1,
+    why:"False. Emergency jobs go directly to the dispatcher — never the standard queue. Misflagging an emergency creates safety and liability risk." },
+
+  { type:"mc", ref:"Section 2.5 — Company Pain Point #5 (Unlogged Callbacks)",
+    stem:"You promise a customer a callback. What's the rule?",
+    options:[
+      "Remember it and call when you have time",
+      "Log every promise in the job notes immediately — if it isn't written down, it didn't happen",
+      "Only log it if the customer asks you to",
+      "Tell a colleague verbally so someone knows"],
+    answer:1,
+    why:"Every promise must be logged in the job notes immediately, using clear wording like 'AGENT PROMISED CALLBACK BY [TIME]'. Your notes are the company's memory." },
+];
+
+const form = document.getElementById('quiz');
+const TAG = {mc:["t-mc","Multiple choice"], tf:["t-tf","True / False"], sc:["t-sc","Scenario"]};
+let locked = false;
+
+function render(){
+  form.innerHTML = "";
+  QUESTIONS.forEach((q,i)=>{
+    const card = document.createElement('div');
+    card.className = 'q'; card.id = 'q'+i;
+    const [cls,label] = TAG[q.type];
+    let html = `<span class="tag ${cls}">${label}</span>`
+      + `<div class="stem"><span class="num">Q${i+1}.</span> ${q.stem}</div>`;
+    q.options.forEach((opt,j)=>{
+      html += `<label class="opt" id="q${i}o${j}">`
+        + `<input type="radio" name="q${i}" value="${j}">`
+        + `<span class="lab">${opt}</span><span class="mark" id="m${i}o${j}"></span></label>`;
+    });
+    html += `<div class="explain" id="e${i}"></div>`;
+    html += `<div class="secref">${q.ref}</div>`;
+    card.innerHTML = html;
+    form.appendChild(card);
+  });
+}
+
+function grade(){
+  if(locked) return;
+  // all answered?
+  for(let i=0;i<QUESTIONS.length;i++){
+    if(!form.querySelector(`input[name="q${i}"]:checked`)){
+      document.getElementById('warn').style.display='block';
+      document.getElementById('q'+i).scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+  }
+  document.getElementById('warn').style.display='none';
+  locked = true;
+  let correct = 0;
+  QUESTIONS.forEach((q,i)=>{
+    const card = document.getElementById('q'+i);
+    card.classList.add('locked');
+    const chosen = +form.querySelector(`input[name="q${i}"]:checked`).value;
+    if(chosen===q.answer) correct++;
+    // mark correct option
+    const co = document.getElementById(`q${i}o${q.answer}`);
+    co.classList.add('correct');
+    document.getElementById(`m${i}o${q.answer}`).textContent = '✓';
+    if(chosen!==q.answer){
+      const wo = document.getElementById(`q${i}o${chosen}`);
+      wo.classList.add('wrong');
+      document.getElementById(`m${i}o${chosen}`).textContent = '✗';
+    }
+    // disable inputs
+    card.querySelectorAll('input').forEach(inp=>inp.disabled=true);
+    const ex = document.getElementById('e'+i);
+    ex.innerHTML = `<b>${chosen===q.answer?'Correct.':'Answer: '+q.options[q.answer]+'.'}</b> ${q.why}`;
+    ex.style.display='block';
+  });
+
+  const pct = Math.round(correct/QUESTIONS.length*100);
+  const pass = pct>=80;
+  const sb = document.getElementById('scorebar');
+  sb.style.display='block';
+  document.getElementById('scoreText').textContent =
+    `You scored ${correct} / ${QUESTIONS.length}  (${pct}%)`;
+  const v = document.getElementById('verdict');
+  v.textContent = pass ? 'PASS' : 'NOT YET — review & retake';
+  v.className = 'verdict ' + (pass?'pass':'fail');
+  const fill = document.getElementById('barFill');
+  fill.style.background = pass ? 'var(--green)' : 'var(--red)';
+  requestAnimationFrame(()=>{ fill.style.width = pct+'%'; });
+
+  document.getElementById('submit').style.display='none';
+  document.getElementById('retry').style.display='inline-block';
+  sb.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function reset(){
+  locked=false;
+  render();
+  document.getElementById('scorebar').style.display='none';
+  document.getElementById('submit').style.display='inline-block';
+  document.getElementById('retry').style.display='none';
+  document.getElementById('warn').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('submit').addEventListener('click',grade);
+document.getElementById('retry').addEventListener('click',reset);
+render();
+</script>
+</body>
+</html>
