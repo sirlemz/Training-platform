@@ -46,6 +46,7 @@ app.use('/assessment', express.static(path.join(__dirname, '../public')));
 // ── API routes ───────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/admin/assessments', require('./routes/assessments'));
 app.use('/api/trainee', require('./routes/trainee'));
 
 // ── Serve built client in production ────────────────────────

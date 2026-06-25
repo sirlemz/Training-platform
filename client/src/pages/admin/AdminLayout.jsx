@@ -27,6 +27,9 @@ export default function AdminLayout() {
           <NavLink to="/admin/trainees" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <span className="icon">👥</span> Trainees
           </NavLink>
+          <NavLink to="/admin/assessments" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <span className="icon">📋</span> Assessments
+          </NavLink>
         </nav>
 
         <div className="sidebar-footer">

@@ -60,6 +60,11 @@ export const api = {
   // Admin — progress
   getClassProgress: (classId) => req('GET', `/admin/classes/${classId}/progress`),
 
+  // Admin — assessments library
+  getAssessments: () => req('GET', '/admin/assessments'),
+  uploadAssessment: (formData) => req('POST', '/admin/assessments', formData, true),
+  deleteAssessment: (filename) => req('DELETE', `/admin/assessments/${encodeURIComponent(filename)}`),
+
   // Trainee
   myClasses: () => req('GET', '/trainee/classes'),
   myClass: (id) => req('GET', `/trainee/classes/${id}`),

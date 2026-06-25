@@ -8,6 +8,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminClasses from './pages/admin/AdminClasses';
 import AdminClassDetail from './pages/admin/AdminClassDetail';
 import AdminTrainees from './pages/admin/AdminTrainees';
+import AdminAssessments from './pages/admin/AdminAssessments';
 import TraineeLayout from './pages/trainee/TraineeLayout';
 import TraineeDashboard from './pages/trainee/TraineeDashboard';
 import TraineeClass from './pages/trainee/TraineeClass';
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="classes" element={<AdminClasses />} />
             <Route path="classes/:id" element={<AdminClassDetail />} />
             <Route path="trainees" element={<AdminTrainees />} />
+            <Route path="assessments" element={<AdminAssessments />} />
           </Route>
 
           {/* Trainee routes */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
@@ -15,7 +15,16 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
   const [allowRetake, setAllowRetake] = useState(mod?.allow_retake === 1);
   const [videoFile, setVideoFile] = useState(null);
   const [textContent, setTextContent] = useState(mod?.content || '');
+  const [assessments, setAssessments] = useState([]);
+  const [selectedAssessment, setSelectedAssessment] = useState(mod?.content || '');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    api.getAssessments().then(list => {
+      setAssessments(list);
+      if (!selectedAssessment && list.length > 0) setSelectedAssessment(list[0].filename);
+    });
+  }, []);
 
   const handleSave = async () => {
     if (!title.trim()) return;
@@ -31,8 +40,9 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
         fd.append('video', videoFile);
       } else if (type === 'text') {
         fd.append('content', textContent);
+      } else if (type === 'assessment') {
+        fd.append('content', selectedAssessment);
       }
-      // assessment type has no additional content (uses embedded HTML)
 
       if (mod) {
         await api.updateModule(mod.id, fd);
@@ -82,8 +92,17 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
         )}
 
         {type === 'assessment' && (
-          <div className="info-box" style={{ marginBottom: 14 }}>
-            The embedded TGS BPO Pre-Hire Assessment (4 sections: Typing, Multitasking, Communication, Cognitive) will be displayed to trainees. One attempt only.
+          <div className="fg">
+            <label className="lbl">Select Assessment *</label>
+            {assessments.length === 0 ? (
+              <div className="warn-box">No assessments uploaded yet. Go to <strong>Assessments</strong> in the sidebar to upload one first.</div>
+            ) : (
+              <select className="inp" value={selectedAssessment} onChange={e => setSelectedAssessment(e.target.value)}>
+                {assessments.map(a => (
+                  <option key={a.filename} value={a.filename}>{a.filename}</option>
+                ))}
+              </select>
+            )}
           </div>
         )}
 
@@ -103,7 +122,7 @@ function ModuleFormModal({ classId, mod, onSave, onClose }) {
 
         <div className="modal-footer">
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn-pri" onClick={handleSave} disabled={saving || !title.trim() || (type === 'video' && !mod && !videoFile)}>
+          <button className="btn btn-pri" onClick={handleSave} disabled={saving || !title.trim() || (type === 'video' && !mod && !videoFile) || (type === 'assessment' && !selectedAssessment)}>
             {saving ? 'Saving…' : mod ? 'Save Changes' : 'Add Module'}
           </button>
         </div>

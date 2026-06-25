@@ -112,7 +112,8 @@ function AssessmentPlayer({ module: mod, user, onComplete }) {
     return () => window.removeEventListener('message', handler);
   }, [mod.id, onComplete]);
 
-  const src = `/assessment/assessment.html?platform=1&tname=${encodeURIComponent(user.name)}&temail=${encodeURIComponent(user.email)}`;
+  const assessmentFile = mod.content || 'assessment.html';
+  const src = `/assessment/assessments/${encodeURIComponent(assessmentFile)}?platform=1&tname=${encodeURIComponent(user.name)}&temail=${encodeURIComponent(user.email)}`;
 
   if (done) {
     const overall = scoreData?.overall;
