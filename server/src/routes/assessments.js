@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
     cb(null, final);
   }
 });
+
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
@@ -33,14 +34,18 @@ router.use(requireAdmin);
 
 // List all uploaded assessment files
 router.get('/', (req, res) => {
-  const files = fs.readdirSync(ASSESSMENTS_DIR)
-    .filter(f => f.match(/\.html?$/i))
-    .map(f => {
-      const stat = fs.statSync(path.join(ASSESSMENTS_DIR, f));
-      return { filename: f, size: stat.size, uploadedAt: stat.mtime };
-    })
-    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-  res.json(files);
+  try {
+    const files = fs.readdirSync(ASSESSMENTS_DIR)
+      .filter(f => f.match(/\.html?$/i))
+      .map(f => {
+        const stat = fs.statSync(path.join(ASSESSMENTS_DIR, f));
+        return { filename: f, size: stat.size, uploadedAt: stat.mtime };
+      })
+      .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    res.json(files);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Upload a new assessment HTML file
@@ -51,11 +56,15 @@ router.post('/', upload.single('file'), (req, res) => {
 
 // Delete an assessment file
 router.delete('/:filename', (req, res) => {
-  const filename = req.params.filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-  const filePath = path.join(ASSESSMENTS_DIR, filename);
-  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
-  fs.unlinkSync(filePath);
-  res.json({ ok: true });
+  try {
+    const filename = req.params.filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const filePath = path.join(ASSESSMENTS_DIR, filename);
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
+    fs.unlinkSync(filePath);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
