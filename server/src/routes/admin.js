@@ -1,10 +1,16 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
-const db = require('../db');
+const mongoose = require('mongoose');
 const { requireAdmin } = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
+// Reference Mongoose Models
+const User = mongoose.model('User');
+const Class = mongoose.model('Class');
+const Module = mongoose.model('Module');
+const Progress = mongoose.model('Progress');
 
 router.use(requireAdmin);
 
@@ -22,201 +28,372 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 * 1024 } });
 
 // ── Stats ────────────────────────────────────────────────────
-router.get('/stats', (req, res) => {
-  const trainees = db.prepare("SELECT COUNT(*) as c FROM users WHERE role='trainee'").get().c;
-  const classes = db.prepare('SELECT COUNT(*) as c FROM classes').get().c;
-  const completions = db.prepare(`
-    SELECT COUNT(DISTINCT ct.user_id || '-' || ct.class_id) as c
-    FROM class_trainees ct
-    JOIN modules m ON m.class_id = ct.class_id
-    LEFT JOIN progress p ON p.module_id = m.id AND p.user_id = ct.user_id
-    GROUP BY ct.class_id, ct.user_id
-    HAVING COUNT(m.id) > 0 AND COUNT(CASE WHEN p.status='completed' THEN 1 END) = COUNT(m.id)
-  `).all().length;
-  res.json({ trainees, classes, completions });
+router.get('/stats', async (req, res) => {
+  try {
+    const trainees = await User.countDocuments({ role: 'trainee' });
+    const classes = await Class.countDocuments({});
+
+    // Compute course completion status dynamically across classes
+    const allClasses = await Class.find({});
+    let completions = 0;
+
+    for (const cls of allClasses) {
+      const moduleIds = await Module.find({ class_id: cls._id }).distinct('_id');
+      if (moduleIds.length === 0) continue;
+
+      for (const traineeId of cls.trainees) {
+        const completedCount = await Progress.countDocuments({
+          user_id: traineeId,
+          module_id: { $in: moduleIds },
+          status: 'completed'
+        });
+        if (completedCount === moduleIds.length) {
+          completions++;
+        }
+      }
+    }
+
+    res.json({ trainees, classes, completions });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Trainees ─────────────────────────────────────────────────
-router.get('/trainees', (req, res) => {
-  const trainees = db.prepare("SELECT id, name, email, created_at FROM users WHERE role='trainee' ORDER BY name").all();
-  res.json(trainees);
+router.get('/trainees', async (req, res) => {
+  try {
+    const trainees = await User.find({ role: 'trainee' }).sort({ name: 1 });
+    res.json(trainees.map(t => ({ id: t._id, name: t.name, email: t.email, created_at: t.created_at })));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.post('/trainees', (req, res) => {
+router.post('/trainees', async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.status(400).json({ error: 'name, email and password required' });
+  
   try {
     const hash = bcrypt.hashSync(password, 10);
-    const result = db.prepare('INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)').run(name, email.toLowerCase().trim(), hash, 'trainee');
-    res.status(201).json({ id: result.lastInsertRowid, name, email: email.toLowerCase().trim() });
+    const cleanEmail = email.toLowerCase().trim();
+    
+    const newUser = await User.create({
+      name,
+      email: cleanEmail,
+      password_hash: hash,
+      role: 'trainee'
+    });
+    
+    res.status(201).json({ id: newUser._id, name, email: cleanEmail });
   } catch (e) {
-    if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') return res.status(409).json({ error: 'Email already exists' });
-    throw e;
+    if (e.code === 11000) return res.status(409).json({ error: 'Email already exists' });
+    res.status(500).json({ error: e.message });
   }
 });
 
-router.put('/trainees/:id', (req, res) => {
+router.put('/trainees/:id', async (req, res) => {
   const { name, email, password } = req.body;
-  const user = db.prepare('SELECT id FROM users WHERE id = ? AND role = ?').get(req.params.id, 'trainee');
-  if (!user) return res.status(404).json({ error: 'Trainee not found' });
-  if (password) {
-    db.prepare('UPDATE users SET name=?, email=?, password_hash=? WHERE id=?').run(name, email.toLowerCase().trim(), bcrypt.hashSync(password, 10), user.id);
-  } else {
-    db.prepare('UPDATE users SET name=?, email=? WHERE id=?').run(name, email.toLowerCase().trim(), user.id);
+  try {
+    const user = await User.findOne({ _id: req.params.id, role: 'trainee' });
+    if (!user) return res.status(404).json({ error: 'Trainee not found' });
+
+    user.name = name || user.name;
+    user.email = email ? email.toLowerCase().trim() : user.email;
+    if (password) {
+      user.password_hash = bcrypt.hashSync(password, 10);
+    }
+
+    await user.save();
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  res.json({ ok: true });
 });
 
-router.delete('/trainees/:id', (req, res) => {
-  db.prepare('DELETE FROM users WHERE id = ? AND role = ?').run(req.params.id, 'trainee');
-  res.json({ ok: true });
+router.delete('/trainees/:id', async (req, res) => {
+  try {
+    await User.deleteOne({ _id: req.params.id, role: 'trainee' });
+    // Pull the deleted user out of any classes they were assigned to
+    await Class.updateMany({}, { $pull: { trainees: req.params.id } });
+    // Clear out their progress records
+    await Progress.deleteMany({ user_id: req.params.id });
+    
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Classes ──────────────────────────────────────────────────
-router.get('/classes', (req, res) => {
-  const classes = db.prepare('SELECT * FROM classes ORDER BY created_at DESC').all();
-  const result = classes.map(c => {
-    const moduleCount = db.prepare('SELECT COUNT(*) as c FROM modules WHERE class_id = ?').get(c.id).c;
-    const traineeCount = db.prepare('SELECT COUNT(*) as c FROM class_trainees WHERE class_id = ?').get(c.id).c;
-    return { ...c, moduleCount, traineeCount };
-  });
-  res.json(result);
+router.get('/classes', async (req, res) => {
+  try {
+    const classes = await Class.find({}).sort({ created_at: -1 });
+    const result = await Promise.all(classes.map(async c => {
+      const moduleCount = await Module.countDocuments({ class_id: c._id });
+      const traineeCount = c.trainees.length;
+      return {
+        id: c._id,
+        name: c.name,
+        description: c.description,
+        created_at: c.created_at,
+        moduleCount,
+        traineeCount
+      };
+    }));
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.post('/classes', (req, res) => {
+router.post('/classes', async (req, res) => {
   const { name, description } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
-  const result = db.prepare('INSERT INTO classes (name, description) VALUES (?, ?)').run(name, description || '');
-  res.status(201).json({ id: result.lastInsertRowid, name, description });
+  try {
+    const newClass = await Class.create({ name, description: description || '' });
+    res.status(201).json({ id: newClass._id, name, description });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.get('/classes/:id', (req, res) => {
-  const cls = db.prepare('SELECT * FROM classes WHERE id = ?').get(req.params.id);
-  if (!cls) return res.status(404).json({ error: 'Class not found' });
+router.get('/classes/:id', async (req, res) => {
+  try {
+    const cls = await Class.findById(req.params.id).populate('trainees', 'name email created_at');
+    if (!cls) return res.status(404).json({ error: 'Class not found' });
 
-  const modules = db.prepare('SELECT * FROM modules WHERE class_id = ? ORDER BY sequence_order').all(cls.id);
+    const modules = await Module.find({ class_id: cls._id }).sort({ sequence_order: 1 });
+    const moduleIds = modules.map(m => m._id);
 
-  const trainees = db.prepare(`
-    SELECT u.id, u.name, u.email, ct.assigned_at
-    FROM class_trainees ct
-    JOIN users u ON u.id = ct.user_id
-    WHERE ct.class_id = ?
-    ORDER BY u.name
-  `).all(cls.id);
+    const traineeProgress = await Promise.all(cls.trainees.map(async t => {
+      const completed = await Progress.countDocuments({
+        user_id: t._id,
+        module_id: { $in: moduleIds },
+        status: 'completed'
+      });
+      return {
+        id: t._id,
+        name: t.name,
+        email: t.email,
+        created_at: t.created_at,
+        completedModules: completed,
+        totalModules: modules.length
+      };
+    }));
 
-  // Progress per trainee
-  const traineeProgress = trainees.map(t => {
-    const completed = db.prepare(`
-      SELECT COUNT(*) as c FROM progress
-      WHERE user_id = ? AND module_id IN (SELECT id FROM modules WHERE class_id = ?) AND status = 'completed'
-    `).get(t.id, cls.id).c;
-    return { ...t, completedModules: completed, totalModules: modules.length };
-  });
-
-  res.json({ ...cls, modules, trainees: traineeProgress });
+    res.json({
+      id: cls._id,
+      name: cls.name,
+      description: cls.description,
+      created_at: cls.created_at,
+      modules: modules.map(m => ({ ...m.toObject(), id: m._id })),
+      trainees: traineeProgress
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.put('/classes/:id', (req, res) => {
+router.put('/classes/:id', async (req, res) => {
   const { name, description } = req.body;
-  db.prepare('UPDATE classes SET name=?, description=? WHERE id=?').run(name, description, req.params.id);
-  res.json({ ok: true });
+  try {
+    await Class.findByIdAndUpdate(req.params.id, { name, description });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.delete('/classes/:id', (req, res) => {
-  db.prepare('DELETE FROM classes WHERE id = ?').run(req.params.id);
-  res.json({ ok: true });
+router.delete('/classes/:id', async (req, res) => {
+  try {
+    await Class.findByIdAndDelete(req.params.id);
+    const classModules = await Module.find({ class_id: req.params.id });
+    const classModuleIds = classModules.map(m => m._id);
+    
+    // Clean up local video storage files
+    for (const mod of classModules) {
+      if (mod.type === 'video' && mod.content) {
+        const filePath = path.join(__dirname, '../../../uploads', mod.content);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }
+    }
+
+    await Module.deleteMany({ class_id: req.params.id });
+    await Progress.deleteMany({ module_id: { $in: classModuleIds } });
+    
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Class trainees ───────────────────────────────────────────
-router.post('/classes/:id/trainees', (req, res) => {
+router.post('/classes/:id/trainees', async (req, res) => {
   const { userId } = req.body;
   try {
-    db.prepare('INSERT INTO class_trainees (class_id, user_id) VALUES (?, ?)').run(req.params.id, userId);
+    const cls = await Class.findById(req.params.id);
+    if (!cls) return res.status(404).json({ error: 'Class not found' });
+
+    if (cls.trainees.includes(userId)) {
+      return res.status(409).json({ error: 'Already assigned' });
+    }
+
+    cls.trainees.push(userId);
+    await cls.save();
     res.status(201).json({ ok: true });
-  } catch (e) {
-    if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') return res.status(409).json({ error: 'Already assigned' });
-    throw e;
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-router.delete('/classes/:id/trainees/:userId', (req, res) => {
-  db.prepare('DELETE FROM class_trainees WHERE class_id = ? AND user_id = ?').run(req.params.id, req.params.userId);
-  res.json({ ok: true });
+router.delete('/classes/:id/trainees/:userId', async (req, res) => {
+  try {
+    await Class.findByIdAndUpdate(req.params.id, { $pull: { trainees: req.params.userId } });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Modules ──────────────────────────────────────────────────
-router.post('/classes/:id/modules', upload.single('video'), (req, res) => {
+router.post('/classes/:id/modules', upload.single('video'), async (req, res) => {
   const { title, type, description, allow_retake } = req.body;
   if (!title || !type) return res.status(400).json({ error: 'title and type required' });
 
-  let content = req.body.content || '';
-  if (type === 'video' && req.file) {
-    content = req.file.filename;
-  }
-
-  const maxOrder = db.prepare('SELECT MAX(sequence_order) as m FROM modules WHERE class_id = ?').get(req.params.id).m || 0;
-  const result = db.prepare(
-    'INSERT INTO modules (class_id, title, type, content, description, sequence_order, allow_retake) VALUES (?, ?, ?, ?, ?, ?, ?)'
-  ).run(req.params.id, title, type, content, description || '', maxOrder + 1, allow_retake === 'true' || allow_retake === true ? 1 : 0);
-
-  res.status(201).json({ id: result.lastInsertRowid, title, type, content, description, sequence_order: maxOrder + 1 });
-});
-
-router.put('/modules/:id', upload.single('video'), (req, res) => {
-  const { title, description, allow_retake } = req.body;
-  const mod = db.prepare('SELECT * FROM modules WHERE id = ?').get(req.params.id);
-  if (!mod) return res.status(404).json({ error: 'Module not found' });
-
-  let content = mod.content;
-  if (req.file) {
-    // Delete old file if it was a video
-    if (mod.type === 'video' && mod.content) {
-      const oldPath = path.join(__dirname, '../../../uploads', mod.content);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+  try {
+    let content = req.body.content || '';
+    if (type === 'video' && req.file) {
+      content = req.file.filename;
     }
-    content = req.file.filename;
-  } else if (req.body.content !== undefined) {
-    content = req.body.content;
-  }
 
-  db.prepare('UPDATE modules SET title=?, content=?, description=?, allow_retake=? WHERE id=?').run(
-    title || mod.title, content, description ?? mod.description, allow_retake === 'true' || allow_retake === true ? 1 : 0, mod.id
-  );
-  res.json({ ok: true });
+    const lastModule = await Module.findOne({ class_id: req.params.id }).sort({ sequence_order: -1 });
+    const maxOrder = lastModule ? lastModule.sequence_order : 0;
+
+    const newModule = await Module.create({
+      class_id: req.params.id,
+      title,
+      type,
+      content,
+      description: description || '',
+      sequence_order: maxOrder + 1,
+      allow_retake: allow_retake === 'true' || allow_retake === true ? 1 : 0
+    });
+
+    res.status(201).json({
+      id: newModule._id,
+      title,
+      type,
+      content,
+      description,
+      sequence_order: maxOrder + 1
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.delete('/modules/:id', (req, res) => {
-  const mod = db.prepare('SELECT * FROM modules WHERE id = ?').get(req.params.id);
-  if (mod?.type === 'video' && mod.content) {
-    const filePath = path.join(__dirname, '../../../uploads', mod.content);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+router.put('/modules/:id', upload.single('video'), async (req, res) => {
+  const { title, description, allow_retake } = req.body;
+  try {
+    const mod = await Module.findById(req.params.id);
+    if (!mod) return res.status(404).json({ error: 'Module not found' });
+
+    let content = mod.content;
+    if (req.file) {
+      if (mod.type === 'video' && mod.content) {
+        const oldPath = path.join(__dirname, '../../../uploads', mod.content);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+      content = req.file.filename;
+    } else if (req.body.content !== undefined) {
+      content = req.body.content;
+    }
+
+    mod.title = title || mod.title;
+    mod.content = content;
+    mod.description = description !== undefined ? description : mod.description;
+    mod.allow_retake = allow_retake === 'true' || allow_retake === true ? 1 : 0;
+
+    await mod.save();
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  db.prepare('DELETE FROM modules WHERE id = ?').run(req.params.id);
-  res.json({ ok: true });
 });
 
-router.put('/modules/reorder', (req, res) => {
+router.delete('/modules/:id', async (req, res) => {
+  try {
+    const mod = await Module.findById(req.params.id);
+    if (mod && mod.type === 'video' && mod.content) {
+      const filePath = path.join(__dirname, '../../../uploads', mod.content);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    
+    await Module.findByIdAndDelete(req.params.id);
+    await Progress.deleteMany({ module_id: req.params.id });
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/modules/reorder', async (req, res) => {
   const { order } = req.body; // array of { id, sequence_order }
-  const stmt = db.prepare('UPDATE modules SET sequence_order = ? WHERE id = ?');
-  const txn = db.transaction(() => order.forEach(({ id, sequence_order }) => stmt.run(sequence_order, id)));
-  txn();
-  res.json({ ok: true });
+  try {
+    await Promise.all(order.map(({ id, sequence_order }) => 
+      Module.findByIdAndUpdate(id, { sequence_order })
+    ));
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Progress overview ─────────────────────────────────────────
-router.get('/classes/:id/progress', (req, res) => {
-  const modules = db.prepare('SELECT id, title, type, sequence_order FROM modules WHERE class_id = ? ORDER BY sequence_order').all(req.params.id);
-  const trainees = db.prepare(`
-    SELECT u.id, u.name FROM class_trainees ct JOIN users u ON u.id = ct.user_id WHERE ct.class_id = ?
-  `).all(req.params.id);
+router.get('/classes/:id/progress', async (req, res) => {
+  try {
+    const modules = await Module.find({ class_id: req.params.id }).sort({ sequence_order: 1 });
+    const cls = await Class.findById(req.params.id).populate('trainees', 'name');
+    if (!cls) return res.status(404).json({ error: 'Class not found' });
 
-  const grid = trainees.map(t => {
-    const prog = db.prepare('SELECT module_id, status, score, completed_at FROM progress WHERE user_id = ? AND module_id IN (SELECT id FROM modules WHERE class_id = ?)').all(t.id, req.params.id);
-    const progMap = Object.fromEntries(prog.map(p => [p.module_id, p]));
-    return { ...t, modules: modules.map(m => ({ ...m, progress: progMap[m.id] || null })) };
-  });
+    const moduleIds = modules.map(m => m._id);
 
-  res.json({ modules, trainees: grid });
+    const grid = await Promise.all(cls.trainees.map(async t => {
+      const prog = await Progress.find({
+        user_id: t._id,
+        module_id: { $in: moduleIds }
+      });
+      
+      const progMap = {};
+      prog.forEach(p => {
+        progMap[p.module_id.toString()] = {
+          module_id: p.module_id,
+          status: p.status,
+          score: p.score,
+          completed_at: p.completed_at
+        };
+      });
+
+      return {
+        id: t._id,
+        name: t.name,
+        modules: modules.map(m => ({
+          id: m._id,
+          title: m.title,
+          type: m.type,
+          sequence_order: m.sequence_order,
+          progress: progMap[m._id.toString()] || null
+        }))
+      };
+    }));
+
+    res.json({
+      modules: modules.map(m => ({ id: m._id, title: m.title, type: m.type, sequence_order: m.sequence_order })),
+      trainees: grid
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;
