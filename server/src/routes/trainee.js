@@ -1,110 +1,184 @@
 const router = require('express').Router();
-const db = require('../db');
+const mongoose = require('mongoose');
 const { requireAuth } = require('../middleware/auth');
+
+// Reference Mongoose Models
+const Class = mongoose.model('Class');
+const Module = mongoose.model('Module');
+const Progress = mongoose.model('Progress');
 
 router.use(requireAuth);
 
 // ── My classes ───────────────────────────────────────────────
-router.get('/classes', (req, res) => {
-  const classes = db.prepare(`
-    SELECT c.id, c.name, c.description, ct.assigned_at
-    FROM class_trainees ct
-    JOIN classes c ON c.id = ct.class_id
-    WHERE ct.user_id = ?
-    ORDER BY ct.assigned_at DESC
-  `).all(req.user.id);
+router.get('/classes', async (req, res) => {
+  try {
+    // Find all classes where the trainees array contains the current user's ID
+    const classes = await Class.find({ trainees: req.user.id }).sort({ created_at: -1 });
 
-  const result = classes.map(c => {
-    const total = db.prepare('SELECT COUNT(*) as n FROM modules WHERE class_id = ?').get(c.id).n;
-    const completed = db.prepare(`
-      SELECT COUNT(*) as n FROM progress p
-      JOIN modules m ON m.id = p.module_id
-      WHERE p.user_id = ? AND m.class_id = ? AND p.status = 'completed'
-    `).get(req.user.id, c.id).n;
-    return { ...c, totalModules: total, completedModules: completed };
-  });
+    const result = await Promise.all(classes.map(async c => {
+      const total = await Module.countDocuments({ class_id: c._id });
+      
+      // Get all module IDs belonging to this class to evaluate progress records
+      const moduleIds = await Module.find({ class_id: c._id }).distinct('_id');
+      
+      const completed = await Progress.countDocuments({
+        user_id: req.user.id,
+        module_id: { $in: moduleIds },
+        status: 'completed'
+      });
 
-  res.json(result);
+      return {
+        id: c._id,
+        name: c.name,
+        description: c.description,
+        created_at: c.created_at,
+        totalModules: total,
+        completedModules: completed
+      };
+    }));
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Class detail with modules + my progress ───────────────────
-router.get('/classes/:id', (req, res) => {
-  const assigned = db.prepare('SELECT 1 FROM class_trainees WHERE class_id = ? AND user_id = ?').get(req.params.id, req.user.id);
-  if (!assigned) return res.status(403).json({ error: 'Not enrolled in this class' });
+router.get('/classes/:id', async (req, res) => {
+  try {
+    const cls = await Class.findById(req.params.id);
+    if (!cls) return res.status(404).json({ error: 'Class not found' });
+    
+    // Verify user enrollment clearance
+    if (!cls.trainees.includes(req.user.id)) {
+      return res.status(403).json({ error: 'Not enrolled in this class' });
+    }
 
-  const cls = db.prepare('SELECT * FROM classes WHERE id = ?').get(req.params.id);
-  if (!cls) return res.status(404).json({ error: 'Class not found' });
+    const modules = await Module.find({ class_id: cls._id }).sort({ sequence_order: 1 });
+    const moduleIds = modules.map(m => m._id);
 
-  const modules = db.prepare('SELECT * FROM modules WHERE class_id = ? ORDER BY sequence_order').all(cls.id);
-  const prog = db.prepare('SELECT * FROM progress WHERE user_id = ? AND module_id IN (SELECT id FROM modules WHERE class_id = ?)').all(req.user.id, cls.id);
-  const progMap = Object.fromEntries(prog.map(p => [p.module_id, p]));
+    // Pull matching student progress history
+    const prog = await Progress.find({ user_id: req.user.id, module_id: { $in: moduleIds } });
+    const progMap = {};
+    prog.forEach(p => {
+      progMap[p.module_id.toString()] = p;
+    });
 
-  const modulesWithProgress = modules.map((m, idx) => {
-    const p = progMap[m.id] || null;
-    // A module is unlocked if it's the first, or the previous module is completed
-    const unlocked = idx === 0 || (progMap[modules[idx - 1].id]?.status === 'completed');
-    return { ...m, progress: p, unlocked };
-  });
+    // Determine lock/unlock states sequentially
+    const modulesWithProgress = modules.map((m, idx) => {
+      const p = progMap[m._id.toString()] || null;
+      
+      // A module is unlocked if it's the first one, or if the previous module's status is 'completed'
+      const unlocked = idx === 0 || (progMap[modules[idx - 1]._id.toString()]?.status === 'completed');
+      
+      return {
+        ...m.toObject(),
+        id: m._id,
+        progress: p ? { ...p.toObject(), id: p._id } : null,
+        unlocked
+      };
+    });
 
-  res.json({ ...cls, modules: modulesWithProgress });
+    res.json({
+      id: cls._id,
+      name: cls.name,
+      description: cls.description,
+      created_at: cls.created_at,
+      modules: modulesWithProgress
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ── Mark progress ────────────────────────────────────────────
-router.post('/progress/:moduleId', (req, res) => {
+router.post('/progress/:moduleId', async (req, res) => {
   const { status, score, score_data } = req.body;
-  const mod = db.prepare('SELECT * FROM modules WHERE id = ?').get(req.params.moduleId);
-  if (!mod) return res.status(404).json({ error: 'Module not found' });
+  
+  try {
+    const mod = await Module.findById(req.params.moduleId);
+    if (!mod) return res.status(404).json({ error: 'Module not found' });
 
-  // Verify trainee is enrolled in this module's class
-  const enrolled = db.prepare('SELECT 1 FROM class_trainees WHERE class_id = ? AND user_id = ?').get(mod.class_id, req.user.id);
-  if (!enrolled) return res.status(403).json({ error: 'Not enrolled' });
+    // Verify trainee is assigned to this module's parent course container
+    const cls = await Class.findById(mod.class_id);
+    if (!cls || !cls.trainees.includes(req.user.id)) {
+      return res.status(403).json({ error: 'Not enrolled' });
+    }
 
-  // Check if already completed and retake not allowed
-  const existing = db.prepare('SELECT * FROM progress WHERE user_id = ? AND module_id = ?').get(req.user.id, mod.id);
-  if (existing?.status === 'completed' && !mod.allow_retake && mod.type === 'assessment') {
-    return res.status(409).json({ error: 'Assessment already completed and retakes are not allowed' });
+    // Block modification conditions if retaking is restricted
+    const existing = await Progress.findOne({ user_id: req.user.id, module_id: mod._id });
+    if (existing?.status === 'completed' && !mod.allow_retake && mod.type === 'assessment') {
+      return res.status(409).json({ error: 'Assessment already completed and retakes are not allowed' });
+    }
+
+    const now = status === 'completed' ? new Date() : null;
+    const stringifiedScoreData = score_data ? JSON.stringify(score_data) : null;
+
+    if (existing) {
+      existing.status = status;
+      existing.score = score !== undefined ? score : existing.score;
+      existing.score_data = stringifiedScoreData !== null ? stringifiedScoreData : existing.score_data;
+      existing.attempt_count += 1;
+      if (now) existing.completed_at = now;
+      
+      await existing.save();
+    } else {
+      await Progress.create({
+        user_id: req.user.id,
+        module_id: mod._id,
+        status,
+        score: score ?? null,
+        score_data: stringifiedScoreData,
+        attempt_count: 1,
+        completed_at: now
+      });
+    }
+
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const now = status === 'completed' ? new Date().toISOString() : null;
-  if (existing) {
-    db.prepare(`
-      UPDATE progress SET status=?, score=?, score_data=?, attempt_count=attempt_count+1, completed_at=?
-      WHERE user_id=? AND module_id=?
-    `).run(status, score ?? null, score_data ? JSON.stringify(score_data) : null, now, req.user.id, mod.id);
-  } else {
-    db.prepare(`
-      INSERT INTO progress (user_id, module_id, status, score, score_data, attempt_count, completed_at)
-      VALUES (?, ?, ?, ?, ?, 1, ?)
-    `).run(req.user.id, mod.id, status, score ?? null, score_data ? JSON.stringify(score_data) : null, now);
-  }
-
-  res.json({ ok: true });
 });
 
-// ── Check class completion (for certificate) ──────────────────
-router.get('/classes/:id/certificate', (req, res) => {
-  const assigned = db.prepare('SELECT 1 FROM class_trainees WHERE class_id = ? AND user_id = ?').get(req.params.id, req.user.id);
-  if (!assigned) return res.status(403).json({ error: 'Not enrolled' });
+// ── Check class completion (for certificate generation) ──────
+router.get('/classes/:id/certificate', async (req, res) => {
+  try {
+    const cls = await Class.findById(req.params.id);
+    if (!cls || !cls.trainees.includes(req.user.id)) {
+      return res.status(403).json({ error: 'Not enrolled' });
+    }
 
-  const total = db.prepare('SELECT COUNT(*) as n FROM modules WHERE class_id = ?').get(req.params.id).n;
-  const completed = db.prepare(`
-    SELECT COUNT(*) as n FROM progress p
-    JOIN modules m ON m.id = p.module_id
-    WHERE p.user_id = ? AND m.class_id = ? AND p.status = 'completed'
-  `).get(req.user.id, req.params.id).n;
+    const total = await Module.countDocuments({ class_id: cls._id });
+    const moduleIds = await Module.find({ class_id: cls._id }).distinct('_id');
+    
+    const completed = await Progress.countDocuments({
+      user_id: req.user.id,
+      module_id: { $in: moduleIds },
+      status: 'completed'
+    });
 
-  if (total === 0 || completed < total) {
-    return res.status(400).json({ error: 'Class not yet complete' });
+    if (total === 0 || completed < total) {
+      return res.status(400).json({ error: 'Class not yet complete' });
+    }
+
+    // Locate the latest completion timestamp across module metrics
+    const latestProgressRecord = await Progress.find({
+      user_id: req.user.id,
+      module_id: { $in: moduleIds },
+      status: 'completed'
+    }).sort({ completed_at: -1 }).limit(1);
+
+    const lastCompletion = latestProgressRecord.length > 0 ? latestProgressRecord[0].completed_at : null;
+
+    res.json({
+      eligible: true,
+      className: cls.name,
+      completedAt: lastCompletion,
+      traineeName: req.user.name
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  const cls = db.prepare('SELECT * FROM classes WHERE id = ?').get(req.params.id);
-  const lastCompletion = db.prepare(`
-    SELECT MAX(p.completed_at) as d FROM progress p
-    JOIN modules m ON m.id = p.module_id
-    WHERE p.user_id = ? AND m.class_id = ?
-  `).get(req.user.id, req.params.id).d;
-
-  res.json({ eligible: true, className: cls.name, completedAt: lastCompletion, traineeName: req.user.name });
 });
 
 module.exports = router;
