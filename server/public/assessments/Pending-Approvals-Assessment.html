@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pending Approvals — Knowledge Check</title>
+<style>
+  :root{
+    --navy:#1F3A5F; --navy-dk:#16293F; --teal:#0E8A8A; --teal-dk:#0A6B6B;
+    --ink:#23303D; --muted:#5B6B7B; --card:#F2F6F8; --line:#DCE6EC;
+    --white:#fff; --good:#1F8A5B; --good-bg:#E7F4ED; --bad:#C0392B; --bad-bg:#FBEAE8;
+    --amber-bg:#FBF3E7; --amber-line:#EAD9BE;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Calibri,Arial,sans-serif;background:#EEF2F5;color:var(--ink);line-height:1.5}
+  .wrap{max-width:780px;margin:0 auto;padding:24px 16px 60px}
+  header.hero{background:var(--navy);color:#fff;border-radius:16px;padding:28px 30px;position:relative;overflow:hidden}
+  header.hero .tag{font-size:13px;letter-spacing:3px;font-weight:700;color:#9FD3D3;margin:0 0 8px}
+  header.hero h1{font-family:Cambria,Georgia,serif;font-size:30px;margin:0 0 6px}
+  header.hero p{margin:0;color:#CFE6E6;font-size:15px}
+  header.hero .blob{position:absolute;border-radius:50%;background:var(--teal-dk);opacity:.5}
+  .b1{width:160px;height:160px;right:-40px;top:-50px}
+  .b2{width:90px;height:90px;right:60px;bottom:-40px;opacity:.35}
+
+  .bar{height:8px;background:var(--line);border-radius:999px;margin:22px 0 6px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--teal);border-radius:999px;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:18px}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px;box-shadow:0 4px 14px rgba(20,40,60,.06)}
+  .qnum{font-size:12px;letter-spacing:2px;font-weight:700;color:var(--teal-dk);margin:0 0 8px}
+  .qtext{font-size:20px;font-weight:600;color:var(--navy);margin:0 0 18px;font-family:Cambria,Georgia,serif}
+  .opts{display:flex;flex-direction:column;gap:11px}
+  .opt{display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--line);border-radius:10px;padding:13px 15px;cursor:pointer;transition:.15s;background:#fff}
+  .opt:hover{border-color:var(--teal);background:#F7FBFB}
+  .opt.sel{border-color:var(--teal);background:#EAF3F3;box-shadow:inset 0 0 0 1px var(--teal)}
+  .opt .mark{flex:0 0 24px;height:24px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);margin-top:1px}
+  .opt.sel .mark{background:var(--teal);border-color:var(--teal);color:#fff}
+  .opt .otext{font-size:15.5px;color:var(--ink)}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+  button{font-family:inherit;font-size:15px;font-weight:600;border:0;border-radius:10px;padding:12px 22px;cursor:pointer}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-primary:hover{background:var(--teal-dk)}
+  .btn-primary:disabled{background:#AFC6C6;cursor:not-allowed}
+  .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--muted)}
+  .hint{font-size:13px;color:var(--muted);text-align:center;margin-top:12px}
+
+  /* results */
+  .score-card{text-align:center;padding:34px 26px}
+  .score-ring{width:150px;height:150px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+  .score-ring .pct{font-size:42px;font-weight:800;line-height:1}
+  .score-ring .lbl{font-size:13px;opacity:.9}
+  .verdict{font-family:Cambria,Georgia,serif;font-size:26px;margin:0 0 6px;color:var(--navy)}
+  .verdict.fail{color:var(--bad)}
+  .sub{color:var(--muted);margin:0 0 4px}
+  .review{margin-top:26px;text-align:left}
+  .review h3{font-family:Cambria,Georgia,serif;color:var(--navy);font-size:20px;border-bottom:2px solid var(--line);padding-bottom:8px}
+  .ritem{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;background:#fff}
+  .ritem .rq{font-weight:600;color:var(--navy);margin:0 0 10px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;border-radius:999px;padding:3px 11px;margin-bottom:8px}
+  .pill.ok{background:var(--good-bg);color:var(--good)}
+  .pill.no{background:var(--bad-bg);color:var(--bad)}
+  .ans{font-size:14.5px;margin:4px 0;padding:8px 12px;border-radius:8px}
+  .ans.you-no{background:var(--bad-bg)}
+  .ans.correct{background:var(--good-bg)}
+  .ans .who{font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px}
+  .ans.you-no .who{color:var(--bad)}
+  .ans.correct .who{color:var(--good)}
+  .expl{font-size:14px;color:var(--muted);margin-top:10px;padding-left:12px;border-left:3px solid var(--teal)}
+  .footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:26px}
+  @media(max-width:520px){header.hero h1{font-size:24px}.qtext{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <p class="tag">OPERATIONS TRAINING</p>
+    <h1>Following Up on Pending Approvals</h1>
+    <p>Knowledge Check &middot; <span id="qcount"></span> questions &middot; passing score 80%</p>
+  </header>
+
+  <div id="quiz">
+    <div class="bar"><i id="progFill"></i></div>
+    <div class="meta"><span id="progText">Question 1</span><span id="answeredText"></span></div>
+    <div class="card" id="qcard"></div>
+    <div class="nav">
+      <button class="btn-ghost" id="backBtn">&larr; Back</button>
+      <button class="btn-primary" id="nextBtn">Next &rarr;</button>
+    </div>
+    <p class="hint" id="hint">Select an answer to continue. You can go back and change answers before submitting.</p>
+  </div>
+
+  <div id="results" style="display:none"></div>
+  <p class="footer">Pending Approvals &mdash; Operations Training &middot; Knowledge Check</p>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "You're on the Dashboard and need the list of work orders. What's the first thing you do?",
+    options: ["Click the Work Orders tab","Open the admin inbox","Click Add Note","Search the client portal"],
+    answer: 0,
+    expl: "From the Dashboard, click the Work Orders tab to be routed to the page listing all created work orders."
+  },
+  {
+    q: "When you set the filter, which box should be ticked — with all others unticked?",
+    options: ["Completed","ReadyForOffice","Contractor Group","Pending Payment"],
+    answer: 1,
+    expl: "Tick ReadyForOffice and untick everything else, so only the work orders ready for the office show."
+  },
+  {
+    q: "After ticking the filter, which buttons do you click to load the filtered list?",
+    options: ["Save, then Close","Run, then Save","Filter, then Run","Refresh only"],
+    answer: 2,
+    expl: "Click Filter, then Run — the list then shows all work orders in ReadyForOffice status."
+  },
+  {
+    q: "What is the correct order the categories should be arranged in?",
+    options: [
+      "Pending Approvals, then everything else",
+      "Unit Turn Pending Approval, Change Order, Split, Change Order, then Pending Approvals",
+      "Change Order, Split, Unit Turn, Pending Approvals",
+      "Alphabetical by client name"
+    ],
+    answer: 1,
+    expl: "Unit Turn Pending Approval on top, followed by Change Order, Split, Change Order, with the Pending Approvals below them."
+  },
+  {
+    q: "The categories come up shuffled. How do you fix the arrangement?",
+    options: ["Refresh the whole page","Click the category header again until the order matches","Re-run the filter","Log out and back in"],
+    answer: 1,
+    expl: "Just click the category header again until it shows the correct arrangement."
+  },
+  {
+    q: "Once a work order is open, where do you look to see when the bid or estimate was submitted?",
+    options: ["General Info","Job Notes","Attachments","Contractor tab"],
+    answer: 1,
+    expl: "Open Job Notes and look for a comment that says the bid/estimate was 'submitted', along with its date."
+  },
+  {
+    q: "A follow-up is needed only when the bid/estimate has been pending for how long?",
+    options: ["More than 24 hours","More than 2 business days","More than 4 business days","More than 2 weeks"],
+    answer: 2,
+    expl: "The rule is four business days. If it's been more than four business days since submission, a follow-up is deemed necessary."
+  },
+  {
+    q: "A work order's bid was submitted today. What do you do?",
+    options: ["Follow up immediately","Skip it for now and check back later","Mark it completed","Escalate to your Team Leader"],
+    answer: 1,
+    expl: "If it was just submitted today (or it's only the 1st–2nd business day), it hasn't waited long enough — skip it for now."
+  },
+  {
+    q: "True or False: A bid submitted on June 2nd, with today being the 22nd, needs a follow-up.",
+    options: ["True","False"],
+    answer: 0,
+    expl: "True. June 2nd to the 22nd is well beyond four business days, so a follow-up is necessary."
+  },
+  {
+    q: "How do you locate the email tied to a work order you need to follow up on?",
+    options: [
+      "Search the client's name in the inbox",
+      "Copy the work order number and look it up in the admin inbox",
+      "Wait for the client to email you",
+      "Open a new email to the contractor"
+    ],
+    answer: 1,
+    expl: "Copy the work order number, then look it up in the admin inbox to find the email — which usually contains a link to that specific work order."
+  },
+  {
+    q: "The email link doesn't drop you on the exact work order in the portal. What do you do?",
+    options: ["Start over from the inbox","Search the work order number in the portal","Call the client","Create a new work order"],
+    answer: 1,
+    expl: "If it's not routed directly to the specific work order, just search the work order number inside the portal."
+  },
+  {
+    q: "When do you add a title to the follow-up note?",
+    options: ["Always","Never","Only for AMH clients","Only on Fridays"],
+    answer: 2,
+    expl: "You only add a title for AMH. For the note content, you use the follow-up template from the client portfolio."
+  },
+  {
+    q: "What goes into the follow-up template before you create the note?",
+    options: [
+      "The date you're making the follow-up, plus your name",
+      "The contractor's phone number",
+      "The original submission date only",
+      "Nothing — leave it as-is"
+    ],
+    answer: 0,
+    expl: "Copy the follow-up template, then enter the date you're making the follow-up (today) along with your name, and create the note."
+  },
+  {
+    q: "Logging the follow-up back on the work order, what must you do before saving the internal note?",
+    options: [
+      "Tick the contractor group",
+      "Untick the contractor group",
+      "Email the contractor",
+      "Change the status to Completed"
+    ],
+    answer: 1,
+    expl: "This is an internal note, so untick the contractor group, then click Save."
+  }
+];
+
+const PASS = 0.8;
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+const qcard = document.getElementById('qcard');
+const backBtn = document.getElementById('backBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progFill = document.getElementById('progFill');
+const progText = document.getElementById('progText');
+const answeredText = document.getElementById('answeredText');
+document.getElementById('qcount').textContent = QUESTIONS.length;
+
+function render(){
+  const item = QUESTIONS[current];
+  const letters = ['A','B','C','D','E'];
+  let html = '<p class="qnum">QUESTION '+(current+1)+' OF '+QUESTIONS.length+'</p>';
+  html += '<p class="qtext">'+item.q+'</p><div class="opts">';
+  item.options.forEach((opt,i)=>{
+    const sel = answers[current]===i ? ' sel' : '';
+    html += '<div class="opt'+sel+'" data-i="'+i+'"><span class="mark">'+letters[i]+'</span><span class="otext">'+opt+'</span></div>';
+  });
+  html += '</div>';
+  qcard.innerHTML = html;
+  qcard.querySelectorAll('.opt').forEach(el=>{
+    el.addEventListener('click',()=>{ answers[current]=parseInt(el.dataset.i); render(); });
+  });
+
+  progFill.style.width = (((current+1)/QUESTIONS.length)*100)+'%';
+  progText.textContent = 'Question '+(current+1);
+  const done = answers.filter(a=>a!==null).length;
+  answeredText.textContent = done+' of '+QUESTIONS.length+' answered';
+  backBtn.style.visibility = current===0 ? 'hidden':'visible';
+  const last = current===QUESTIONS.length-1;
+  if(last){
+    nextBtn.textContent = 'Submit';
+    nextBtn.disabled = answers.filter(a=>a!==null).length !== QUESTIONS.length;
+    document.getElementById('hint').textContent = nextBtn.disabled
+      ? 'Answer every question to submit. ('+(QUESTIONS.length-done)+' left)'
+      : 'All questions answered — click Submit to see your score.';
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.disabled = answers[current]===null;
+    document.getElementById('hint').textContent = 'Select an answer to continue. You can go back and change answers before submitting.';
+  }
+}
+
+backBtn.onclick = ()=>{ if(current>0){current--; render();} };
+nextBtn.onclick = ()=>{
+  if(current < QUESTIONS.length-1){ current++; render(); }
+  else { showResults(); }
+};
+
+function showResults(){
+  let correct = 0;
+  QUESTIONS.forEach((item,i)=>{ if(answers[i]===item.answer) correct++; });
+  const pct = Math.round((correct/QUESTIONS.length)*100);
+  const passed = (correct/QUESTIONS.length) >= PASS;
+  const ringColor = passed ? 'var(--good)' : 'var(--bad)';
+  const letters = ['A','B','C','D','E'];
+
+  let html = '<div class="card score-card">';
+  html += '<div class="score-ring" style="background:'+ringColor+'"><span class="pct">'+pct+'%</span><span class="lbl">'+correct+' / '+QUESTIONS.length+' correct</span></div>';
+  html += '<p class="verdict'+(passed?'':' fail')+'">'+(passed?'Nice work — you passed!':'Not quite — give it another go')+'</p>';
+  html += '<p class="sub">'+(passed
+      ? 'You\'ve got a solid handle on following up on pending approvals.'
+      : 'You need 80% to pass. Review the answers below, then retake the check.')+'</p>';
+  html += '<button class="btn-primary" style="margin-top:16px" onclick="retake()">Retake the check</button>';
+  html += '</div>';
+
+  html += '<div class="review"><h3>Review your answers</h3>';
+  QUESTIONS.forEach((item,i)=>{
+    const ua = answers[i];
+    const ok = ua===item.answer;
+    html += '<div class="ritem">';
+    html += '<span class="pill '+(ok?'ok':'no')+'">'+(ok?'&#10003; Correct':'&#10007; Incorrect')+'</span>';
+    html += '<p class="rq">'+(i+1)+'. '+item.q+'</p>';
+    if(!ok){
+      html += '<div class="ans you-no"><span class="who">Your answer</span>'+letters[ua]+'. '+item.options[ua]+'</div>';
+    }
+    html += '<div class="ans correct"><span class="who">Correct answer</span>'+letters[item.answer]+'. '+item.options[item.answer]+'</div>';
+    html += '<p class="expl">'+item.expl+'</p>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('quiz').style.display='none';
+  const r = document.getElementById('results');
+  r.innerHTML = html;
+  r.style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function retake(){
+  current = 0;
+  for(let i=0;i<answers.length;i++) answers[i]=null;
+  document.getElementById('results').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>

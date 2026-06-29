@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TGS BPO | Day 2 Modules 6 & 7 Assessment</title>
+<style>
+  /* ── Variables ─────────────────────────────────────────────────── */
+  :root {
+    --navy:   #1B3262;
+    --blue:   #2E5BA8;
+    --blue-lt:#4A9ED6;
+    --gold:   #E8A838;
+    --green:  #27AE60;
+    --red:    #C0392B;
+    --gray:   #6B7280;
+    --light:  #EEF3FA;
+    --light2: #F7F9FD;
+    --border: #D1D5DB;
+    --white:  #FFFFFF;
+    --shadow: 0 2px 8px rgba(27,50,98,.10);
+  }
+
+  /* ── Reset & Base ──────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 14px; color: #1F2937;
+         background: #F1F4F9; min-height: 100vh; }
+  a { color: var(--blue); }
+
+  /* ── Top bar ───────────────────────────────────────────────────── */
+  #topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy); color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 52px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  #topbar .brand { font-size: 13px; font-weight: 700; letter-spacing: .5px; color: #fff; }
+  #topbar .brand span { color: var(--gold); }
+  #topbar .right { display: flex; align-items: center; gap: 12px; }
+  #scoreDisplay {
+    background: rgba(255,255,255,.12); border-radius: 6px;
+    padding: 4px 14px; font-size: 13px; font-weight: 700;
+    border: 1px solid rgba(255,255,255,.2);
+  }
+  #scoreDisplay .val { color: var(--gold); font-size: 16px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700;
+    cursor: pointer; border: none; transition: opacity .15s;
+    letter-spacing: .3px; text-transform: uppercase;
+  }
+  .btn:hover { opacity: .85; }
+  .btn-gold   { background: var(--gold); color: var(--navy); }
+  .btn-ghost  { background: rgba(255,255,255,.12); color: #fff;
+                border: 1px solid rgba(255,255,255,.3); }
+  .btn-blue   { background: var(--blue); color: #fff; }
+  .btn-green  { background: var(--green); color: #fff; }
+  .btn-sm     { padding: 4px 10px; font-size: 11px; }
+
+  /* ── Tabs ──────────────────────────────────────────────────────── */
+  #tabs {
+    display: flex; background: #fff; border-bottom: 2px solid var(--border);
+    padding: 0 24px; gap: 0; position: sticky; top: 52px; z-index: 90;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .tab {
+    padding: 12px 20px; font-size: 13px; font-weight: 700; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+    color: var(--gray); transition: all .15s; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tab.active { color: var(--navy); border-color: var(--navy); }
+  .tab .badge {
+    background: var(--light); color: var(--blue); border-radius: 99px;
+    padding: 1px 7px; font-size: 11px; font-weight: 700;
+  }
+  .tab.active .badge { background: var(--navy); color: #fff; }
+
+  /* ── Page ──────────────────────────────────────────────────────── */
+  .page { display: none; }
+  .page.active { display: block; }
+  .container { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── Cover card ────────────────────────────────────────────────── */
+  .cover {
+    background: var(--navy); color: #fff; border-radius: 10px;
+    padding: 32px 36px; margin-bottom: 24px; position: relative; overflow: hidden;
+  }
+  .cover::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(255,255,255,.05);
+  }
+  .cover::after {
+    content: ''; position: absolute; right: 40px; bottom: -60px;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: rgba(255,255,255,.03);
+  }
+  .cover .tag {
+    display: inline-block; background: var(--gold); color: var(--navy);
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px;
+    letter-spacing: .5px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .cover h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .cover p  { font-size: 13px; color: rgba(255,255,255,.7); }
+
+  /* ── Info fields ───────────────────────────────────────────────── */
+  .info-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media(max-width:600px){ .info-grid { grid-template-columns: 1fr; } }
+  .info-field label {
+    display: block; font-size: 11px; font-weight: 700; color: var(--gray);
+    text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .info-field input {
+    width: 100%; padding: 8px 12px; border: 1.5px solid var(--border);
+    border-radius: 6px; font-size: 13px; background: #fff;
+    transition: border-color .15s;
+  }
+  .info-field input:focus { outline: none; border-color: var(--blue); }
+
+  /* ── Score summary bar ─────────────────────────────────────────── */
+  .score-bar {
+    display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 0;
+    border-radius: 8px; overflow: hidden; margin-bottom: 24px;
+    border: 1.5px solid var(--border); box-shadow: var(--shadow);
+  }
+  .score-cell {
+    padding: 14px 16px; text-align: center; background: #fff;
+  }
+  .score-cell + .score-cell { border-left: 1.5px solid var(--border); }
+  .score-cell .lbl { font-size: 11px; color: var(--gray); font-weight: 700;
+                     text-transform: uppercase; letter-spacing: .4px; }
+  .score-cell .num { font-size: 22px; font-weight: 800; color: var(--navy);
+                     margin-top: 2px; }
+  .score-cell .num span { font-size: 13px; color: var(--gray); font-weight: 400; }
+  .score-cell.total { background: var(--navy); }
+  .score-cell.total .lbl { color: rgba(255,255,255,.65); }
+  .score-cell.total .num { color: var(--gold); }
+  .pass-badge {
+    display: inline-block; margin-top: 4px; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 99px; letter-spacing: .3px;
+  }
+  .pass-badge.pass   { background: #D1FAE5; color: #065F46; }
+  .pass-badge.fail   { background: #FEE2E2; color: #991B1B; }
+  .pass-badge.pending{ background: var(--light); color: var(--gray); }
+
+  /* ── Section headers ───────────────────────────────────────────── */
+  .section-hdr {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    padding-bottom: 10px; border-bottom: 2px solid var(--navy);
+  }
+  .section-hdr .num {
+    background: var(--navy); color: #fff; border-radius: 6px;
+    width: 32px; height: 32px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0;
+  }
+  .section-hdr h2 { font-size: 16px; font-weight: 800; color: var(--navy); }
+  .section-hdr .pts {
+    margin-left: auto; background: var(--light); color: var(--blue);
+    font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+  }
+
+  /* ── Question cards ────────────────────────────────────────────── */
+  .q-card {
+    background: #fff; border-radius: 8px; padding: 16px 18px;
+    margin-bottom: 12px; box-shadow: var(--shadow);
+    border: 1.5px solid var(--border); transition: border-color .2s;
+  }
+  .q-card:focus-within { border-color: var(--blue); }
+  .q-header {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
+  }
+  .q-num {
+    background: var(--navy); color: #fff; border-radius: 5px;
+    min-width: 26px; height: 26px; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .q-text { font-size: 13.5px; font-weight: 600; color: #111827; line-height: 1.5; }
+  .q-pts {
+    margin-left: auto; font-size: 11px; font-weight: 700; color: var(--blue);
+    background: var(--light); padding: 2px 8px; border-radius: 99px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 10px 12px; font-size: 13px; font-family: Arial, sans-serif;
+    resize: vertical; min-height: 80px; line-height: 1.5;
+    background: var(--light2); transition: border-color .15s;
+  }
+  textarea:focus { outline: none; border-color: var(--blue); background: #fff; }
+  .answered textarea { border-color: #A7F3D0; }
+
+  /* Trainer score input inside q-card */
+  .trainer-score-row {
+    display: none; margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    align-items: center; gap: 10px;
+  }
+  .trainer-mode .trainer-score-row { display: flex; }
+  .trainer-score-row label { font-size: 11px; font-weight: 700; color: var(--gray); }
+  .score-input {
+    width: 60px; padding: 4px 8px; border: 1.5px solid var(--border);
+    border-radius: 5px; font-size: 13px; font-weight: 700; text-align: center;
+    color: var(--navy);
+  }
+  .score-input:focus { outline: none; border-color: var(--blue); }
+  .max-pts { font-size: 11px; color: var(--gray); }
+  .answer-key-box {
+    display: none; margin-top: 8px; padding: 10px 14px;
+    background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 6px;
+    font-size: 12.5px; color: #78350F; line-height: 1.55;
+  }
+  .trainer-mode .answer-key-box { display: block; }
+  .answer-key-box strong { color: #92400E; }
+
+  /* ── Prospect profile card ─────────────────────────────────────── */
+  .profile-card {
+    background: #fff; border-radius: 8px; overflow: hidden;
+    border: 1.5px solid var(--border); margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .profile-hdr {
+    background: var(--navy); color: #fff; padding: 10px 18px;
+    font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    text-transform: uppercase; color: var(--gold);
+  }
+  .profile-body { display: grid; grid-template-columns: 1fr 1fr; }
+  @media(max-width:600px){ .profile-body { grid-template-columns: 1fr; } }
+  .profile-left {
+    padding: 18px; background: var(--light2);
+    border-right: 1px solid var(--border);
+  }
+  .profile-right { padding: 18px; }
+  .profile-name { font-size: 18px; font-weight: 800; color: var(--navy); margin-bottom: 2px; }
+  .profile-title { font-size: 13px; color: var(--blue); margin-bottom: 2px; }
+  .profile-co    { font-size: 12px; color: var(--gray); margin-bottom: 12px; }
+  .profile-meta  { font-size: 12px; line-height: 1.8; }
+  .profile-meta strong { color: var(--navy); }
+  .profile-post {
+    background: var(--light2); border-left: 4px solid var(--gold);
+    padding: 10px 14px; border-radius: 0 6px 6px 0;
+    font-size: 13px; font-style: italic; color: #374151;
+    margin-bottom: 12px; line-height: 1.5;
+  }
+  .bant-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .bant-chip {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px;
+  }
+  .bant-chip.pass { background: #D1FAE5; color: #065F46; }
+  .bant-chip.partial { background: #FEF3C7; color: #92400E; }
+
+  /* ── Message writing areas ─────────────────────────────────────── */
+  .msg-card {
+    background: #fff; border-radius: 8px; padding: 18px;
+    margin-bottom: 14px; border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .msg-card-hdr {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .msg-badge {
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 800;
+    padding: 3px 10px; border-radius: 99px; text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+  .msg-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .msg-hint  { font-size: 11px; color: var(--gray); margin-left: auto; }
+  .char-counter {
+    text-align: right; font-size: 11px; margin-top: 4px; font-weight: 700;
+  }
+  .char-counter.ok     { color: var(--green); }
+  .char-counter.over   { color: var(--red); }
+  .char-counter.under  { color: var(--gold); }
+  .char-counter.empty  { color: var(--gray); }
+  .msg-meta-field {
+    margin-top: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .msg-meta-field label { font-size: 11px; font-weight: 700; color: var(--gray); flex-shrink: 0; }
+  .msg-meta-field input {
+    flex: 1; padding: 5px 10px; border: 1.5px solid var(--border);
+    border-radius: 5px; font-size: 12px;
+  }
+
+  /* ── Rubric table ──────────────────────────────────────────────── */
+  .rubric-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rubric-table th {
+    background: var(--navy); color: #fff; padding: 10px 12px;
+    text-align: left; font-size: 12px; font-weight: 700;
+  }
+  .rubric-table td {
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .rubric-table tr:nth-child(even) td { background: var(--light2); }
+  .rubric-table .crit { font-weight: 700; color: var(--navy); }
+  .rubric-table .score-cell-td { text-align: center; width: 90px; }
+  .rubric-table tfoot td {
+    background: var(--light); font-weight: 700; color: var(--navy);
+  }
+  .rubric-table .r-score {
+    width: 56px; padding: 4px 8px; border: 1.5px solid var(--border);
+    border-radius: 5px; font-size: 13px; font-weight: 700; text-align: center;
+    color: var(--navy);
+  }
+
+  /* ── Trainer panel ─────────────────────────────────────────────── */
+  .trainer-panel {
+    display: none; background: #FFFBEB; border: 1.5px solid #FDE68A;
+    border-radius: 8px; padding: 16px 18px; margin-bottom: 20px;
+  }
+  .trainer-mode .trainer-panel { display: block; }
+  .trainer-panel h3 { color: #92400E; font-size: 13px; margin-bottom: 6px; }
+  .trainer-panel p  { color: #78350F; font-size: 12px; line-height: 1.6; }
+
+  /* ── Progress bar ──────────────────────────────────────────────── */
+  .progress-wrap { margin-bottom: 20px; }
+  .progress-label { font-size: 11px; color: var(--gray); font-weight: 700;
+                    margin-bottom: 5px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--blue); border-radius: 99px;
+                   transition: width .4s ease; }
+
+  /* ── Result modal ──────────────────────────────────────────────── */
+  #resultModal {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(0,0,0,.5); align-items: center; justify-content: center;
+  }
+  #resultModal.open { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 12px; padding: 36px 40px;
+    max-width: 440px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+  .modal-box .score-big { font-size: 56px; font-weight: 900; color: var(--navy);
+                          line-height: 1; margin: 16px 0 8px; }
+  .modal-box .result-label { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .modal-box.pass .result-label { color: var(--green); }
+  .modal-box.fail .result-label { color: var(--red); }
+  .modal-box p { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+  .modal-close { cursor: pointer; position: absolute; top: 14px; right: 18px;
+                 font-size: 20px; color: var(--gray); background: none; border: none; }
+
+  /* ── Answer key page ───────────────────────────────────────────── */
+  .ak-row {
+    background: #fff; border-radius: 8px; padding: 14px 16px;
+    margin-bottom: 8px; display: grid; grid-template-columns: 36px 1fr;
+    gap: 12px; border: 1.5px solid var(--border); box-shadow: var(--shadow);
+  }
+  .ak-num {
+    background: var(--navy); color: #fff; border-radius: 5px;
+    width: 30px; height: 30px; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+  .ak-q { font-size: 12px; color: var(--gray); font-style: italic; margin-bottom: 4px; }
+  .ak-a { font-size: 13px; color: #111827; line-height: 1.55; }
+
+  /* ── Utility ───────────────────────────────────────────────────── */
+  .card { background: #fff; border-radius: 8px; padding: 18px;
+          border: 1.5px solid var(--border); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .info-box {
+    background: var(--light); border-left: 4px solid var(--blue);
+    border-radius: 0 6px 6px 0; padding: 12px 16px; font-size: 13px;
+    color: #1E3A5F; margin-bottom: 16px; line-height: 1.6;
+  }
+  .info-box strong { color: var(--navy); }
+  .mt16 { margin-top: 16px; }
+  .mb16 { margin-bottom: 16px; }
+  .flex-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  /* ── Print styles ──────────────────────────────────────────────── */
+  @media print {
+    #topbar, #tabs, .btn, .trainer-score-row, .answer-key-box,
+    .trainer-panel, #trainerToggle, #printBtn { display: none !important; }
+    body { background: #fff; font-size: 12px; }
+    .page { display: block !important; }
+    .container { padding: 0; max-width: 100%; }
+    textarea { border: 1px solid #ccc; background: #fff; }
+    .card, .q-card, .msg-card, .profile-card { box-shadow: none; break-inside: avoid; }
+    #resultModal { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <div class="brand">TGS BPO <span>|</span> Outbound Chat Specialist</div>
+  <div class="right">
+    <div id="scoreDisplay">Score: <span class="val" id="liveScore">—</span> / 100</div>
+    <button class="btn btn-ghost btn-sm" id="trainerToggle" onclick="toggleTrainer()">🔑 Trainer Mode</button>
+    <button class="btn btn-gold btn-sm" id="printBtn" onclick="window.print()">🖨 Print</button>
+  </div>
+</div>
+
+<!-- ── Tabs ──────────────────────────────────────────────────────────────── -->
+<div id="tabs">
+  <div class="tab active" onclick="switchTab('part1')">
+    Part 1 <span class="badge" id="p1badge">0/10</span>
+  </div>
+  <div class="tab" onclick="switchTab('part2')">
+    Part 2 — Practical
+  </div>
+  <div class="tab" onclick="switchTab('answerkey')">
+    Answer Key
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE 1 — PART 1: WRITTEN COMPREHENSION
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-part1">
+<div class="container">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="tag">Day 2 | Modules 6 &amp; 7</div>
+    <h1>LinkedIn Message Writing Workshop &amp; Peer Review</h1>
+    <p>Post-Video Assessment &nbsp;·&nbsp; Complete all parts before submission</p>
+  </div>
+
+  <!-- Info fields -->
+  <div class="info-grid">
+    <div class="info-field">
+      <label>Agent Name</label>
+      <input type="text" id="agentName" placeholder="Full name" oninput="saveState()">
+    </div>
+    <div class="info-field">
+      <label>Date</label>
+      <input type="date" id="assessDate" oninput="saveState()">
+    </div>
+    <div class="info-field">
+      <label>Trainer</label>
+      <input type="text" id="trainerName" placeholder="Trainer name" oninput="saveState()">
+    </div>
+  </div>
+
+  <!-- Score summary -->
+  <div class="score-bar">
+    <div class="score-cell">
+      <div class="lbl">Part 1 — Written</div>
+      <div class="num" id="p1score">—<span> / 30</span></div>
+    </div>
+    <div class="score-cell">
+      <div class="lbl">Part 2 — Practical</div>
+      <div class="num" id="p2score">—<span> / 70</span></div>
+    </div>
+    <div class="score-cell total">
+      <div class="lbl">Total Score</div>
+      <div class="num" id="totalScore">—<span style="font-size:13px;color:rgba(255,255,255,.5)"> / 100</span></div>
+      <div id="passBadge" class="pass-badge pending">Pending</div>
+    </div>
+  </div>
+
+  <!-- Trainer panel -->
+  <div class="trainer-panel">
+    <h3>⚠️ Trainer Mode Active</h3>
+    <p>Score inputs and answer keys are now visible. Enter scores in each question card and the rubric table. The total score updates automatically. Click "Trainer Mode" in the top bar to exit.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Written questions answered</span>
+      <span id="progressText">0 of 10</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Section header -->
+  <div class="section-hdr">
+    <div class="num">1</div>
+    <h2>Written Comprehension</h2>
+    <div class="pts">30 pts · 3 pts each</div>
+  </div>
+
+  <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">Answer each question in full sentences. Use your own words based on what you learned in the video.</p>
+
+  <!-- Questions -->
+  <div id="questionsContainer"></div>
+
+  <div class="flex-row mt16">
+    <button class="btn btn-blue" onclick="switchTab('part2')">Continue to Part 2 →</button>
+    <button class="btn btn-ghost" style="background:var(--border);color:var(--navy)" onclick="clearAll()">Clear All</button>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE 2 — PART 2: PRACTICAL TASK
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-part2">
+<div class="container">
+
+  <div class="section-hdr">
+    <div class="num">2</div>
+    <h2>Practical Writing Task</h2>
+    <div class="pts">70 pts</div>
+  </div>
+
+  <!-- Prospect profile -->
+  <div class="profile-card">
+    <div class="profile-hdr">Prospect Profile</div>
+    <div class="profile-body">
+      <div class="profile-left">
+        <div class="profile-name">Marcus Rivera</div>
+        <div class="profile-title">Operations Director</div>
+        <div class="profile-co">Nova Build Group</div>
+        <div class="profile-meta">
+          <div><strong>Industry:</strong> Construction &amp; Property Development</div>
+          <div><strong>Company size:</strong> ~200 employees</div>
+          <div><strong>Authority:</strong> Decision-maker for operations tools</div>
+        </div>
+      </div>
+      <div class="profile-right">
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;">LinkedIn Post (3 days ago)</div>
+        <div class="profile-post">"We've tripled our project load this year and admin is killing us. Spending more time chasing paperwork than managing sites."</div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;">BANT-Lite Check</div>
+        <div class="bant-row">
+          <span class="bant-chip pass">✓ Business Fit</span>
+          <span class="bant-chip pass">✓ Authority</span>
+          <span class="bant-chip pass">✓ Need</span>
+          <span class="bant-chip partial">~ Timing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task brief -->
+  <div class="info-box">
+    <strong>Your Task:</strong> Using Marcus Rivera's profile above, write all three LinkedIn outreach messages below.
+    Your messages will be scored on the SOP Section 4.1 rubric at the bottom of this page.<br><br>
+    <strong>Message 1</strong> — Initial connection note (150–250 characters, personalized opening + bridge + CTA)<br>
+    <strong>Message 2</strong> — Follow-Up 1 (Day 3 — new angle or value, NOT a reminder)<br>
+    <strong>Message 3</strong> — Follow-Up 2 (Day 7 — gentle check-in, warm, 2–3 sentences)
+  </div>
+
+  <!-- Message 1 -->
+  <div class="msg-card">
+    <div class="msg-card-hdr">
+      <span class="msg-badge">Msg 1</span>
+      <span class="msg-title">Initial Connection Note</span>
+      <span class="msg-hint">Target: 150–250 characters</span>
+    </div>
+    <textarea id="msg1" rows="4" placeholder="Write your initial LinkedIn connection note here..." oninput="updateCharCount(); saveState()"></textarea>
+    <div class="char-counter empty" id="charCount">0 characters</div>
+  </div>
+
+  <!-- Message 2 -->
+  <div class="msg-card">
+    <div class="msg-card-hdr">
+      <span class="msg-badge" style="background:var(--blue)">Msg 2</span>
+      <span class="msg-title">Follow-Up 1 <span style="font-weight:400;color:var(--gray)">— Day 3</span></span>
+    </div>
+    <div class="msg-meta-field mb16" style="margin-bottom:10px">
+      <label>New angle used:</label>
+      <input type="text" id="fu1angle" placeholder="Describe the new angle or value you're bringing..." oninput="saveState()">
+    </div>
+    <textarea id="msg2" rows="5" placeholder="Write your Follow-Up 1 message here..." oninput="saveState()"></textarea>
+  </div>
+
+  <!-- Message 3 -->
+  <div class="msg-card">
+    <div class="msg-card-hdr">
+      <span class="msg-badge" style="background:var(--blue-lt)">Msg 3</span>
+      <span class="msg-title">Follow-Up 2 <span style="font-weight:400;color:var(--gray)">— Day 7</span></span>
+    </div>
+    <textarea id="msg3" rows="4" placeholder="Write your Follow-Up 2 message here (warm, brief, 2–3 sentences)..." oninput="saveState()"></textarea>
+  </div>
+
+  <!-- Rubric -->
+  <div class="section-hdr mt16">
+    <div class="num" style="background:var(--blue)">R</div>
+    <h2>Scoring Rubric — SOP Section 4.1</h2>
+    <div class="pts">35 pts per criterion set</div>
+  </div>
+
+  <div class="trainer-panel">
+    <h3>Trainer: Score each criterion below (0–5 pts). Total auto-calculates.</h3>
+    <p>5 pts = fully met across all 3 messages &nbsp;|&nbsp; 2–3 pts = partially met &nbsp;|&nbsp; 0 pts = clear violation or missing.</p>
+  </div>
+
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="rubric-table">
+      <thead>
+        <tr>
+          <th style="width:160px">Criteria</th>
+          <th>What You're Checking</th>
+          <th style="width:60px;text-align:center">Max</th>
+          <th style="width:90px;text-align:center">Score</th>
+        </tr>
+      </thead>
+      <tbody id="rubricBody"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" style="text-align:right;font-weight:700;color:var(--navy);padding:12px">TOTAL PRACTICAL SCORE</td>
+          <td style="text-align:center;font-weight:700">35</td>
+          <td style="text-align:center">
+            <span id="rubricTotal" style="font-size:16px;font-weight:800;color:var(--navy)">—</span>
+            <span style="color:var(--gray);font-size:12px"> / 35</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Trainer feedback -->
+  <div class="trainer-panel">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px">Qualitative Feedback</div>
+        <textarea id="trainerFeedback" rows="5" placeholder="Trainer notes on the message set..." oninput="saveState()" style="background:#fff"></textarea>
+      </div>
+      <div style="font-size:13px;line-height:2;color:#78350F">
+        <div>Part 1 Written: <strong id="fp1">—</strong> / 30</div>
+        <div>Part 2 Practical: <strong id="fp2">—</strong> / 35</div>
+        <div style="border-top:1px solid #FDE68A;margin-top:6px;padding-top:6px">
+          Total: <strong id="ftotal" style="font-size:16px;color:var(--navy)">—</strong> / 65
+          <div id="fpass" style="margin-top:4px"></div>
+        </div>
+        <button class="btn btn-green mt16" onclick="showResult()" style="margin-top:12px">Calculate Final Score</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-row mt16">
+    <button class="btn btn-blue" onclick="switchTab('part1')">← Back to Part 1</button>
+    <button class="btn btn-gold" onclick="showResult()">Calculate Score</button>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE 3 — ANSWER KEY
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-answerkey">
+<div class="container">
+
+  <div class="cover" style="background:linear-gradient(135deg,var(--navy),var(--blue))">
+    <div class="tag">Trainer Copy</div>
+    <h1>Answer Key</h1>
+    <p>Day 2 Modules 6 &amp; 7 — LinkedIn Message Writing Workshop &amp; Peer Review</p>
+  </div>
+
+  <div class="info-box">
+    <strong>Scoring guidance:</strong> Award full marks if the agent covers the key points. Accept paraphrased answers that demonstrate understanding. Do not require verbatim recitation. Partial credit (1–2 pts) for incomplete but partially correct answers.
+  </div>
+
+  <div class="section-hdr">
+    <div class="num">AK</div>
+    <h2>Part 1 — Written Comprehension Answers</h2>
+  </div>
+
+  <div id="answerKeyContainer"></div>
+
+  <div class="section-hdr mt16">
+    <div class="num" style="background:var(--blue)">P2</div>
+    <h2>Part 2 — Practical Scoring Guidance</h2>
+  </div>
+
+  <div class="card">
+    <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">Award 5 pts per criterion if consistently applied across the message set.</p>
+    <div style="font-size:13px;line-height:1.7;color:#374151">
+      <p><strong style="color:var(--green)">Full marks (35/35) require:</strong> At least one personalized element in each message; correct 3-part structure (Opening → Bridge → CTA); exactly one CTA per message; professional tone throughout; length within SOP limits; FU1 clearly brings a new angle; no prohibited behaviors anywhere in the set.</p>
+      <br>
+      <p><strong style="color:var(--red)">Common deductions:</strong></p>
+      <ul style="padding-left:18px;margin-top:6px;font-size:13px;color:#374151">
+        <li>Generic opener with no prospect-specific reference → −5 (Personalization)</li>
+        <li>Missing Bridge or Bridge merged into CTA → −5 (Structure)</li>
+        <li>CTA includes a link or booking page → −5 (CTA Quality)</li>
+        <li>FU1 says "just checking in" or "following up on my last message" → −5 (FU Differentiation)</li>
+        <li>Connection note exceeds 250 characters → −3 to −5 (Length)</li>
+        <li>Repeated greeting or name used 3+ times in one message → −5 (Prohibited Behaviors)</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ── Result Modal ───────────────────────────────────────────────────────── -->
+<div id="resultModal">
+  <div class="modal-box" id="modalBox" style="position:relative">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="font-size:13px;color:var(--gray);margin-bottom:8px">Assessment Result</div>
+    <div class="score-big" id="modalScore">—</div>
+    <div class="result-label" id="modalLabel">—</div>
+    <p id="modalMsg"></p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-blue" onclick="closeModal()">Close</button>
+      <button class="btn btn-gold" onclick="window.print()">Print Results</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Data ──────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    id: 'q1', pts: 3,
+    text: 'What are the four elements that count as a personalization minimum standard in a LinkedIn message? Name all four.',
+    lines: 3,
+    answer: '<strong>All four accepted elements:</strong> (1) Prospect\'s name + something specific about them personally; (2) Their company or industry; (3) A recent post, article, or content they shared; (4) A role-specific observation or pain point. At least ONE of these must appear in every single message — no exceptions.'
+  },
+  {
+    id: 'q2', pts: 3,
+    text: 'Describe the three-part message structure that every LinkedIn outreach must follow. Name each part and explain its purpose in one sentence.',
+    lines: 4,
+    answer: '<strong>Opening:</strong> Reference something specific to the prospect (personalization hook). <strong>Bridge:</strong> Connect TGS\'s value proposition to the prospect\'s world — explain why it\'s relevant to their specific situation. <strong>CTA:</strong> One clear, low-friction ask that invites a reply (not a call or link drop).'
+  },
+  {
+    id: 'q3', pts: 3,
+    text: 'What is the follow-up sequence required by SOP Section 4.1? List the days and what each message should accomplish.',
+    lines: 4,
+    answer: '<strong>Day 0:</strong> Initial message — first contact, personalized outreach. <strong>Day 3 (FU1):</strong> Bring a new angle of relevance — not a reminder. <strong>Day 7 (FU2):</strong> Gentle check-in — warm but brief, 2–3 sentences. <strong>Day 14 (FU3/Final):</strong> Acknowledge the silence, leave the door open, re-engagement or close.'
+  },
+  {
+    id: 'q4', pts: 3,
+    text: 'Why is Follow-Up 1 NOT a reminder? What must it include instead?',
+    lines: 3,
+    answer: 'FU1 must bring a new angle of relevance — a fresh observation, a question specific to the prospect\'s situation, or a piece of added value they haven\'t seen. Writing "just following up" or "circling back" is a QA compliance failure because it adds no value and signals automated outreach.'
+  },
+  {
+    id: 'q5', pts: 3,
+    text: 'What is the SOP length requirement for a LinkedIn connection note? What happens if you exceed it?',
+    lines: 3,
+    answer: 'A connection note must be between 150 and 250 characters. If it exceeds 250 characters, LinkedIn converts it to a standard InMail/message — it is no longer treated as a connection note — and the SOP compliance category is automatically failed in QA review.'
+  },
+  {
+    id: 'q6', pts: 3,
+    text: 'List three behaviors that are automatic QA compliance failures in LinkedIn outreach.',
+    lines: 3,
+    answer: 'Any three of: (1) Copy-paste blasting — sending the same message to multiple prospects with no personalization; (2) Spammy or aggressive tone, hard-selling in the first message; (3) Messaging the same prospect twice in under 3 days (violating the sequence); (4) Dropping a link or website URL in the initial message; (5) Duplicate greeting or using the prospect\'s name excessively (3+ times in one message).'
+  },
+  {
+    id: 'q7', pts: 3,
+    text: 'What is the purpose of the Bridge in the Opening → Bridge → CTA structure? How is it different from the CTA?',
+    lines: 3,
+    answer: 'The Bridge connects the personalized opening to TGS\'s value — it explains WHY what TGS offers is relevant to that specific prospect\'s situation. The CTA asks for a specific action (inviting a reply). The Bridge builds context and relevance; the CTA drives the conversation forward. They are distinct — merging them or skipping the Bridge is a structural failure.'
+  },
+  {
+    id: 'q8', pts: 3,
+    text: 'During the peer review, you are evaluating your partner\'s messages against seven criteria. Name at least five of them.',
+    lines: 3,
+    answer: 'Any five of the seven: (1) Personalization — does the opening reference something specific to Marcus? (2) Message Structure — does it follow Opening → Bridge → CTA? (3) CTA Quality — exactly one CTA that invites a reply, no link drop? (4) Tone — professional but conversational? (5) Length — within SOP limits for message type? (6) FU Differentiation — does FU1 bring a new angle (not a reminder)? (7) QA Compliance — no prohibited behaviors?'
+  },
+  {
+    id: 'q9', pts: 3,
+    text: 'What score is awarded in QA for the Message Quality & Personalization category, and what percentage of the total QA score does it represent?',
+    lines: 2,
+    answer: 'Message Quality & Personalization is worth 25% of the total QA score — making it the single biggest category in the entire QA rubric. Every message is evaluated against it in every review cycle.'
+  },
+  {
+    id: 'q10', pts: 3,
+    text: 'In your own words, explain why dropping a link in an initial LinkedIn message is prohibited, even if the link is helpful.',
+    lines: 3,
+    answer: 'Dropping a link in a first message signals automated or mass outreach and damages trust before any relationship is established. LinkedIn\'s algorithm also flags and suppresses messages with links, reducing deliverability. The goal of the initial message is to start a conversation — not to close a sale or drive traffic. Sharing a link feels transactional and removes the human-to-human quality that makes LinkedIn outreach effective.'
+  }
+];
+
+const RUBRIC_CRITERIA = [
+  { key: 'personalization', label: 'Personalization', desc: 'Opening references something specific to Marcus (post, role, company, or industry)' },
+  { key: 'structure',       label: 'Message Structure', desc: 'Follows Opening → Bridge → CTA in correct order across all messages' },
+  { key: 'cta',             label: 'CTA Quality', desc: 'Exactly ONE clear CTA per message that invites a reply (no link drop, no call request)' },
+  { key: 'tone',            label: 'Tone', desc: 'Professional but conversational; first-name basis; not salesy or robotic' },
+  { key: 'length',          label: 'Length Compliance', desc: 'Connection note 150–250 chars; FU1/FU2 under 300 chars; within SOP limits' },
+  { key: 'fu_diff',         label: 'FU Differentiation', desc: 'FU1 brings a new angle or added value — NOT just "following up" or "checking in"' },
+  { key: 'prohibited',      label: 'Prohibited Behaviors', desc: 'No copy-paste blasting, no link drops, no duplicate greetings, sequence respected' },
+];
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let trainerMode = false;
+let p1Total = 0;
+let p2Total = 0;
+
+// ─── Build Questions ────────────────────────────────────────────────────────
+function buildQuestions() {
+  const container = document.getElementById('questionsContainer');
+  QUESTIONS.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'card_' + q.id;
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${i+1}</div>
+        <div class="q-text">${q.text}</div>
+        <div class="q-pts">${q.pts} pts</div>
+      </div>
+      <textarea id="${q.id}" rows="${q.lines}" placeholder="Your answer..." oninput="onAnswer('${q.id}'); saveState()"></textarea>
+      <div class="trainer-score-row" id="tr_${q.id}">
+        <label>Score:</label>
+        <input type="number" class="score-input" id="s_${q.id}" min="0" max="${q.pts}"
+               placeholder="0" oninput="calcScores(); saveState()" title="Enter score 0–${q.pts}">
+        <span class="max-pts">/ ${q.pts} pts</span>
+      </div>
+      <div class="answer-key-box" id="ak_${q.id}">
+        <strong>Acceptable answer:</strong><br>${q.answer}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ─── Build Rubric ───────────────────────────────────────────────────────────
+function buildRubric() {
+  const tbody = document.getElementById('rubricBody');
+  RUBRIC_CRITERIA.forEach((c, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="crit">${c.label}</td>
+      <td>${c.desc}</td>
+      <td style="text-align:center">5</td>
+      <td class="score-cell-td">
+        <input type="number" class="r-score" id="r_${c.key}" min="0" max="5"
+               placeholder="—" oninput="calcRubric(); saveState()"
+               ${trainerMode ? '' : 'disabled'}>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ─── Build Answer Key ───────────────────────────────────────────────────────
+function buildAnswerKey() {
+  const container = document.getElementById('answerKeyContainer');
+  QUESTIONS.forEach((q, i) => {
+    const row = document.createElement('div');
+    row.className = 'ak-row';
+    row.innerHTML = `
+      <div class="ak-num">${i+1}</div>
+      <div>
+        <div class="ak-q">${q.text}</div>
+        <div class="ak-a">${q.answer}</div>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ─── Tab switching ──────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['part1','part2','answerkey'][i] === tab);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ─── Trainer mode ───────────────────────────────────────────────────────────
+function toggleTrainer() {
+  trainerMode = !trainerMode;
+  document.body.classList.toggle('trainer-mode', trainerMode);
+  const btn = document.getElementById('trainerToggle');
+  btn.textContent = trainerMode ? '🔓 Exit Trainer Mode' : '🔑 Trainer Mode';
+  btn.className = 'btn btn-sm ' + (trainerMode ? 'btn-gold' : 'btn-ghost');
+
+  // Enable/disable rubric inputs
+  RUBRIC_CRITERIA.forEach(c => {
+    const el = document.getElementById('r_' + c.key);
+    if (el) el.disabled = !trainerMode;
+  });
+  calcScores();
+}
+
+// ─── Answer progress ────────────────────────────────────────────────────────
+function onAnswer(id) {
+  const ta = document.getElementById(id);
+  const card = document.getElementById('card_' + id);
+  const filled = ta.value.trim().length > 0;
+  card.classList.toggle('answered', filled);
+  updateProgress();
+}
+
+function updateProgress() {
+  let filled = 0;
+  QUESTIONS.forEach(q => {
+    const ta = document.getElementById(q.id);
+    if (ta && ta.value.trim().length > 0) filled++;
+  });
+  const pct = (filled / QUESTIONS.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = filled + ' of ' + QUESTIONS.length;
+  document.getElementById('p1badge').textContent = filled + '/' + QUESTIONS.length;
+}
+
+// ─── Character counter for Message 1 ───────────────────────────────────────
+function updateCharCount() {
+  const msg1 = document.getElementById('msg1');
+  const counter = document.getElementById('charCount');
+  const len = msg1.value.length;
+  counter.textContent = len + ' characters';
+  counter.className = 'char-counter';
+  if      (len === 0)          counter.classList.add('empty');
+  else if (len < 150)          counter.classList.add('under');
+  else if (len <= 250)         counter.classList.add('ok');
+  else                         counter.classList.add('over');
+}
+
+// ─── Score calculation ──────────────────────────────────────────────────────
+function calcScores() {
+  if (!trainerMode) return;
+
+  // Part 1 — written
+  let p1 = 0;
+  QUESTIONS.forEach(q => {
+    const el = document.getElementById('s_' + q.id);
+    const v = parseFloat(el?.value);
+    if (!isNaN(v)) p1 += Math.min(v, q.pts);
+  });
+  p1Total = p1;
+  document.getElementById('p1score').innerHTML = p1 + '<span> / 30</span>';
+  document.getElementById('fp1').textContent = p1;
+
+  calcRubric();
+}
+
+function calcRubric() {
+  if (!trainerMode) return;
+  let r = 0;
+  RUBRIC_CRITERIA.forEach(c => {
+    const el = document.getElementById('r_' + c.key);
+    const v = parseFloat(el?.value);
+    if (!isNaN(v)) r += Math.min(v, 5);
+  });
+  // Scale to 70 pts: rubric is out of 35, multiply by 2
+  p2Total = r * 2;
+  document.getElementById('rubricTotal').textContent = r;
+  document.getElementById('p2score').innerHTML = p2Total + '<span> / 70</span>';
+  document.getElementById('fp2').textContent = r + ' / 35 (×2 = ' + p2Total + ')';
+
+  const total = p1Total + p2Total;
+  document.getElementById('totalScore').innerHTML =
+    total + '<span style="font-size:13px;color:rgba(255,255,255,.5)"> / 100</span>';
+  document.getElementById('liveScore').textContent = total;
+
+  const passBadge = document.getElementById('passBadge');
+  const fpass = document.getElementById('fpass');
+  if (total >= 80) {
+    passBadge.textContent = '✓ PASS';
+    passBadge.className = 'pass-badge pass';
+    fpass.innerHTML = '<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700">✓ PASS</span>';
+  } else if (total > 0) {
+    passBadge.textContent = '✗ RETAKE';
+    passBadge.className = 'pass-badge fail';
+    fpass.innerHTML = '<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700">✗ RETAKE</span>';
+  } else {
+    passBadge.textContent = 'Pending';
+    passBadge.className = 'pass-badge pending';
+    fpass.innerHTML = '';
+  }
+  document.getElementById('ftotal').textContent = total;
+}
+
+// ─── Result modal ───────────────────────────────────────────────────────────
+function showResult() {
+  const total = p1Total + p2Total;
+  const modal = document.getElementById('resultModal');
+  const box   = document.getElementById('modalBox');
+  document.getElementById('modalScore').textContent = total + ' / 100';
+  if (total >= 80) {
+    document.getElementById('modalLabel').textContent = '✓ PASS';
+    document.getElementById('modalMsg').textContent =
+      'Congratulations! Score of ' + total + '/100 meets the passing threshold of 80.';
+    box.className = 'modal-box pass';
+  } else {
+    document.getElementById('modalLabel').textContent = '✗ RETAKE REQUIRED';
+    document.getElementById('modalMsg').textContent =
+      'Score of ' + total + '/100 is below the passing threshold of 80. Please review the content and retake.';
+    box.className = 'modal-box fail';
+  }
+  modal.classList.add('open');
+}
+function closeModal() {
+  document.getElementById('resultModal').classList.remove('open');
+}
+
+// ─── Persistence (localStorage) ────────────────────────────────────────────
+function saveState() {
+  const state = { agentName: val('agentName'), assessDate: val('assessDate'),
+                  trainerName: val('trainerName') };
+  QUESTIONS.forEach(q => {
+    state[q.id] = val(q.id);
+    const si = document.getElementById('s_' + q.id);
+    if (si) state['s_' + q.id] = si.value;
+  });
+  ['msg1','msg2','msg3','fu1angle','trainerFeedback'].forEach(id => {
+    state[id] = val(id);
+  });
+  RUBRIC_CRITERIA.forEach(c => {
+    const el = document.getElementById('r_' + c.key);
+    if (el) state['r_' + c.key] = el.value;
+  });
+  try { localStorage.setItem('tgs_assessment_d2m67', JSON.stringify(state)); } catch(e){}
+}
+
+function loadState() {
+  let state;
+  try { state = JSON.parse(localStorage.getItem('tgs_assessment_d2m67') || 'null'); } catch(e){}
+  if (!state) return;
+  setVal('agentName', state.agentName);
+  setVal('assessDate', state.assessDate);
+  setVal('trainerName', state.trainerName);
+  QUESTIONS.forEach(q => {
+    setVal(q.id, state[q.id]);
+    const si = document.getElementById('s_' + q.id);
+    if (si && state['s_' + q.id]) si.value = state['s_' + q.id];
+    if (state[q.id]) {
+      const card = document.getElementById('card_' + q.id);
+      if (card) card.classList.add('answered');
+    }
+  });
+  ['msg1','msg2','msg3','fu1angle','trainerFeedback'].forEach(id => setVal(id, state[id]));
+  RUBRIC_CRITERIA.forEach(c => {
+    const el = document.getElementById('r_' + c.key);
+    if (el && state['r_' + c.key]) el.value = state['r_' + c.key];
+  });
+  updateCharCount();
+  updateProgress();
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el && v) el.value = v;
+}
+
+function clearAll() {
+  if (!confirm('Clear all answers? This cannot be undone.')) return;
+  try { localStorage.removeItem('tgs_assessment_d2m67'); } catch(e){}
+  location.reload();
+}
+
+// Set today's date as default
+function setDefaultDate() {
+  const d = document.getElementById('assessDate');
+  if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildQuestions();
+  buildRubric();
+  buildAnswerKey();
+  setDefaultDate();
+  loadState();
+});
+</script>
+</body>
+</html>

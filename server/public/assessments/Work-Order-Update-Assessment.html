@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assessment — Updating Clients & Work Orders</title>
+<style>
+  :root{
+    --navy:#1F3A5F; --navy-dk:#16293F; --teal:#0E8A8A; --teal-dk:#0A6B6B;
+    --ink:#23303D; --muted:#5B6B7B; --card:#F2F6F8; --line:#DCE6EC;
+    --good:#0E8A8A; --good-bg:#E7F5F2; --bad:#C0463B; --bad-bg:#FBECEA; --white:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Calibri,Arial,sans-serif;
+    background:linear-gradient(160deg,#1F3A5F 0%,#16293F 100%);
+    color:var(--ink); min-height:100vh; padding:32px 16px;
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  .wrap{width:100%; max-width:760px;}
+  .card{
+    background:var(--white); border-radius:16px; overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.28);
+  }
+  header{ background:var(--navy); color:#fff; padding:30px 34px 26px; position:relative; }
+  header .kicker{ font-size:13px; letter-spacing:3px; font-weight:700; color:#9FD3D3; }
+  header h1{ font-family:Cambria,Georgia,serif; font-size:27px; font-weight:700; margin-top:8px; line-height:1.2;}
+  header p{ color:#B9C7D6; font-size:14.5px; margin-top:8px;}
+  .bar{ height:8px; background:#0E2235;}
+  .bar > div{ height:100%; width:0; background:linear-gradient(90deg,var(--teal),#2bb3b3); transition:width .35s ease;}
+  .body{ padding:30px 34px 34px; }
+
+  /* Start screen */
+  .meta{ display:flex; gap:14px; flex-wrap:wrap; margin:22px 0 26px;}
+  .pill{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; flex:1; min-width:150px;}
+  .pill b{ display:block; font-size:21px; color:var(--navy); font-family:Cambria,Georgia,serif;}
+  .pill span{ font-size:12.5px; color:var(--muted);}
+  ul.info{ list-style:none; margin:6px 0 26px;}
+  ul.info li{ padding:8px 0 8px 28px; position:relative; font-size:15px; color:var(--ink);}
+  ul.info li::before{ content:"✓"; position:absolute; left:0; top:7px; color:var(--teal); font-weight:700;}
+
+  .btn{
+    display:inline-block; border:none; cursor:pointer; font-size:16px; font-weight:700;
+    padding:14px 28px; border-radius:10px; transition:transform .05s, background .2s;
+    font-family:inherit;
+  }
+  .btn:active{ transform:translateY(1px);}
+  .btn-primary{ background:var(--teal); color:#fff;}
+  .btn-primary:hover{ background:var(--teal-dk);}
+  .btn-ghost{ background:var(--card); color:var(--navy); border:1px solid var(--line);}
+  .btn-ghost:hover{ background:#E7EEF2;}
+  .btn:disabled{ opacity:.45; cursor:not-allowed;}
+
+  /* Question */
+  .qnum{ font-size:12.5px; letter-spacing:2px; font-weight:700; color:var(--teal-dk); text-transform:uppercase;}
+  .qtext{ font-family:Cambria,Georgia,serif; font-size:21px; font-weight:700; color:var(--navy); margin:8px 0 20px; line-height:1.35;}
+  .opts{ display:flex; flex-direction:column; gap:11px;}
+  .opt{
+    text-align:left; background:#fff; border:2px solid var(--line); border-radius:11px;
+    padding:15px 17px; font-size:15.5px; cursor:pointer; color:var(--ink);
+    display:flex; align-items:center; gap:13px; transition:border-color .15s, background .15s;
+    font-family:inherit;
+  }
+  .opt:hover:not(.locked){ border-color:var(--teal); background:#F7FBFB;}
+  .opt .mk{
+    flex:0 0 26px; height:26px; border-radius:50%; border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--muted);
+  }
+  .opt.correct{ border-color:var(--good); background:var(--good-bg);}
+  .opt.correct .mk{ border-color:var(--good); background:var(--good); color:#fff;}
+  .opt.wrong{ border-color:var(--bad); background:var(--bad-bg);}
+  .opt.wrong .mk{ border-color:var(--bad); background:var(--bad); color:#fff;}
+  .opt.locked{ cursor:default;}
+  .opt.dim{ opacity:.6;}
+
+  .fb{ margin-top:18px; border-radius:11px; padding:15px 18px; font-size:14.5px; display:none; line-height:1.5;}
+  .fb.show{ display:block;}
+  .fb.ok{ background:var(--good-bg); border:1px solid #BFE5DE; color:#0A5A53;}
+  .fb.no{ background:var(--bad-bg); border:1px solid #F0CFCB; color:#8E322A;}
+  .fb b{ color:inherit;}
+
+  .nav{ display:flex; justify-content:space-between; align-items:center; margin-top:24px;}
+  .count{ font-size:13.5px; color:var(--muted);}
+
+  /* Results */
+  .scorewrap{ text-align:center; padding:8px 0 4px;}
+  .ring{ width:150px; height:150px; margin:0 auto 6px; position:relative;}
+  .ring svg{ transform:rotate(-90deg);}
+  .ring .pct{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .ring .pct b{ font-size:38px; font-family:Cambria,Georgia,serif; color:var(--navy); line-height:1;}
+  .ring .pct span{ font-size:12px; color:var(--muted); margin-top:3px;}
+  .verdict{ font-family:Cambria,Georgia,serif; font-size:24px; font-weight:700; margin:10px 0 4px;}
+  .verdict.pass{ color:var(--teal-dk);} .verdict.fail{ color:var(--bad);}
+  .vsub{ color:var(--muted); font-size:15px; margin-bottom:22px;}
+  .review{ text-align:left; margin-top:10px;}
+  .review h3{ font-family:Cambria,Georgia,serif; color:var(--navy); font-size:17px; margin:24px 0 12px;}
+  .ritem{ border:1px solid var(--line); border-radius:11px; padding:14px 16px; margin-bottom:11px; background:var(--card);}
+  .ritem .rq{ font-weight:700; color:var(--ink); font-size:14.5px; margin-bottom:7px;}
+  .ritem .ra{ font-size:13.5px; margin:3px 0; display:flex; gap:8px; align-items:flex-start;}
+  .ritem .ra .tag{ font-weight:700; flex:0 0 auto;}
+  .ra.yours .tag{ color:var(--bad);} .ra.right .tag{ color:var(--good-dk,#0A5A53);}
+  .ra.right .tag{ color:#0A5A53;}
+  .hide{ display:none;}
+  footer{ text-align:center; color:#8AA0B2; font-size:12px; margin-top:18px;}
+  @media (max-width:520px){ header,.body{padding-left:22px; padding-right:22px;} .qtext{font-size:19px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div class="kicker">OPERATIONS TRAINING · KNOWLEDGE CHECK</div>
+      <h1>Updating Clients &amp; Work Orders</h1>
+      <p>Through the Operations Email</p>
+    </header>
+    <div class="bar"><div id="prog"></div></div>
+    <div class="body" id="body"><!-- screens injected here --></div>
+  </div>
+  <footer>Complete the video before taking this assessment · Pass mark 80%</footer>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "You receive an update email from a tech. What is the very first thing you do with it?",
+    options: [
+      "Grab the work order number from the email",
+      "Reply to the tech to confirm you got it",
+      "Move the email straight to the JumpNotes folder",
+      "Call the client to tell them about the appointment"
+    ],
+    answer: 0,
+    explain: "Every update is tied to a work order number — that number is your anchor for finding the job in PPW and in the admin inbox."
+  },
+  {
+    q: "After you find the work order number, where do you search it first, and what do you click to confirm the appointment details?",
+    options: [
+      "The client portal → click “Job Notes”",
+      "PPW → open the work order → click “Job Notes”",
+      "The admin inbox → click “Move To”",
+      "PPW → click “General Info” → click “Send”"
+    ],
+    answer: 1,
+    explain: "Search the number in PPW, open the work order, and click Job Notes to confirm the appointment (in our example, 3–7 PM today) matches the tech's email."
+  },
+  {
+    q: "How do you get into the client's portal to schedule the appointment?",
+    options: [
+      "Open any recent email from the client and reply with the date",
+      "Search PPW and click a “Portal” button inside the work order",
+      "Search the work order number in the admin inbox, open the original (first) email, and click the link",
+      "Ask your Team Leader to send you the portal link each time"
+    ],
+    answer: 2,
+    explain: "In the admin inbox, search the work order number and open the very first email about the job — that original email contains the link that routes you into the client portal."
+  },
+  {
+    q: "In the example, what appointment window did the tech book — and where do those details come from?",
+    options: [
+      "9 AM to 12 PM, from the client portal",
+      "3 PM to 7 PM, from the tech's email",
+      "Whatever time the client portal suggests by default",
+      "3 PM to 7 PM, chosen by whoever updates the order"
+    ],
+    answer: 1,
+    explain: "The date and time window always come straight from the tech's email — here, 3 to 7 PM today, the 23rd. Always match these exactly."
+  },
+  {
+    q: "Inside this client portal, what do you click to begin scheduling the appointment?",
+    options: [
+      "“Schedule Appointment”",
+      "“General Info”",
+      "“Monthly Set Date”",
+      "“Tenant Contacted”"
+    ],
+    answer: 2,
+    explain: "Click “Monthly Set Date” to open the scheduling options, then select the date (the 23rd) and set the window from 3 PM to 7 PM before confirming."
+  },
+  {
+    q: "You've booked the appointment in the portal. What do you do before leaving the client side?",
+    options: [
+      "Nothing — booking the appointment is enough",
+      "Copy the schedule into a note, label it “Updated Client” with the date, then Send and Save",
+      "Delete the original email so it isn't processed twice",
+      "Change the PPW category first, then come back"
+    ],
+    answer: 1,
+    explain: "Leave a clear record: paste the schedule into the note, label it “Updated Client – June 23, 2026,” click Send, then save the record."
+  },
+  {
+    q: "Back in PPW under General Info, which category do you select now that the appointment is set?",
+    options: [
+      "Tenant Contacted Emergency",
+      "Scheduled Routine",
+      "Completed",
+      "Scheduled Emergency"
+    ],
+    answer: 3,
+    explain: "Setting the appointment makes it a scheduled work order, so you select “Scheduled Emergency” and set the date to the 23rd, then save."
+  },
+  {
+    q: "Why do you keep the word “Emergency” in the category instead of switching to a non-emergency status?",
+    options: [
+      "Because every work order in PPW is labeled Emergency",
+      "Because the job was created as a 12-hour Scheduled Emergency, so updates stay in that same category",
+      "Because Emergency orders are processed faster by the client",
+      "Because the tech marked it urgent in their email"
+    ],
+    answer: 1,
+    explain: "This came in as a 12-hour Scheduled Emergency. When you update it, you keep the same category — only the front status changes, from “Tenant Contacted” to “Scheduled.”"
+  },
+  {
+    q: "Both the portal and PPW are updated and matching. What is the final step?",
+    options: [
+      "Email the client a summary of the appointment",
+      "Leave the email in the inbox so others can see it",
+      "Go back to the original email and Move To → JumpNotes",
+      "Re-open the work order to double-check the category"
+    ],
+    answer: 2,
+    explain: "Filing the original email to JumpNotes signals the job is fully handled and keeps the inbox clean."
+  },
+  {
+    q: "What is the single most important principle behind this whole workflow?",
+    options: [
+      "The client portal is the only system that has to be correct",
+      "PPW updates automatically once the portal is set",
+      "The update must live in BOTH the client portal and PPW, and the details must match",
+      "Speed matters more than accuracy on emergency orders"
+    ],
+    answer: 2,
+    explain: "The update has to exist in both places — the client portal and PPW — with matching details. That's what keeps everyone on the same page."
+  }
+];
+
+const PASS = 0.8;
+const body = document.getElementById('body');
+const prog = document.getElementById('prog');
+let idx = 0, selected = null, locked = false;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+function setProgress(p){ prog.style.width = (p*100)+'%'; }
+
+function renderStart(){
+  setProgress(0);
+  body.innerHTML = `
+    <p style="font-size:15.5px;color:var(--muted);line-height:1.55">
+      This short check confirms you can take a tech's update and process it end-to-end —
+      from finding the work order to filing the email. Answer each question, get instant feedback,
+      and see your score at the end.
+    </p>
+    <div class="meta">
+      <div class="pill"><b>${QUESTIONS.length}</b><span>Questions</span></div>
+      <div class="pill"><b>80%</b><span>To pass</span></div>
+      <div class="pill"><b>~5 min</b><span>To complete</span></div>
+    </div>
+    <ul class="info">
+      <li>One question at a time, with an explanation after each answer</li>
+      <li>You can review every question at the end</li>
+      <li>Retake as many times as you like</li>
+    </ul>
+    <button class="btn btn-primary" id="startBtn">Start assessment</button>
+  `;
+  document.getElementById('startBtn').onclick = ()=>{ idx=0; answers.fill(null); renderQ(); };
+}
+
+function renderQ(){
+  selected = null; locked = false;
+  const item = QUESTIONS[idx];
+  setProgress(idx/QUESTIONS.length);
+  body.innerHTML = `
+    <div class="qnum">Question ${idx+1} of ${QUESTIONS.length}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <div class="nav">
+      <span class="count">${answeredCount()} answered</span>
+      <button class="btn btn-primary" id="nextBtn" disabled>Submit answer</button>
+    </div>
+  `;
+  const opts = document.getElementById('opts');
+  const letters = ['A','B','C','D','E'];
+  item.options.forEach((opt,i)=>{
+    const el = document.createElement('button');
+    el.className = 'opt';
+    el.innerHTML = `<span class="mk">${letters[i]}</span><span>${opt}</span>`;
+    el.onclick = ()=> chooseOption(i, el);
+    opts.appendChild(el);
+  });
+  document.getElementById('nextBtn').onclick = onNext;
+}
+
+function chooseOption(i, el){
+  if(locked) return;
+  selected = i;
+  document.querySelectorAll('.opt').forEach(o=>o.style.borderColor='');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.style.borderColor = 'var(--teal)';
+  const btn = document.getElementById('nextBtn');
+  btn.disabled = false;
+}
+
+function onNext(){
+  const item = QUESTIONS[idx];
+  if(!locked){
+    // lock & grade
+    if(selected===null) return;
+    locked = true;
+    answers[idx] = selected;
+    const opts = document.querySelectorAll('.opt');
+    opts.forEach((o,i)=>{
+      o.classList.add('locked');
+      if(i===item.answer) o.classList.add('correct');
+      else if(i===selected) o.classList.add('wrong');
+      else o.classList.add('dim');
+    });
+    const correct = selected===item.answer;
+    const fb = document.getElementById('fb');
+    fb.className = 'fb show ' + (correct?'ok':'no');
+    fb.innerHTML = (correct? '<b>Correct.</b> ' : '<b>Not quite.</b> ') + item.explain;
+    const btn = document.getElementById('nextBtn');
+    btn.textContent = (idx===QUESTIONS.length-1) ? 'See results' : 'Next question';
+    document.querySelector('.count').textContent = answeredCount()+' answered';
+  } else {
+    if(idx===QUESTIONS.length-1){ renderResults(); }
+    else { idx++; renderQ(); }
+  }
+}
+
+function answeredCount(){ return answers.filter(a=>a!==null).length; }
+function score(){ return answers.reduce((s,a,i)=> s + (a===QUESTIONS[i].answer?1:0), 0); }
+
+function renderResults(){
+  setProgress(1);
+  const sc = score(), total = QUESTIONS.length, pct = Math.round(sc/total*100);
+  const passed = sc/total >= PASS;
+  const r = 65, c = 2*Math.PI*r, off = c*(1-sc/total);
+  const ringColor = passed ? '#0E8A8A' : '#C0463B';
+  let reviewHTML = '';
+  QUESTIONS.forEach((item,i)=>{
+    const ok = answers[i]===item.answer;
+    if(ok) return;
+    reviewHTML += `
+      <div class="ritem">
+        <div class="rq">Q${i+1}. ${item.q}</div>
+        <div class="ra yours"><span class="tag">Your answer:</span><span>${answers[i]!==null?item.options[answers[i]]:'—'}</span></div>
+        <div class="ra right"><span class="tag">Correct:</span><span>${item.options[item.answer]}</span></div>
+        <div class="ra"><span style="color:var(--muted)">${item.explain}</span></div>
+      </div>`;
+  });
+  const reviewBlock = reviewHTML
+    ? `<div class="review"><h3>Review the ones to revisit</h3>${reviewHTML}</div>`
+    : `<div class="review"><h3>Perfect score — every answer correct.</h3></div>`;
+
+  body.innerHTML = `
+    <div class="scorewrap">
+      <div class="ring">
+        <svg width="150" height="150">
+          <circle cx="75" cy="75" r="${r}" stroke="#E6EDF1" stroke-width="13" fill="none"/>
+          <circle cx="75" cy="75" r="${r}" stroke="${ringColor}" stroke-width="13" fill="none"
+                  stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="pct"><b>${pct}%</b><span>${sc} / ${total} correct</span></div>
+      </div>
+      <div class="verdict ${passed?'pass':'fail'}">${passed?'Passed — nicely done!':'Not yet — give it another go'}</div>
+      <div class="vsub">${passed
+        ? 'You can confidently process a work-order update end-to-end.'
+        : 'Review the steps below, rewatch the video if you need to, and retake the check.'}</div>
+      <button class="btn btn-primary" id="retry">Retake assessment</button>
+    </div>
+    ${reviewBlock}
+  `;
+  document.getElementById('retry').onclick = renderStart;
+}
+
+renderStart();
+</script>
+</body>
+</html>

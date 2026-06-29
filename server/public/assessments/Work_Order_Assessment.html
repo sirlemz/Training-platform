@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Work Order Training — Assessment</title>
+<style>
+ :root{--navy:#1F3864;--blue:#2E5395;--amber:#E08A1E;--ink:#232A33;--grey:#5A6472;
+   --line:#D9E1EF;--lblue:#EAF0F8;--green:#2E7D32;--red:#C0392B;--bg:#F4F6FB;}
+ *{box-sizing:border-box}
+ body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+   color:var(--ink);background:var(--bg);line-height:1.5}
+ .wrap{max-width:820px;margin:0 auto;padding:0 18px 80px}
+ header{background:var(--navy);color:#fff;padding:30px 0 26px;margin-bottom:0}
+ header .wrap{padding-bottom:0}
+ h1{margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:.2px}
+ header p{margin:0;color:#CADAF2;font-size:14px}
+ .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+ .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+   color:#fff;font-size:12px;padding:4px 10px;border-radius:999px}
+ .bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);
+   padding:10px 0;box-shadow:0 2px 8px rgba(31,56,100,.06)}
+ .bar .wrap{display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0}
+ .track{flex:1;height:8px;background:var(--lblue);border-radius:999px;overflow:hidden}
+ .fill{height:100%;width:0;background:var(--amber);transition:width .25s}
+ .count{font-size:13px;color:var(--grey);white-space:nowrap}
+ .sec{margin:26px 0 6px;font-size:13px;font-weight:800;letter-spacing:.8px;color:var(--amber);text-transform:uppercase}
+ .sec small{display:block;color:var(--grey);font-weight:600;letter-spacing:0;text-transform:none;font-size:13px;margin-top:2px}
+ .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 18px 6px;
+   margin:14px 0;box-shadow:0 1px 3px rgba(31,56,100,.05)}
+ .qnum{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:4px}
+ .qtext{font-size:16px;font-weight:600;margin:0 0 12px}
+ .opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:10px;
+   padding:11px 13px;margin:8px 0;cursor:pointer;background:#fff;transition:.12s}
+ .opt:hover{border-color:var(--blue);background:#FAFCFF}
+ .opt input{margin-top:2px;accent-color:var(--blue);width:16px;height:16px;flex:none}
+ .opt.sel{border-color:var(--blue);background:var(--lblue)}
+ .opt.correct{border-color:var(--green);background:#EAF6EB}
+ .opt.wrong{border-color:var(--red);background:#FBECEA}
+ .fb{display:none;border-top:1px dashed var(--line);margin-top:8px;padding:10px 2px 12px;font-size:14px}
+ .fb.show{display:block}
+ .fb .tag{font-weight:800;font-size:12px;padding:2px 8px;border-radius:6px;margin-right:8px}
+ .fb.ok .tag{background:#EAF6EB;color:var(--green)} .fb.no .tag{background:#FBECEA;color:var(--red)}
+ .fb .why{color:var(--grey);margin-top:6px}
+ .hint{font-size:12px;color:var(--grey);margin:-4px 0 6px}
+ .actions{display:flex;gap:12px;margin:26px 0;flex-wrap:wrap}
+ button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 22px;cursor:pointer}
+ .primary{background:var(--amber);color:#fff}.primary:disabled{opacity:.5;cursor:not-allowed}
+ .ghost{background:#fff;border:1px solid var(--line);color:var(--navy)}
+ .result{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;margin:18px 0;text-align:center}
+ .result.show{display:block}
+ .score{font-size:54px;font-weight:800;line-height:1;margin:6px 0}
+ .verdict{display:inline-block;font-weight:800;padding:6px 16px;border-radius:999px;font-size:15px;margin-top:6px}
+ .pass{background:#EAF6EB;color:var(--green)} .fail{background:#FBECEA;color:var(--red)}
+ .result p{color:var(--grey);margin:12px 0 0}
+ .foot{color:var(--grey);font-size:12px;text-align:center;margin-top:30px}
+</style></head>
+<body>
+<header><div class="wrap">
+  <h1>Work Order Training — Knowledge Check</h1>
+  <p>Covers both modules: <b>Creating Accurate Work Orders</b> &amp; <b>Work Order Creation in PPW</b></p>
+  <div class="meta"><span class="pill">23 questions</span><span class="pill">Pass mark: 80%</span>
+  <span class="pill">Self-scoring</span></div>
+</div></header>
+<div class="bar"><div class="wrap">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="count" id="count">0 / 23 answered</div>
+</div></div>
+<div class="wrap">
+  <form id="quiz"></form>
+  <div class="actions">
+    <button class="primary" id="submit" disabled>Submit &amp; score</button>
+    <button class="ghost" id="reset" type="button">Reset</button>
+  </div>
+  <div class="result" id="result"></div>
+  <div class="foot">Answers reset when you reload the page. Discuss any missed items with your Team Leader.</div>
+</div>
+<script>
+const QUESTIONS = [{"v": 1, "type": "single", "q": "On the Contractor Vendor Contact Availability Sheet, what does <b>“Yes”</b> in the availability column mean?", "options": ["The contractor is available to accept work orders", "The contractor needs manager approval first", "The contractor is on a temporary hold", "The contractor has already been assigned"], "correct": 0, "why": "“Yes” means the contractor can accept work orders. “No” means do not assign and check the reason."}, {"v": 1, "type": "single", "q": "A contractor shows <b>“No.”</b> Which column tells you the reason?", "options": ["Column A", "Column H", "Column J", "The Comments tab"], "correct": 1, "why": "Column H explains the “No” — whether the contractor requested it or the company set it, and whether it’s temporary or long-term."}, {"v": 1, "type": "single", "q": "True or False: Column H can tell you whether a “No” status is temporary or long-term.", "options": ["True", "False"], "correct": 0, "why": "Correct — Column H indicates both who set the “No” and whether it’s temporary or long-term."}, {"v": 1, "type": "single", "q": "The NTE isn’t specified on the order. Which sheet do you check first?", "options": ["The NTE-1 sheet", "The 10% Holdback sheet", "Client Contacts &amp; Info", "The Client Categories Document"], "correct": 2, "why": "Check Client Contacts &amp; Info first: Row 2 shows each client’s NTE and Row 3 shows whether they have a holdback percentage."}, {"v": 1, "type": "single", "q": "A client <b>has</b> a holdback percentage. Which sheet do you use for their NTE?", "options": ["The standard NTE-1 sheet", "The 10% Holdback clients sheet", "The Client Categories Document", "The Contractor Availability Sheet"], "correct": 1, "why": "Clients with a holdback use the 10% Holdback sheet. No holdback → the standard NTE-1 sheet."}, {"v": 1, "type": "single", "q": "Which clients were given as examples of holdback clients?", "options": ["Tricode, Main Street, All Accounting", "Mine, Home River, Renter’s Warehouse", "MainStreet Renewal only", "Lesson and Tricode"], "correct": 1, "why": "Mine, Home River, and Renter’s Warehouse were the holdback examples. (All Accounting PM holds 3%.)"}, {"v": 1, "type": "single", "q": "The word <b>“High”</b> means different things by client. Match the example correctly:", "options": ["High = Critical for Tricode; High = Emergency for Main Street", "High = Emergency for Tricode; High = Critical for Main Street", "High = Critical for both", "High = Low priority for both"], "correct": 0, "why": "For Tricode, “High” means Critical; for Main Street, “High” means Emergency — always check the Client Categories Document."}, {"v": 1, "type": "single", "q": "True or False: You can assume a client’s priority labels mean the same as every other client’s.", "options": ["True", "False"], "correct": 1, "why": "False — never assume. Cross-reference the Client Categories Document every time, since the same word can mean different urgency levels."}, {"v": 1, "type": "single", "q": "A client writes: <i>“This isn’t the first time — they’ve done this before.”</i> What does this signal?", "options": ["A duplicate that should be deleted", "A possible warranty", "A high-priority emergency", "A holdback client"], "correct": 1, "why": "Wording like “not the first time” or “done before” signals a possible warranty — verify it before creating the order."}, {"v": 1, "type": "single", "q": "When searching an address in PPW to check for a warranty (Video 1), what should you search with?", "options": ["The full address including suffixes like “Circle” or “West”", "The street number and street name only (drop suffixes)", "The resident’s name", "The zip code only"], "correct": 1, "why": "Use just the street number and street name — extra words like “Circle” or “West” can hide matching prior orders."}, {"v": 1, "type": "multi", "q": "When creating a <b>possible-warranty</b> work order, which TWO things should you do? (Select all that apply)", "options": ["Set the Work Type to “Possible Warranty”", "Write “Possible Warranty” in the comment (add the prior WO # if known)", "Write “Bid Only” in the comment", "Skip saving until a manager approves"], "correct": [0, 1], "why": "Set Work Type to “Possible Warranty” and put “Possible Warranty” (plus the prior WO # if known) in the comment instead of “Bid Only” or “with an NTE,” then Save."}, {"v": 2, "type": "single", "q": "How many steps are in the PPW work order creation process?", "options": ["5", "8", "10", "12"], "correct": 2, "why": "It’s a 10-step process, in order, every time."}, {"v": 2, "type": "single", "q": "A standard work order (tech available, no calls, single item) should take about how long?", "options": ["~5 minutes", "10–15 minutes", "30+ minutes", "About an hour"], "correct": 0, "why": "~5 min = standard; 10–15 min = complex (multiple items/coordination); 30+ min = no tech available."}, {"v": 2, "type": "single", "q": "If no tech responds and the work order can’t be assigned, it is marked ___ and counted separately.", "options": ["Pending", "Rejected", "On Hold", "Escalated"], "correct": 1, "why": "An unassignable WO is marked Rejected and logged separately in your daily count."}, {"v": 2, "type": "single", "q": "True or False: MainStreet Renewal sends email notifications, so you can wait for those instead of checking the portal.", "options": ["True", "False"], "correct": 1, "why": "False — MainStreet Renewal no longer sends email notifications. Always check the client portal directly."}, {"v": 2, "type": "single", "q": "In Step 2 (Verify Service Coverage), the PPW Zip Lookup tool is nicknamed:", "options": ["“Zippo”", "“Zipper”", "“GeoFind”", "“MapIt”"], "correct": 0, "why": "It’s the Zip Lookup, nicknamed “Zippo.” Enter the zip (state not required), then select the Work Type category."}, {"v": 2, "type": "single", "q": "In Step 3, which column on the Contractor Sheet shows whether a contractor will ‘Accept Work’?", "options": ["Column A", "Column H", "Column J", "Column C"], "correct": 0, "why": "Column A shows ‘Accept Work’ (Yes = available, No = skip). Then read the Comments before assigning."}, {"v": 2, "type": "single", "q": "True or False: A contractor marked “Yes” is always the right fit, so you can assign without reading the comments.", "options": ["True", "False"], "correct": 1, "why": "False — “Yes” doesn’t mean the right fit. Always read comments for time-of-day limits, blackout dates, and job-type exclusions."}, {"v": 2, "type": "single", "q": "A property had a prior work order, but for a <b>different</b> issue than today’s request. What do you do?", "options": ["Tag it as a possible warranty", "Create a new work order", "Reject it as a duplicate", "Mark it on hold"], "correct": 1, "why": "Warranty is issue-based, not address-based. Same property + different issue → create a new WO. Only the same issue is a possible warranty."}, {"v": 2, "type": "single", "q": "In Step 6, what should the <b>Client Due Date</b> be set to?", "options": ["One day before the Due Date", "The same as the Due Date", "Always today", "The Receive Date"], "correct": 1, "why": "Client Due Date always mirrors the Due Date. (For Low priority, the Due Date is the receive date + 4 days, including the receive date.)"}, {"v": 2, "type": "single", "q": "In Step 8 (Log the Internal Job Note), what must you do before saving?", "options": ["Tick the Contractor visibility box", "Untick the Contractor visibility box", "Email the note to the contractor", "Mark the note as Bid Only only"], "correct": 1, "why": "Untick Contractor visibility — the job note is internal and the contractor should never see it."}, {"v": 2, "type": "single", "q": "In Step 9, where do you find the correct courtesy-SMS template for the assigned contractor?", "options": ["Column A of the Contractor Sheet", "Column J of the Contractor Sheet", "The PPW Comments field", "The client portal Feed"], "correct": 1, "why": "Each contractor has their own text template in Column J. Use the one specific to the assigned contractor, sent via RingCentral."}, {"v": 2, "type": "single", "q": "True or False: In Step 10, if no photos are available you cannot save the work order.", "options": ["True", "False"], "correct": 1, "why": "False — photos aren’t required to save. If none are available, proceed. (They do help techs assess scope before arrival.)"}];
+const PASS = 0.8;
+const form = document.getElementById('quiz');
+const answers = {};
+let graded = false;
+
+const secTitles = {1:["Module 1 — Creating Accurate Work Orders","The 5 accuracy checks"],
+                   2:["Module 2 — Work Order Creation in PPW","The 10-step process"]};
+let lastV = null, qn = 0;
+
+QUESTIONS.forEach((q, i) => {
+  if(q.v !== lastV){ lastV = q.v;
+    const s = document.createElement('div'); s.className='sec';
+    s.innerHTML = secTitles[q.v][0] + '<small>'+secTitles[q.v][1]+'</small>';
+    form.appendChild(s);
+  }
+  qn++;
+  const card = document.createElement('div'); card.className='card'; card.id='card'+i;
+  const multi = q.type === 'multi';
+  let html = '<div class="qnum">Question '+qn+'</div><p class="qtext">'+q.q+'</p>';
+  if(multi) html += '<div class="hint">Select all that apply.</div>';
+  card.innerHTML = html;
+  q.options.forEach((opt, j) => {
+    const lab = document.createElement('label'); lab.className='opt'; lab.dataset.q=i; lab.dataset.o=j;
+    lab.innerHTML = '<input type="'+(multi?'checkbox':'radio')+'" name="q'+i+'" value="'+j+'">'+
+                    '<span>'+opt+'</span>';
+    lab.querySelector('input').addEventListener('change', ()=>onChange(i, j, multi));
+    card.appendChild(lab);
+  });
+  const fb = document.createElement('div'); fb.className='fb'; fb.id='fb'+i;
+  card.appendChild(fb);
+  form.appendChild(card);
+});
+
+function onChange(i, j, multi){
+  if(graded) return;
+  if(multi){
+    const set = new Set(answers[i]||[]);
+    set.has(j) ? set.delete(j) : set.add(j);
+    answers[i] = [...set];
+    if(answers[i].length===0) delete answers[i];
+  } else {
+    answers[i] = j;
+  }
+  // visual selection
+  document.querySelectorAll('#card'+i+' .opt').forEach(o=>{
+    const oj = +o.dataset.o;
+    const on = multi ? (answers[i]||[]).includes(oj) : answers[i]===oj;
+    o.classList.toggle('sel', !!on);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const done = Object.keys(answers).length, n = QUESTIONS.length;
+  document.getElementById('fill').style.width = (done/n*100)+'%';
+  document.getElementById('count').textContent = done+' / '+n+' answered';
+  document.getElementById('submit').disabled = done < n;
+}
+
+function eq(a,b){ a=[...a].sort(); b=[...b].sort(); return a.length===b.length && a.every((v,k)=>v===b[k]); }
+
+document.getElementById('submit').addEventListener('click', e=>{
+  e.preventDefault(); if(graded) return; graded = true;
+  let correct = 0;
+  QUESTIONS.forEach((q,i)=>{
+    const multi = q.type==='multi';
+    const ans = answers[i];
+    const isRight = multi ? eq(ans||[], q.correct) : ans===q.correct;
+    if(isRight) correct++;
+    const corr = multi ? q.correct : [q.correct];
+    const chosen = multi ? (ans||[]) : [ans];
+    document.querySelectorAll('#card'+i+' .opt').forEach(o=>{
+      const oj=+o.dataset.o;
+      o.classList.remove('sel');
+      o.style.cursor='default';
+      if(corr.includes(oj)) o.classList.add('correct');
+      else if(chosen.includes(oj)) o.classList.add('wrong');
+      o.querySelector('input').disabled=true;
+    });
+    const fb = document.getElementById('fb'+i); fb.classList.add('show', isRight?'ok':'no');
+    fb.innerHTML = '<span class="tag">'+(isRight?'Correct':'Review')+'</span>'+
+                   '<span>'+(isRight?'Nice work.':'Not quite.')+'</span>'+
+                   '<div class="why">'+q.why+'</div>';
+  });
+  const n = QUESTIONS.length, pct = Math.round(correct/n*100), pass = correct/n >= PASS;
+  const r = document.getElementById('result'); r.classList.add('show');
+  r.innerHTML = '<div class="verdict '+(pass?'pass':'fail')+'">'+(pass?'PASS':'NOT YET')+'</div>'+
+    '<div class="score">'+pct+'%</div>'+
+    '<div><b>'+correct+' of '+n+'</b> correct &middot; pass mark 80%</div>'+
+    '<p>'+(pass?'Great job — you can apply both workflows confidently. Review any flagged items above for the finer points.'
+        :'You\'re close. Scroll up to review the explanations on the flagged questions, then retake.')+'</p>';
+  document.getElementById('submit').disabled = true;
+  r.scrollIntoView({behavior:'smooth'});
+});
+
+document.getElementById('reset').addEventListener('click', ()=>location.reload());
+updateProgress();
+</script>
+</body></html>
